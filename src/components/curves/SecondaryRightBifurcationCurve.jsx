@@ -1,0 +1,27 @@
+import React, { useMemo } from 'react'
+import { Line } from '@react-three/drei'
+import { buildSecondaryRightBifurcationSegments } from '../../entities/bifurcation'
+import { waveColors } from '../../config/waveColors'
+
+export default function SecondaryRightBifurcationCurve({ params, view, resolution = 40, visible = true }) {
+  const segments = useMemo(
+    () => visible ? buildSecondaryRightBifurcationSegments(params, view, Math.max(220, Math.min(520, resolution * 6))) : [],
+    [params, view, resolution, visible],
+  )
+
+  if (!visible || segments.length === 0) return null
+
+  return (
+    <group>
+      {segments.map((points, idx) => (
+        <Line
+          key={`secondary-right-bifurcation-${idx}`}
+          points={points}
+          color={waveColors.bifurcationRight ?? '#7c3aed'}
+          lineWidth={1.35}
+          renderOrder={7}
+        />
+      ))}
+    </group>
+  )
+}

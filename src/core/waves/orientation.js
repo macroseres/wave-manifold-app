@@ -1,0 +1,2 @@
+// Compatibility facade. Domain implementation lives in entities/waves/.
+export * from '../../entities/waves/orientation.js'

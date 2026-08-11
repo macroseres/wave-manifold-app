@@ -1,0 +1,6 @@
+cff-version: 1.2.0
+title: Wave Manifold App
+message: "If you use this software, please cite this repository."
+authors:
+  - family-names: Lopez
+    given-names: Edwin
