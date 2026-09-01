@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { DRAG_PLANE, TMP_WORLD } from './constants.js'
 import { clampCharacteristicPoint } from './coordinates.js'
+import { physicalPointToVisual, visualZToPhysical } from '../../../geometry/zCompactification.js'
 
 function pointRayDistance(worldPoint, ray) {
   const v = worldPoint.clone().sub(ray.origin)
@@ -14,7 +15,7 @@ export function localFromPlaneEvent(event, root, branch, view) {
   const world = new THREE.Vector3()
   if (!event.ray.intersectPlane(DRAG_PLANE, world)) return null
   const local = root.worldToLocal(world.clone())
-  return clampCharacteristicPoint({ branch, t: local.x, Y: 0, z: local.z }, view)
+  return clampCharacteristicPoint({ branch, t: local.x, Y: 0, z: visualZToPhysical(local.z) }, view)
 }
 
 function snapPriority(curve) {
@@ -27,7 +28,7 @@ export function nearestCurvePointFromRay({ event, root, curveSamples, branch }) 
   let best = null
   let bestScore = Infinity
   for (const sample of curveSamples) {
-    const local = new THREE.Vector3(sample.coords[0], sample.coords[1], sample.coords[2])
+    const local = new THREE.Vector3(...physicalPointToVisual(sample.coords))
     const world = root.localToWorld(local.clone())
     const d = pointRayDistance(world, event.ray)
     const score = d * snapPriority(sample.curve)

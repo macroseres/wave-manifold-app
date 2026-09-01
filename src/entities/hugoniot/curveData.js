@@ -3,13 +3,14 @@ import { buildHugoniotBifoliation, selectLeafFromBifoliation } from '../waves/in
 import { waveColors } from '../../config/waveColors.js'
 import { HUGONIOT } from '../../config/numerics.js'
 
-export function buildHugoniotCurveData(fixedState, params, view, samples = 500, direction = FORWARD_HUGONIOT) {
+export function buildHugoniotCurveData(fixedState, params, view, samples = 500, direction = FORWARD_HUGONIOT, { compactifiedZ = false } = {}) {
   const bifoliation = buildHugoniotBifoliation({
     fixedState,
     params,
     view,
     samples,
     zExtensionMargin: HUGONIOT.Z_EXTENSION_MARGIN,
+    compactifiedZ,
   })
   const branch = normalizeHugoniotDirection(direction) === BACKWARD_HUGONIOT ? 'plus' : 'minus'
   const leaf = selectLeafFromBifoliation(bifoliation, branch)

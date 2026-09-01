@@ -9,6 +9,7 @@ import {
   waveColors,
 } from '../../entities/surfaceImplicit'
 import { HUGONIOT } from '../../config/numerics'
+import { ZCompactifiedMesh } from '../../app/scene/ZCompactification'
 
 function finite(value) {
   return Number.isFinite(value)
@@ -172,7 +173,7 @@ export default function IntermediateSlowSurface({
   return (
     <group>
       {geometries.map((geometry, index) => (
-        <mesh key={`intermediate-slow-surface-${index}`} geometry={geometry} renderOrder={4}>
+        <ZCompactifiedMesh key={`intermediate-slow-surface-${index}`} geometry={geometry} renderOrder={4}>
           <meshStandardMaterial
             color={color}
             transparent
@@ -182,7 +183,7 @@ export default function IntermediateSlowSurface({
             roughness={0.55}
             metalness={0.05}
           />
-        </mesh>
+        </ZCompactifiedMesh>
       ))}
     </group>
   )

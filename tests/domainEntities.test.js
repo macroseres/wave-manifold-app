@@ -5,6 +5,8 @@ import { buildRarefactionArcSegments } from '../src/entities/rarefaction/arcSegm
 import { buildLeftHysteresisCurve, buildRightHysteresisCurve } from '../src/entities/hysteresis/curveSegments.js'
 import { buildCoincidenceCurveSegments } from '../src/entities/coincidence/curveSegments.js'
 import { buildSecondaryRightBifurcationSegments } from '../src/entities/bifurcation/segments.js'
+import { solveInflectionSegments } from '../src/entities/surfaceImplicit/specialSegments.js'
+import { physicalZToVisual } from '../src/geometry/zCompactification.js'
 
 const params = { a: 0, b1: 8, b2: 0.2, c: 1 }
 const view = { tMin: -2, tMax: 2, yMin: -2, yMax: 2, zMin: -2, zMax: 2 }
@@ -16,6 +18,13 @@ test('characteristic entity builds finite plane geometry and branch colors', () 
   assert.equal(position.count, 4)
   assert.equal(typeof characteristicMarkerColor({ t: -0.3, branch: 'fast' }), 'string')
   geometry.dispose()
+})
+
+test('compactified inflection drawing reaches both visual z boundaries', () => {
+  const slow = solveInflectionSegments(params, view, 580, 'slow', { compactifiedZ: true }).flat()
+  const fast = solveInflectionSegments(params, view, 580, 'fast', { compactifiedZ: true }).flat()
+  assert.ok(Math.max(...slow.map((point) => physicalZToVisual(point[2]))) > 0.999)
+  assert.ok(Math.min(...fast.map((point) => physicalZToVisual(point[2]))) < -0.999)
 })
 
 test('rarefaction entity returns oriented arc segments with decorated points', () => {

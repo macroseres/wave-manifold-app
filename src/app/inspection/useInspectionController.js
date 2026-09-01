@@ -119,6 +119,21 @@ export function useInspectionController({
     }))
   }, [decoratePoint, decorateProbe, inspectionModeEnabled, params, setActiveBranch, setInspectedCurvePoint, setInspectionProbesByBranch])
 
+  const moveInspectionProbe = useCallback((branch, point) => {
+    if (!branch || !point) return
+    setInspectionProbesByBranch((previous) => {
+      const current = previous?.[branch]
+      if (!current) return previous
+      const moved = decorateProbe({
+        ...current,
+        ...point,
+        branch,
+        Y: Number.isFinite(point.Y) ? point.Y : current.Y ?? 0,
+      })
+      return { ...previous, [branch]: moved }
+    })
+  }, [decorateProbe, setInspectionProbesByBranch])
+
   const scenePointerMove = useCallback((event, hoveredInspectionPoint) => {
     if (!hoveredInspectionPoint) return
 
@@ -152,6 +167,7 @@ export function useInspectionController({
     inspectCurvePoint,
     hoverInspectionPoint,
     createInspectionProbe,
+    moveInspectionProbe,
     scenePointerMove,
     scenePointerLeave,
   }

@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import * as THREE from 'three'
-import { Line } from '@react-three/drei'
+import { ZCompactifiedLine as Line } from '../../../app/scene/ZCompactification'
 import { HOVER_RING_RADIUS, HOVER_RING_TUBE, MARKER_HOVER_RING_COLOR, POINT_RADIUS } from './constants.js'
 import { coordsOf, hoverColor } from './coordinates.js'
+import { physicalPointToVisual } from '../../../geometry/zCompactification.js'
 
 export function drawSegments(segments, color, keyPrefix, lineWidth = 1.35, dashed = false) {
   return (segments ?? []).map((segment, index) => {
@@ -28,7 +29,7 @@ function InspectionIntersectionMarker({ marker, coords, color, markerScale, onHo
 
   return (
     <group
-      position={coords}
+      position={physicalPointToVisual(coords)}
       scale={markerScale}
       renderOrder={24}
       onPointerOver={(event) => {

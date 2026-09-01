@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react'
 import * as THREE from 'three'
 import { FORWARD_HUGONIOT, BACKWARD_HUGONIOT, normalizeHugoniotDirection } from '../../entities/hugoniot/directions'
-import { Line } from '@react-three/drei'
+import { ZCompactifiedLine as Line } from '../../app/scene/ZCompactification'
+import { physicalPointToVisual } from '../../geometry/zCompactification'
 
 import { buildHugoniotCurveData, flattenVisibleHugoniotIntersections } from '../../entities/hugoniot/curveData'
 
@@ -11,7 +12,7 @@ function PointMarker({ point, radius, color, markerScale, onInspectPoint, onHove
   const [hovered, setHovered] = React.useState(false)
   return (
     <mesh
-      position={[point.t, point.Y, point.z]}
+      position={physicalPointToVisual([point.t, point.Y, point.z])}
       scale={markerScale}
       onPointerDown={interactive ? ((event) => {
         const button = event.nativeEvent?.button ?? event.button
@@ -77,12 +78,13 @@ function HugoniotCurve({
   direction = FORWARD_HUGONIOT,
   color = null,
   interactive = true,
+  compactifiedZ = false,
 }) {
   const { segments, markers } = useMemo(() => {
     if (!visible || !fixedState) return { segments: [], markers: [] }
     const samples = Math.max(260, Math.min(560, resolution * 7))
-    return buildHugoniotCurveData(fixedState, params, view, samples, direction)
-  }, [fixedState, params, view, resolution, direction, visible])
+    return buildHugoniotCurveData(fixedState, params, view, samples, direction, { compactifiedZ })
+  }, [fixedState, params, view, resolution, direction, visible, compactifiedZ])
 
   const visibleIntersections = useMemo(() => {
     return flattenVisibleHugoniotIntersections(intersectionGroups)

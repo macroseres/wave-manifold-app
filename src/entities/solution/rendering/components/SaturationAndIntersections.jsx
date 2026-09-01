@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
-import { Html, Line } from '@react-three/drei'
+import { Html } from '@react-three/drei'
+import { ZCompactifiedLine as Line } from '../../../../app/scene/ZCompactification'
 import MathLabel from '../../../../components/panel/MathLabel.jsx'
 import { solutionColors } from '../solutionColors.js'
 import HoverableSolutionPoint from './HoverableSolutionPoint.jsx'
@@ -258,4 +259,3 @@ export function FastReflectionSlowSaturationIntersectionPoint({
     </group>
   )
 }
-

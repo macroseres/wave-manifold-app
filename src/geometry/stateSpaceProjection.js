@@ -1,6 +1,13 @@
 import { solveInflectionSegments } from '../entities/inflection/index.js'
 import { solveRightHysteresisPoint } from '../entities/hysteresis/index.js'
 import { projectPointMinus, projectPointPlus } from '../entities/geometry/stateProjections.js'
+import { hugoniotMinusImplicit } from './hugoniotStateImplicit.js'
+import { coincidenceStateImplicit } from './coincidenceStateImplicit.js'
+import { visualZToPhysical } from './zCompactification.js'
+
+const CHARACTERISTIC_Z_HAT_MARGIN = 1e-4
+
+export { hugoniotMinusImplicit } from './hugoniotStateImplicit.js'
 
 export function inflectionImplicitJ(u, v, params) {
   const b1 = params?.b1
@@ -43,8 +50,8 @@ export function interpolateImplicitState(a, b) {
   }
 }
 
-export function buildImplicitInflectionStateSegments(bounds, params, resolution = 180) {
-  if (!bounds || !params) return []
+function buildImplicitStateSegments(bounds, resolution, evaluate) {
+  if (!bounds || typeof evaluate !== 'function') return []
   const { uMin, uMax, vMin, vMax } = bounds
   if (![uMin, uMax, vMin, vMax].every(Number.isFinite) || uMax <= uMin || vMax <= vMin) return []
 
@@ -54,7 +61,7 @@ export function buildImplicitInflectionStateSegments(bounds, params, resolution 
     const u = uMin + i * du
     return Array.from({ length: resolution + 1 }, (_, j) => {
       const v = vMin + j * dv
-      return { u, v, value: inflectionImplicitJ(u, v, params) }
+      return { u, v, value: evaluate(u, v) }
     })
   })
 
@@ -87,6 +94,25 @@ export function buildImplicitInflectionStateSegments(bounds, params, resolution 
     }
   }
   return segments
+}
+
+export function buildImplicitInflectionStateSegments(bounds, params, resolution = 180) {
+  if (!params) return []
+  return buildImplicitStateSegments(bounds, resolution, (u, v) => inflectionImplicitJ(u, v, params))
+}
+
+export function buildImplicitCoincidenceStateSegments(bounds, params, resolution = 220) {
+  if (!params) return []
+  return buildImplicitStateSegments(bounds, resolution, (u, v) => coincidenceStateImplicit(u, v, params))
+}
+
+export function buildImplicitHugoniotMinusStateSegments(bounds, fixedLeftState, params, resolution = 220) {
+  if (!fixedLeftState || !params) return []
+  return buildImplicitStateSegments(
+    bounds,
+    resolution,
+    (u, v) => hugoniotMinusImplicit(u, v, fixedLeftState, params),
+  )
 }
 
 export function buildCharacteristicProjectionSamples(view, params, branch, samplesT = 181, samplesZ = 181) {
@@ -256,10 +282,33 @@ export function buildHysPlusProjectionSegments(view, params, side = 'minus', bou
 }
 
 export function branchCharacteristicWindow(view, branch) {
-  const zeroTauGap = Math.max(1e-5, 0.001 * Math.max(1, view.tMax - view.tMin))
-  const tMin = branch === 'fast' ? view.tMin : Math.max(zeroTauGap, view.tMin)
-  const tMax = branch === 'fast' ? Math.min(-zeroTauGap, view.tMax) : view.tMax
-  return { tMin, tMax, zMin: view.zMin, zMax: view.zMax, valid: tMax > tMin && view.zMax > view.zMin }
+  // A coincidência tau=0 pertence ao fecho dos dois ramos e é a fronteira
+  // comum exata entre eles. Não abrimos mais um intervalo artificial em zero.
+  const tMin = branch === 'fast' ? view.tMin : Math.max(0, view.tMin)
+  const tMax = branch === 'fast' ? Math.min(0, view.tMax) : view.tMax
+  return {
+    tMin,
+    tMax,
+    zMin: view.zMin,
+    zMax: view.zMax,
+    zHatMin: -1,
+    zHatMax: 1,
+    valid: tMax > tMin && view.zMax > view.zMin,
+  }
+}
+
+// A fronteira compactificada inclui z-hat = +/-1, que corresponde a z infinito.
+// Para avaliá-la numericamente usamos pontos imediatamente interiores, mas o
+// parâmetro continua percorrendo uniformemente todo o intervalo [-1, 1].
+export function characteristicBoundaryZAtFraction(window, fraction) {
+  const a = clamp(fraction, 0, 1)
+  const zHat = window.zHatMin + a * (window.zHatMax - window.zHatMin)
+  const safeZHat = clamp(
+    zHat,
+    window.zHatMin + CHARACTERISTIC_Z_HAT_MARGIN,
+    window.zHatMax - CHARACTERISTIC_Z_HAT_MARGIN,
+  )
+  return visualZToPhysical(safeZHat)
 }
 
 export function stateFromScreenPoint(pointer, bounds) {
@@ -282,13 +331,13 @@ export function projectedStateForTZ(t, z, params, branch) {
     : null
 }
 
-export function refineCharacteristicProjectionFromState(target, view, params, branch) {
+export function refineCharacteristicProjectionFromState(target, view, params, branch, metricBounds = null) {
   const win = branchCharacteristicWindow(view, branch)
   if (!win.valid || !target) return null
 
   const { b1, b2 } = params
-  const uScale = Math.max(1e-9, Math.abs(target.u), Math.abs(win.zMax - win.zMin))
-  const vScale = Math.max(1e-9, Math.abs(target.v), Math.abs(win.zMax - win.zMin))
+  const uScale = Math.max(1e-9, metricBounds?.uMax - metricBounds?.uMin || 0, Math.abs(target.u), 1)
+  const vScale = Math.max(1e-9, metricBounds?.vMax - metricBounds?.vMin || 0, Math.abs(target.v), 1)
 
   const tFromZ = (z) => {
     const eq = projectPointMinus({ t: 0, Y: 0, z, branch }, params)
@@ -305,34 +354,59 @@ export function refineCharacteristicProjectionFromState(target, view, params, br
     return clamp(t, win.tMin, win.tMax)
   }
 
-  const scoreAtZ = (z) => {
+  const scoreAtZHat = (zHat) => {
+    const z = visualZToPhysical(clamp(
+      zHat,
+      win.zHatMin + CHARACTERISTIC_Z_HAT_MARGIN,
+      win.zHatMax - CHARACTERISTIC_Z_HAT_MARGIN,
+    ))
     const t = tFromZ(z)
     const projected = projectedStateForTZ(t, z, params, branch)
-    if (!projected) return { score: Number.POSITIVE_INFINITY, t, z, projected: null }
+    if (!projected) return { score: Number.POSITIVE_INFINITY, t, z, zHat, projected: null }
     const du = (projected.state.u - target.u) / uScale
     const dv = (projected.state.v - target.v) / vScale
-    return { score: du * du + dv * dv, t, z, projected }
+    return { score: du * du + dv * dv, t, z, zHat, projected }
   }
 
-  let best = null
-  const coarse = 80
+  // O desenho da fronteira usa z-hat em [-1, 1]; o arrasto deve procurar no
+  // mesmo domínio. Procurar linearmente em z físico deixava inacessíveis as
+  // regiões visualmente presentes fora dos antigos zMin/zMax.
+  const coarse = 240
+  const coarseCandidates = []
   for (let i = 0; i <= coarse; i += 1) {
-    const z = win.zMin + (i / coarse) * (win.zMax - win.zMin)
-    const candidate = scoreAtZ(z)
-    if (!best || candidate.score < best.score) best = candidate
+    const zHat = win.zHatMin + (i / coarse) * (win.zHatMax - win.zHatMin)
+    coarseCandidates.push(scoreAtZHat(zHat))
   }
 
-  let left = Math.max(win.zMin, best.z - (win.zMax - win.zMin) / coarse)
-  let right = Math.min(win.zMax, best.z + (win.zMax - win.zMin) / coarse)
-  for (let k = 0; k < 28; k += 1) {
-    const m1 = left + (right - left) / 3
-    const m2 = right - (right - left) / 3
-    if (scoreAtZ(m1).score <= scoreAtZ(m2).score) right = m2
-    else left = m1
+  let best = coarseCandidates.reduce((current, candidate) => (
+    !current || candidate.score < current.score ? candidate : current
+  ), null)
+  const localMinima = coarseCandidates
+    .map((candidate, index) => ({ candidate, index }))
+    .filter(({ candidate, index }) => (
+      index === 0
+      || index === coarse
+      || (candidate.score <= coarseCandidates[index - 1].score
+        && candidate.score <= coarseCandidates[index + 1].score)
+    ))
+    .sort((a, b) => a.candidate.score - b.candidate.score)
+    .slice(0, 8)
+
+  const zHatStep = (win.zHatMax - win.zHatMin) / coarse
+  for (const { candidate } of localMinima) {
+    let left = Math.max(win.zHatMin, candidate.zHat - zHatStep)
+    let right = Math.min(win.zHatMax, candidate.zHat + zHatStep)
+    for (let k = 0; k < 30; k += 1) {
+      const m1 = left + (right - left) / 3
+      const m2 = right - (right - left) / 3
+      if (scoreAtZHat(m1).score <= scoreAtZHat(m2).score) right = m2
+      else left = m1
+    }
+    const refined = scoreAtZHat((left + right) / 2)
+    if (!best || refined.score < best.score) best = refined
   }
 
-  const refined = scoreAtZ((left + right) / 2)
-  return refined.projected ? refined.projected : best?.projected
+  return best?.projected ?? null
 }
 
 export function projectionBounds(samples = []) {

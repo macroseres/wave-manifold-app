@@ -71,8 +71,8 @@ function snapAndSelectClickedRarefactionComponent(segments, fixedState, view) {
   return snapped.length >= 2 ? [snapped] : []
 }
 
-function buildRarefactionSegments(fixedState, params, view, samples = 900, constrainZ = false, direction = undefined) {
-  const bifoliation = buildRarefactionBifoliation({ fixedState, params, view, samples, constrainZ })
+function buildRarefactionSegments(fixedState, params, view, samples = 900, constrainZ = false, direction = undefined, compactifiedZ = false) {
+  const bifoliation = buildRarefactionBifoliation({ fixedState, params, view, samples, constrainZ, compactifiedZ })
   const branch = normalizeHugoniotDirection(direction) === BACKWARD_HUGONIOT ? 'plus' : 'minus'
   const leaf = selectLeafFromBifoliation(bifoliation, branch)
 
@@ -84,7 +84,7 @@ function buildRarefactionSegments(fixedState, params, view, samples = 900, const
     const z = point?.z ?? point?.coords?.[2]
     // A rarefação deve ser limitada apenas no eixo z.
     // O eixo tau não é usado como critério de corte.
-    return Number.isFinite(t) && Number.isFinite(z) && z >= drawView.zMin && z <= drawView.zMax
+    return Number.isFinite(t) && Number.isFinite(z) && (compactifiedZ || (z >= drawView.zMin && z <= drawView.zMax))
   }
 
   const clipped = []
@@ -102,7 +102,7 @@ function buildRarefactionSegments(fixedState, params, view, samples = 900, const
   return snapAndSelectClickedRarefactionComponent(clipped, fixedState, drawView)
 }
 
-export function buildRarefactionSegmentsData({ fixedState, params, view, resolution = 40, constrainZ = false, direction = undefined }) {
+export function buildRarefactionSegmentsData({ fixedState, params, view, resolution = 40, constrainZ = false, direction = undefined, compactifiedZ = false }) {
   const samples = Math.max(900, Math.min(1800, resolution * 24))
-  return buildRarefactionSegments(fixedState, params, view, samples, constrainZ, direction)
+  return buildRarefactionSegments(fixedState, params, view, samples, constrainZ, direction, compactifiedZ)
 }

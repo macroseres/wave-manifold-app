@@ -21,6 +21,7 @@ export const waveColors = {
   hysteresisLeft: '#64748b',
   hysteresisRight: '#111827',
   coincidence: '#000000',
+  coincidenceState: '#f8fafc',
   saturatedCoincidence: '#ff00ff',
   bifurcationRight: '#7c3aed',
   inflection: '#c0c0c0',

@@ -11,6 +11,13 @@ import {
   characteristicMarkerColor as markerColorForPoint,
   makeCharacteristicPlaneGeometry as makeCharacteristicPlane,
 } from '../../entities/characteristic'
+import {
+  VISUAL_Z_MAX,
+  VISUAL_Z_MIN,
+  physicalPointToVisual,
+  physicalZToVisual,
+  visualZToPhysical,
+} from '../../geometry/zCompactification'
 
 function CharacteristicSurface({
   view,
@@ -30,11 +37,11 @@ function CharacteristicSurface({
 }) {
   const zeroTauGap = Math.max(1e-5, ZERO_TAU_GAP_FACTOR * Math.max(1, view.tMax - view.tMin))
   const fastGeometry = useMemo(() => (
-    makeCharacteristicPlane(view.tMin, Math.min(-zeroTauGap, view.tMax), view.zMin, view.zMax)
-  ), [view, zeroTauGap])
+    makeCharacteristicPlane(view.tMin, Math.min(-zeroTauGap, view.tMax), VISUAL_Z_MIN, VISUAL_Z_MAX)
+  ), [view.tMin, view.tMax, zeroTauGap])
   const slowGeometry = useMemo(() => (
-    makeCharacteristicPlane(Math.max(zeroTauGap, view.tMin), view.tMax, view.zMin, view.zMax)
-  ), [view, zeroTauGap])
+    makeCharacteristicPlane(Math.max(zeroTauGap, view.tMin), view.tMax, VISUAL_Z_MIN, VISUAL_Z_MAX)
+  ), [view.tMin, view.tMax, zeroTauGap])
 
   const rootRef = useRef(null)
   const pointerDownRef = useRef(null)
@@ -54,6 +61,7 @@ function CharacteristicSurface({
     event.stopPropagation()
     if (!interactive || !onInspectPoint) return
     const local = event.object.worldToLocal(event.point.clone())
+    local.z = visualZToPhysical(local.z)
     onInspectPoint({
       t: local.x,
       Y: 0,
@@ -116,6 +124,7 @@ function CharacteristicSurface({
     // Se bloquearmos a propagação aqui, o OrbitControls pode ficar preso
     // em estado de rotação após um clique simples sobre a característica.
     const local = event.object.worldToLocal(event.point.clone())
+    local.z = visualZToPhysical(local.z)
     const nextPoint = { t: local.x, Y: 0, z: local.z, branch }
     if (inspectionMode) onCreateInspectionProbe?.(nextPoint)
     else onSelectPoint(nextPoint)
@@ -131,7 +140,7 @@ function CharacteristicSurface({
     return {
       t: Math.min(tMax, Math.max(tMin, t)),
       Y: 0,
-      z: Math.min(view.zMax, Math.max(view.zMin, z)),
+      z,
       branch,
     }
   }
@@ -143,14 +152,14 @@ function CharacteristicSurface({
     if (!hit) return null
     const local = rootRef.current.worldToLocal(worldPoint.clone())
     const t = local.x + (options.offsetT ?? 0)
-    const z = local.z + (options.offsetZ ?? 0)
+    const z = visualZToPhysical(local.z) + (options.offsetZ ?? 0)
     return clampToBranch(branch, t, z)
   }
 
   const applyMarkerPosition = (point) => {
     if (!point?.branch) return
     const marker = markerRefs.current.get(point.branch)
-    if (marker) marker.position.set(point.t, 0, point.z)
+    if (marker) marker.position.set(point.t, 0, physicalZToVisual(point.z))
   }
 
   const flushScheduledDrag = () => {
@@ -290,7 +299,7 @@ function CharacteristicSurface({
             if (node && point.branch) markerRefs.current.set(point.branch, node)
             else if (point.branch) markerRefs.current.delete(point.branch)
           }}
-          position={[point.t, 0, point.z]}
+          position={physicalPointToVisual([point.t, 0, point.z])}
           scale={markerScale}
           renderOrder={18}
           onPointerDown={markerInteractive ? handleMarkerPointerDown(point) : undefined}

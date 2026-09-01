@@ -2,6 +2,7 @@ import { buildHugoniotBifoliation, buildRarefactionBifoliation, buildCompositeBi
 import { solveInflectionSegments, computeLeftStateFromWavePoint, computeRightStateFromWavePoint } from '../../surfaceImplicit/index.js'
 import { FORWARD_HUGONIOT, BACKWARD_HUGONIOT } from '../../hugoniot/directions.js'
 import { finite } from './coordinates.js'
+import { HUGONIOT } from '../../../config/numerics.js'
 
 export function withStates(point, params) {
   const left = computeLeftStateFromWavePoint(point.t, point.Y ?? 0, point.z, params)
@@ -41,10 +42,10 @@ function fixedPlus(point, params) {
   }
 }
 
-export function sampleHugoniot({ point, params, view, direction, samples }) {
+export function sampleHugoniot({ point, params, view, direction, samples, zExtensionMargin = 0 }) {
   const fixedState = direction === BACKWARD_HUGONIOT ? fixedPlus(point, params) : fixedMinus(point, params)
   if (!fixedState || ![fixedState.uMinus, fixedState.vMinus, fixedState.uPlus, fixedState.vPlus].some(finite)) return []
-  const bifoliation = buildHugoniotBifoliation({ fixedState, params, view, samples })
+  const bifoliation = buildHugoniotBifoliation({ fixedState, params, view, samples, zExtensionMargin })
   const leaf = selectLeafFromBifoliation(bifoliation, direction === BACKWARD_HUGONIOT ? 'plus' : 'minus')
   return leaf?.curve?.segments ?? []
 }
@@ -53,14 +54,20 @@ function branchDirection(branch) {
   return branch === 'fast' ? BACKWARD_HUGONIOT : FORWARD_HUGONIOT
 }
 
-export function sampleRarefaction({ point, params, view, samples, branch }) {
+export function sampleRarefaction({ point, params, view, samples, branch, zExtensionMargin = 0 }) {
   const direction = branchDirection(branch)
   const fixedState = direction === BACKWARD_HUGONIOT ? fixedPlus(point, params) : fixedMinus(point, params)
   if (!fixedState || ![fixedState.uMinus, fixedState.vMinus, fixedState.uPlus, fixedState.vPlus].some(finite)) return []
-  const bifoliation = buildRarefactionBifoliation({ fixedState, params, view, samples, constrainZ: true })
+  const zSpan = Math.max(1, view.zMax - view.zMin)
+  const extendedView = zExtensionMargin > 0
+    ? { ...view, zMin: view.zMin - zExtensionMargin * zSpan, zMax: view.zMax + zExtensionMargin * zSpan }
+    : view
+  const bifoliation = buildRarefactionBifoliation({ fixedState, params, view: extendedView, samples, constrainZ: true })
   const leaf = selectLeafFromBifoliation(bifoliation, direction === BACKWARD_HUGONIOT ? 'plus' : 'minus')
   return leaf?.curve?.segments ?? []
 }
+
+export const PROBE_Z_EXTENSION_MARGIN = HUGONIOT.Z_EXTENSION_MARGIN
 
 export function sampleComposite({ point, params, view, samples, resolution, branch }) {
   const direction = branchDirection(branch)

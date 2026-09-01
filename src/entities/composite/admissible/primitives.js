@@ -20,7 +20,7 @@ export function solutionProbePointFromLineEvent(event, fallbackBranch, attachedC
   const local = event.object.worldToLocal(event.point.clone())
   const t = local.x
   const Y = local.y
-  const z = local.z
+  const z = visualZToPhysical(local.z)
   return { t, Y, z, coords: [t, Y, z], branch: branchFromT(t, fallbackBranch), attachedCurve }
 }
 
@@ -42,3 +42,4 @@ export function interpolate3(a, b, alpha) {
 export function flattenNormalizedSegments(segments) {
   return (segments ?? []).flatMap((segment) => normalizeSegment(segment))
 }
+import { visualZToPhysical } from '../../../geometry/zCompactification.js'

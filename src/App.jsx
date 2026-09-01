@@ -248,6 +248,7 @@ export default function App() {
     <>
       <WaveOverlayPanel
         state={waveState}
+        calculationView={calcView}
         actions={waveActions}
         visibility={visibility}
         selection={selection}
@@ -257,6 +258,7 @@ export default function App() {
         canEnableSolutionMode={canEnableSolutionMode}
         setSolutionModeEnabled={setSolutionModeEnabled}
         onExportSnapshot={handleExportSnapshot}
+        onMoveInspectionProbe={inspection.moveInspectionProbe}
       />
 
       <WaveSceneViewport

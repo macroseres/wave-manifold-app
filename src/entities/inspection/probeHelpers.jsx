@@ -18,6 +18,7 @@ export {
   sampleRarefaction,
   sampleComposite,
   sampleInflection,
+  PROBE_Z_EXTENSION_MARGIN,
 } from './helpers/sampling.js'
 export {
   nearestCurvePointFromRay,

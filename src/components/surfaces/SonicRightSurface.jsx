@@ -1,6 +1,7 @@
 import React, { useMemo, useRef } from 'react'
 import * as THREE from 'three'
-import { Line } from '@react-three/drei'
+import { ZCompactifiedLine as Line, ZCompactifiedMesh } from '../../app/scene/ZCompactification'
+import { visualZToPhysical } from '../../geometry/zCompactification'
 import { waveColors } from '../../config/waveColors'
 import {
   buildSonicBranchGeometries,
@@ -30,6 +31,7 @@ export default function SonicRightSurface({
 
   const decoratedPointFromEvent = (event, status = 'inspection') => {
     const local = event.object.worldToLocal(event.point.clone())
+    local.z = visualZToPhysical(local.z)
     const branchInfo = classifySonicPoint('right', { t: local.x, Y: local.y, z: local.z }, params)
     return {
       t: local.x,
@@ -103,7 +105,7 @@ export default function SonicRightSurface({
 
   return (
     <group>
-      <mesh
+      <ZCompactifiedMesh
         geometry={geometries.fast}
         onPointerDown={interactive ? handlePointerDown : undefined}
         onPointerUp={interactive ? handlePointerUp : undefined}
@@ -126,8 +128,8 @@ export default function SonicRightSurface({
           polygonOffsetFactor={1}
           polygonOffsetUnits={1}
         />
-      </mesh>
-      <mesh
+      </ZCompactifiedMesh>
+      <ZCompactifiedMesh
         geometry={geometries.slow}
         onPointerDown={interactive ? handlePointerDown : undefined}
         onPointerUp={interactive ? handlePointerUp : undefined}
@@ -150,7 +152,7 @@ export default function SonicRightSurface({
           polygonOffsetFactor={1}
           polygonOffsetUnits={1}
         />
-      </mesh>
+      </ZCompactifiedMesh>
       {!wireframe && separatorSegments.map((segment, index) => (
         <Line
           key={`sonic-right-separator-${index}`}
@@ -167,4 +169,3 @@ export default function SonicRightSurface({
     </group>
   )
 }
-

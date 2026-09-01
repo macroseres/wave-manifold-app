@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { waveColors } from '../../config/waveColors.js'
+import { visualZToPhysical } from '../../geometry/zCompactification.js'
 
 export const CHARACTERISTIC_POINT_RADIUS = 0.034
 export const CHARACTERISTIC_SELECTED_RING_RADIUS = 0.075
@@ -27,5 +28,6 @@ export function makeCharacteristicPlaneGeometry(t0, t1, z0, z1) {
 
 export function characteristicPointFromSurfaceEvent(event, branch, extra = {}) {
   const local = event.object.worldToLocal(event.point.clone())
-  return { t: local.x, Y: 0, z: local.z, coords: [local.x, 0, local.z], branch, ...extra }
+  const z = visualZToPhysical(local.z)
+  return { t: local.x, Y: 0, z, coords: [local.x, 0, z], branch, ...extra }
 }

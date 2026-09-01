@@ -12,9 +12,9 @@ import { buildRarefactionContinuationLeaf } from './rarefactionLeaf.js'
  * Este arquivo não importa a composta. Assim, Hugoniot, rarefação e composta
  * podem usar o mesmo núcleo sem criar dependência circular.
  */
-export function buildHugoniotBifoliation({ fixedState, params, view, samples = 500, zExtensionMargin = 0 }) {
-  const minus = buildHugoniotLeaf({ fixedState, params, view, samples, direction: FORWARD_HUGONIOT, zExtensionMargin })
-  const plus = buildHugoniotLeaf({ fixedState, params, view, samples, direction: BACKWARD_HUGONIOT, zExtensionMargin })
+export function buildHugoniotBifoliation({ fixedState, params, view, samples = 500, zExtensionMargin = 0, compactifiedZ = false }) {
+  const minus = buildHugoniotLeaf({ fixedState, params, view, samples, direction: FORWARD_HUGONIOT, zExtensionMargin, compactifiedZ })
+  const plus = buildHugoniotLeaf({ fixedState, params, view, samples, direction: BACKWARD_HUGONIOT, zExtensionMargin, compactifiedZ })
 
   return makeWaveBifoliation({
     name: 'mathcal H_pm',
@@ -32,7 +32,7 @@ export function buildHugoniotBifoliation({ fixedState, params, view, samples = 5
   })
 }
 
-export function buildRarefactionBifoliation({ fixedState, params, view, samples = 500, constrainZ = false }) {
+export function buildRarefactionBifoliation({ fixedState, params, view, samples = 500, constrainZ = false, compactifiedZ = false }) {
   const minus = buildRarefactionContinuationLeaf({
     fixedState,
     params,
@@ -40,6 +40,7 @@ export function buildRarefactionBifoliation({ fixedState, params, view, samples 
     samples,
     constrainZ,
     direction: FORWARD_HUGONIOT,
+    compactifiedZ,
   })
   const plus = buildRarefactionContinuationLeaf({
     fixedState,
@@ -48,6 +49,7 @@ export function buildRarefactionBifoliation({ fixedState, params, view, samples 
     samples,
     constrainZ,
     direction: BACKWARD_HUGONIOT,
+    compactifiedZ,
   })
 
   return makeWaveBifoliation({

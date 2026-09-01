@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Line } from '@react-three/drei'
+import { ZCompactifiedLine as Line } from '../../app/scene/ZCompactification'
 import {
   solveDoubleSonicSegments,
   solveInflectionSegments,
@@ -30,13 +30,13 @@ export function DoubleSonicCurve({ params, view, resolution = 40, visible = true
 }
 
 export function InflectionSlowCurve({ params, view, resolution = 40, visible = true }) {
-  const segments = useMemo(() => visible ? solveInflectionSegments(params, view, Math.max(260, Math.min(580, resolution * 7)), 'slow') : [], [params, view, resolution, visible])
+  const segments = useMemo(() => visible ? solveInflectionSegments(params, view, Math.max(260, Math.min(580, resolution * 7)), 'slow', { compactifiedZ: true }) : [], [params, view, resolution, visible])
   if (!visible) return null
   return <CurveGroup segments={segments} color={waveColors.inflectionSlow ?? waveColors.inflection ?? '#06b6d4'} lineWidth={1.35} />
 }
 
 export function InflectionFastCurve({ params, view, resolution = 40, visible = true }) {
-  const segments = useMemo(() => visible ? solveInflectionSegments(params, view, Math.max(260, Math.min(580, resolution * 7)), 'fast') : [], [params, view, resolution, visible])
+  const segments = useMemo(() => visible ? solveInflectionSegments(params, view, Math.max(260, Math.min(580, resolution * 7)), 'fast', { compactifiedZ: true }) : [], [params, view, resolution, visible])
   if (!visible) return null
   return <CurveGroup segments={segments} color={waveColors.inflectionFast ?? waveColors.inflection ?? '#06b6d4'} lineWidth={1.35} />
 }

@@ -1,5 +1,5 @@
 import React, { Fragment, useMemo } from 'react'
-import { Line } from '@react-three/drei'
+import { ZCompactifiedLine as Line } from '../../app/scene/ZCompactification'
 import OrientedArcMarkers from './OrientedArcMarkers'
 import { FORWARD_HUGONIOT } from '../../entities/hugoniot/directions'
 import { reflectDaggerSegments } from '../../entities/shared/reflection'

@@ -14,6 +14,7 @@ export function smoothCurveCoords(points, options = {}) {
     minPoints = 160,
     samplesPerEdge = 10,
     maxPoints = 900,
+    maxRawPoints = 900,
     curveType = 'centripetal',
     tension = 0.45,
   } = options
@@ -41,7 +42,6 @@ export function smoothCurveCoords(points, options = {}) {
   // ponto clicado pode ficar depois do antigo limite de 420 pontos; nesse caso
   // a curva visual parecia nao passar por U_L. Quando houver uma ancora
   // marcada, mantemos uma janela centrada nela.
-  const maxRawPoints = 900
   let boundedItems = finiteVectors
   if (finiteVectors.length > maxRawPoints) {
     const finiteAnchorIndex = anchorIndex >= 0

@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { FORWARD_HUGONIOT, normalizeHugoniotDirection } from '../../../../hugoniot/directions.js'
 import { buildGeometryForRarefactionSaturationSegment } from '../../../../../geometry/compositeSaturatedSurfaceGeometry.js'
 import { toPointObjectSegments } from '../../solutionModeGeometry.js'
+import { ZCompactifiedMesh } from '../../../../../app/scene/ZCompactification.jsx'
 
 function buildBufferGeometry(part) {
   if (!part?.vertices?.length || !part?.indices?.length) return null
@@ -45,7 +46,7 @@ export default function SaturatedArcSurfaces({
   return (
     <group>
       {geometries.map((geometry, index) => (
-        <mesh key={`sat-rnl-hminus-${index}`} geometry={geometry} renderOrder={5}>
+        <ZCompactifiedMesh key={`sat-rnl-hminus-${index}`} geometry={geometry} renderOrder={5}>
           <meshStandardMaterial
             color={color}
             transparent
@@ -55,7 +56,7 @@ export default function SaturatedArcSurfaces({
             roughness={0.58}
             metalness={0.02}
           />
-        </mesh>
+        </ZCompactifiedMesh>
       ))}
     </group>
   )

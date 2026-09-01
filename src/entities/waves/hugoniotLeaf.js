@@ -5,12 +5,13 @@ import { makeWaveCurve, makeWaveLeaf } from '../shared/types/mathTypes.js'
 import { sampleParametricCurveAdaptive } from '../continuation/adaptiveParametricSampler.js'
 import { annotateSpeedsAndAdmissibility, orientSegmentsBySpeed, orientationFromDirection, splitSegmentsAtLargeJumps } from './orientation.js'
 import { HUGONIOT } from '../../config/numerics.js'
+import { VISUAL_Z_MAX, VISUAL_Z_MIN, visualZToPhysical } from '../../geometry/zCompactification.js'
 
 function directionName(direction) {
   return normalizeHugoniotDirection(direction) === BACKWARD_HUGONIOT ? 'plus' : 'minus'
 }
 
-export function buildHugoniotLeaf({ fixedState, params, view, samples = 500, direction, zExtensionMargin = 0 }) {
+export function buildHugoniotLeaf({ fixedState, params, view, samples = 500, direction, zExtensionMargin = 0, compactifiedZ = false }) {
   const waveDirection = directionName(direction)
   const orientation = orientationFromDirection({ family: 'hugoniot', direction: waveDirection })
   const name = waveDirection === 'plus' ? 'H_+' : 'H_-'
@@ -28,7 +29,19 @@ export function buildHugoniotLeaf({ fixedState, params, view, samples = 500, dir
   const targetSamples = Math.max(64, samples)
   const speedFn = (point) => waveSpeed(point.t, point.z, params)
 
-  const rawPoints = sampleParametricCurveAdaptive({
+  const rawPoints = compactifiedZ
+    ? Array.from({ length: targetSamples }, (_, index) => {
+      const margin = 1e-4
+      const zHat = (VISUAL_Z_MIN + margin)
+        + (index / Math.max(1, targetSamples - 1)) * (VISUAL_Z_MAX - VISUAL_Z_MIN - 2 * margin)
+      return evaluateHugoniotLeafPoint({
+        z: visualZToPhysical(zHat),
+        fixedState,
+        params,
+        direction,
+      })
+    })
+    : sampleParametricCurveAdaptive({
     zMin,
     zMax,
     initialSamples: Math.min(260, Math.max(64, Math.floor(targetSamples / (HUGONIOT.ADAPTIVE_INITIAL_DIVISOR ?? 3.2)))),
@@ -46,7 +59,7 @@ export function buildHugoniotLeaf({ fixedState, params, view, samples = 500, dir
     },
     speedFn,
     evaluate: (z) => evaluateHugoniotLeafPoint({ z, fixedState, params, direction }),
-  })
+    })
 
   const validRawPoints = rawPoints.filter(Boolean)
   const markerStep = Math.max(6, Math.floor(validRawPoints.length / 90))
@@ -58,7 +71,7 @@ export function buildHugoniotLeaf({ fixedState, params, view, samples = 500, dir
   const segments = splitSegmentsAtLargeJumps(rawPoints, {
     maxJumpT: jumpTMax,
     maxJumpY: jumpYMax,
-    maxJumpZ: 4 * Math.abs(dz),
+    maxJumpZ: compactifiedZ ? Number.POSITIVE_INFINITY : 4 * Math.abs(dz),
   })
 
   const orientedSegments = orientSegmentsBySpeed(segments, speedFn, orientation)
@@ -80,7 +93,7 @@ export function buildHugoniotLeaf({ fixedState, params, view, samples = 500, dir
       markers,
       fixedState,
       originalDirection: direction,
-      sampler: 'adaptive-parametric-z',
+      sampler: compactifiedZ ? 'uniform-compactified-z' : 'adaptive-parametric-z',
       sampledPointCount: validRawPoints.length,
     },
   })
@@ -95,7 +108,7 @@ export function buildHugoniotLeaf({ fixedState, params, view, samples = 500, dir
     metadata: {
       fixedState,
       markers,
-      sampler: 'adaptive-parametric-z',
+      sampler: compactifiedZ ? 'uniform-compactified-z' : 'adaptive-parametric-z',
       sampledPointCount: validRawPoints.length,
     },
   })

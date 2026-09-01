@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Line } from '@react-three/drei'
+import { ZCompactifiedLine as Line } from '../../app/scene/ZCompactification'
 import { FORWARD_HUGONIOT, BACKWARD_HUGONIOT } from '../../entities/hugoniot/directions'
 import { waveColors } from '../../config/waveColors'
 import OrientedArcMarkers from './OrientedArcMarkers'
@@ -213,5 +213,3 @@ export function CompositeSlowArcCurve(props) { return <CompositeSlowCurve {...pr
 export function CompositeFastArcCurve(props) { return <CompositeFastCurve {...props} /> }
 
 export default React.memo(CompositeCurveBase)
-
-

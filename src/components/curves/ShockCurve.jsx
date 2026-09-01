@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import * as THREE from 'three'
-import { Line } from '@react-three/drei'
+import { ZCompactifiedLine as Line } from '../../app/scene/ZCompactification'
+import { physicalPointToVisual } from '../../geometry/zCompactification'
 import OrientedArcMarkers from './OrientedArcMarkers'
 import { waveColors } from '../../entities/surfaceImplicit'
 import { buildShockSegments, validShockPoint } from '../../entities/hugoniot/shockSegments'
@@ -38,13 +39,12 @@ export default function ShockCurve({
     })
   }, [fixedState, anchorPoint, params, view, resolution, nonLocal, direction, speedMode, sonicTarget, zMargin])
 
-  if (!visible || !fixedState || !anchorPoint || segments.length === 0) return null
-
   const nonLocalEndpoint = nonLocal
     ? segments
       .map((segment) => segment[segment.length - 1])
       .find((point) => validShockPoint(point))
     : null
+  if (!visible || !fixedState || !anchorPoint || segments.length === 0) return null
 
   return (
     <group>
@@ -70,7 +70,7 @@ export default function ShockCurve({
       ))}
       {nonLocalEndpoint ? (
         <mesh
-          position={[nonLocalEndpoint.t, nonLocalEndpoint.Y, nonLocalEndpoint.z]}
+          position={physicalPointToVisual([nonLocalEndpoint.t, nonLocalEndpoint.Y, nonLocalEndpoint.z])}
           scale={markerScale}
           renderOrder={12}
           onContextMenu={(event) => {

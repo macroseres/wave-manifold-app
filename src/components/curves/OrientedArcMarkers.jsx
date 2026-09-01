@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import * as THREE from 'three'
+import { physicalPointToVisual } from '../../geometry/zCompactification'
 
 function finite(value) {
   return Number.isFinite(value)
@@ -60,7 +61,7 @@ function EndpointSphere({ position, color, markerScale, radius, renderOrder, onP
 
   return (
     <group
-      position={position}
+      position={physicalPointToVisual(position)}
       scale={markerScale}
       renderOrder={renderOrder}
       onPointerOver={(event) => {

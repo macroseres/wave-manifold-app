@@ -4,6 +4,7 @@ import OverlayPanel from '../../components/panel/OverlayPanel'
 
 export default function WaveOverlayPanel({
   state,
+  calculationView,
   actions,
   visibility,
   selection,
@@ -13,12 +14,14 @@ export default function WaveOverlayPanel({
   canEnableSolutionMode,
   setSolutionModeEnabled,
   onExportSnapshot,
+  onMoveInspectionProbe,
 }) {
   return (
     <OverlayPanel
       params={state.params}
       setParams={actions.setParams}
       view={state.view}
+      calculationView={calculationView}
       setView={actions.setView}
       resetParams={actions.resetParams}
       resetView={actions.resetView}
@@ -96,6 +99,7 @@ export default function WaveOverlayPanel({
       setSolutionModeEnabled={setSolutionModeEnabled}
       canEnableSolutionMode={canEnableSolutionMode}
       inspectionProbesByBranch={state.inspectionProbesByBranch}
+      onMoveInspectionProbe={onMoveInspectionProbe}
       inspectionCurveVisibility={state.inspectionCurveVisibility}
       setInspectionCurveVisibility={actions.setInspectionCurveVisibility}
       solutionCurveVisibility={state.solutionCurveVisibility}

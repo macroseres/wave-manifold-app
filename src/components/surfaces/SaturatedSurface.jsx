@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import * as THREE from 'three'
 import { buildSaturatedGeometry } from '../../geometry/saturatedSurfaceGeometry'
+import { ZCompactifiedMesh } from '../../app/scene/ZCompactification'
 
 export default function SaturatedSurface({ params, view, resolution, opacity, wireframe, visible = true }) {
   const geometry = useMemo(() => {
@@ -11,7 +12,7 @@ export default function SaturatedSurface({ params, view, resolution, opacity, wi
   if (!geometry || geometry.attributes.position?.count === 0) return null
 
   return (
-    <mesh geometry={geometry} renderOrder={1}>
+    <ZCompactifiedMesh geometry={geometry} renderOrder={1}>
       <meshStandardMaterial
         color="#f59e0b"
         side={THREE.DoubleSide}
@@ -21,6 +22,6 @@ export default function SaturatedSurface({ params, view, resolution, opacity, wi
         roughness={0.45}
         metalness={0.0}
       />
-    </mesh>
+    </ZCompactifiedMesh>
   )
 }

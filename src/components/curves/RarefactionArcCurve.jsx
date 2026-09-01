@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react'
 import * as THREE from 'three'
-import { Line } from '@react-three/drei'
+import { ZCompactifiedLine as Line } from '../../app/scene/ZCompactification'
 import OrientedArcMarkers from './OrientedArcMarkers'
 import { waveColors } from '../../config/waveColors'
 import { buildRarefactionArcSegments, trimRarefactionArcSegmentsToEndpoint } from './rarefactionArcUtils'
 import { reflectDaggerSegments } from '../../entities/shared/reflection'
+import { visualZToPhysical } from '../../geometry/zCompactification'
 
 function coordsOf(point) {
   if (Array.isArray(point)) return point
@@ -23,7 +24,7 @@ function solutionProbePointFromLineEvent(event, fallbackBranch, attachedCurve) {
   const local = event.object.worldToLocal(event.point.clone())
   const t = local.x
   const Y = local.y
-  const z = local.z
+  const z = visualZToPhysical(local.z)
   return { t, Y, z, coords: [t, Y, z], branch: branchFromT(t, fallbackBranch), attachedCurve }
 }
 

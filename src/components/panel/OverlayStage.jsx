@@ -9,12 +9,19 @@ export default function OverlayStage({
   activeView,
   params,
   view,
+  probeView,
   selectedEntries,
   onSelectCharacteristicPoint,
   showInflectionSlow,
   showInflectionFast,
+  showCoincidence,
   showHysteresis,
+  showHugoniotMinus,
   inspectionModeEnabled,
+  inspectionProbesByBranch,
+  inspectionCurveVisibility,
+  onMoveInspectionProbe,
+  resolution,
   solutionDiagnostics,
   formatNumber,
   parameterMapProps,
@@ -33,12 +40,19 @@ export default function OverlayStage({
               <StateSpaceCanvas
                 params={params}
                 view={view}
+                probeView={probeView}
                 selectedEntries={selectedEntries}
                 onSelectCharacteristicPoint={onSelectCharacteristicPoint}
                 showInflectionSlow={showInflectionSlow}
                 showInflectionFast={showInflectionFast}
+                showCoincidence={showCoincidence}
                 showHysteresis={showHysteresis}
+                showHugoniotMinus={showHugoniotMinus}
                 inspectionModeEnabled={inspectionModeEnabled}
+                inspectionProbesByBranch={inspectionProbesByBranch}
+                inspectionCurveVisibility={inspectionCurveVisibility}
+                onMoveInspectionProbe={onMoveInspectionProbe}
+                resolution={resolution}
               />
             </div>
           </div>

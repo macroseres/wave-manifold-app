@@ -20,10 +20,12 @@ import {
   sampleHugoniot,
   sampleInflection,
   sampleRarefaction,
+  PROBE_Z_EXTENSION_MARGIN,
   withStates,
 } from '../../entities/inspection/probeHelpers.jsx'
 import { waveColors } from '../../config/waveColors'
 import { FORWARD_HUGONIOT, BACKWARD_HUGONIOT } from '../../entities/hugoniot/directions'
+import { physicalPointToVisual, physicalZToVisual } from '../../geometry/zCompactification'
 
 function InspectionProbes({
   enabled,
@@ -71,10 +73,10 @@ function InspectionProbes({
       const skipPlusAtProbe = attachedCurve === 'H_+'
       const minusSegments = skipMinusAtProbe
         ? []
-        : sampleHugoniot({ point: pointWithStates, params, view, direction: FORWARD_HUGONIOT, samples })
+        : sampleHugoniot({ point: pointWithStates, params, view, direction: FORWARD_HUGONIOT, samples, zExtensionMargin: PROBE_Z_EXTENSION_MARGIN })
       const plusSegments = skipPlusAtProbe
         ? []
-        : sampleHugoniot({ point: pointWithStates, params, view, direction: BACKWARD_HUGONIOT, samples })
+        : sampleHugoniot({ point: pointWithStates, params, view, direction: BACKWARD_HUGONIOT, samples, zExtensionMargin: PROBE_Z_EXTENSION_MARGIN })
 
       // Para Ctrl+arrastar, o encaixe é feito somente em curvas 1D
       // globais/visíveis, construídas pelos pontos base bloqueados C_s/C_f.
@@ -95,7 +97,7 @@ function InspectionProbes({
       // - composta/inflexão da própria sonda não são desenhadas nem calculadas.
       const shouldDrawProbeRarefaction = point.mode === 'characteristic' || !point.attachedCurve || point.attachedCurve === 'J'
       const rarefactionSegments = rarefactionVisible && shouldDrawProbeRarefaction
-        ? sampleRarefaction({ point: pointWithStates, params, view, branch, samples: Math.max(260, Math.min(720, resolution * 8)) })
+        ? sampleRarefaction({ point: pointWithStates, params, view, branch, samples: Math.max(260, Math.min(720, resolution * 8)), zExtensionMargin: PROBE_Z_EXTENSION_MARGIN })
         : []
       const inflectionSegments = inflectionVisible
         ? sampleInflection({ params, view, branch, samples: Math.max(900, Math.min(1800, resolution * 24)) })
@@ -169,7 +171,7 @@ function InspectionProbes({
   const applyMarkerPosition = (point) => {
     if (!point?.branch) return
     const marker = markerRefs.current.get(point.branch)
-    if (marker) marker.position.set(point.t, point.Y ?? 0, point.z)
+    if (marker) marker.position.set(point.t, point.Y ?? 0, physicalZToVisual(point.z))
   }
 
   const scheduleMarkerPreview = (point) => {
@@ -276,10 +278,10 @@ function InspectionProbes({
         const branchCurves = curveData?.[branch] ?? {}
         return (
           <group key={`inspection-probe-${branch}`}>
-            {drawSegments(branchCurves.minusSegments, waveColors.hugoniotMinus, `inspection-${branch}-hminus`, 3.2, true)}
-            {drawSegments(branchCurves.plusSegments, waveColors.hugoniotPlus, `inspection-${branch}-hplus`, 3.2, true)}
+            {drawSegments(branchCurves.minusSegments, waveColors.hugoniotMinus, `inspection-${branch}-hminus`, 1.35, true)}
+            {drawSegments(branchCurves.plusSegments, waveColors.hugoniotPlus, `inspection-${branch}-hplus`, 1.35, true)}
             {point.mode === 'characteristic' || !point.attachedCurve
-              ? drawSegments(branchCurves.rarefactionSegments, branchColor(branch), `inspection-${branch}-characteristic`, 3.0, true)
+              ? drawSegments(branchCurves.rarefactionSegments, branchColor(branch), `inspection-${branch}-characteristic`, 1.35, true)
               : null}
             {drawIntersectionMarkers(branchCurves.intersectionMarkers, branchColor(branch), `inspection-${branch}-intersections`, markerScale, onHoverPoint, branch, hoverDisabled || suppressHoverRef.current || !!dragRef.current)}
             <group
@@ -287,7 +289,7 @@ function InspectionProbes({
                 if (node) markerRefs.current.set(branch, node)
                 else markerRefs.current.delete(branch)
               }}
-              position={[point.t, point.Y ?? 0, point.z]}
+              position={physicalPointToVisual([point.t, point.Y ?? 0, point.z])}
               scale={markerScale}
               renderOrder={22}
               onPointerDown={handlePointerDown(point)}

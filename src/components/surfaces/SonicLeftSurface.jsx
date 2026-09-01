@@ -1,6 +1,7 @@
 import React, { useMemo, useRef } from 'react'
 import * as THREE from 'three'
-import { Line } from '@react-three/drei'
+import { ZCompactifiedLine as Line, ZCompactifiedMesh } from '../../app/scene/ZCompactification'
+import { visualZToPhysical } from '../../geometry/zCompactification'
 import { waveColors } from '../../config/waveColors'
 import {
   buildSonicBranchGeometries,
@@ -35,6 +36,7 @@ export default function SonicLeftSurface({
     event.stopPropagation()
     if (!interactive || !onInspectPoint) return
     const local = event.object.worldToLocal(event.point.clone())
+    local.z = visualZToPhysical(local.z)
     const branchInfo = classifySonicPoint('left', { t: local.x, Y: local.y, z: local.z }, params)
     onInspectPoint({
       t: local.x,
@@ -91,6 +93,7 @@ export default function SonicLeftSurface({
     if (dragged || !sameObject) return
 
     const local = event.object.worldToLocal(event.point.clone())
+    local.z = visualZToPhysical(local.z)
     onSelectPoint({ t: local.x, Y: local.y, z: local.z })
   }
 
@@ -102,7 +105,7 @@ export default function SonicLeftSurface({
 
   return (
     <group>
-      <mesh
+      <ZCompactifiedMesh
         geometry={geometries.fast}
         onPointerDown={interactive ? handlePointerDown : undefined}
         onPointerUp={interactive ? handlePointerUp : undefined}
@@ -123,8 +126,8 @@ export default function SonicLeftSurface({
           polygonOffsetFactor={1}
           polygonOffsetUnits={1}
         />
-      </mesh>
-      <mesh
+      </ZCompactifiedMesh>
+      <ZCompactifiedMesh
         geometry={geometries.slow}
         onPointerDown={interactive ? handlePointerDown : undefined}
         onPointerUp={interactive ? handlePointerUp : undefined}
@@ -145,7 +148,7 @@ export default function SonicLeftSurface({
           polygonOffsetFactor={1}
           polygonOffsetUnits={1}
         />
-      </mesh>
+      </ZCompactifiedMesh>
       {!wireframe && separatorSegments.map((segment, index) => (
         <Line
           key={`sonic-left-separator-${index}`}
@@ -162,4 +165,3 @@ export default function SonicLeftSurface({
     </group>
   )
 }
-

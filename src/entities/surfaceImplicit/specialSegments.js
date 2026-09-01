@@ -1,6 +1,7 @@
 import { P, Q, A } from './algebra.js'
 import { sonicLineTCoeff, sonicLineConst } from './sonic.js'
 import { pushSegment, inExpandedWindow, inflectionZDomain, clipInflectionSegmentToTauWindow, uniqueFiniteLocal } from './helpers.js'
+import { VISUAL_Z_MAX, VISUAL_Z_MIN, visualZToPhysical } from '../../geometry/zCompactification.js'
 
 export function solveCoincidenceSegments(view) {
   if (view.tMin > 0 || view.tMax < 0 || view.yMin > 0 || view.yMax < 0) return []
@@ -54,18 +55,21 @@ export function solveSecondaryRightBifurcationSegments(params, view, samples = 2
     })
 }
 
-export function solveInflectionSegments(params, view, samples = 640, branch = 'all') {
+export function solveInflectionSegments(params, view, samples = 640, branch = 'all', { compactifiedZ = false } = {}) {
   const { b1, b2 } = params
   const segments = []
   let current = []
   const n = Math.max(360, samples)
   const { zMin, zMax } = inflectionZDomain(view)
+  const visualMargin = 1e-4
+  const visualZMin = VISUAL_Z_MIN + visualMargin
+  const visualZMax = VISUAL_Z_MAX - visualMargin
   const dz = (zMax - zMin) / Math.max(n - 1, 1)
-  const tauGap = Math.max(1e-5, 0.001 * Math.max(1, view.tMax - view.tMin))
-
   const tauWindow = (() => {
-    if (branch === 'slow') return { tMin: Math.max(tauGap, view.tMin), tMax: view.tMax }
-    if (branch === 'fast') return { tMin: view.tMin, tMax: Math.min(-tauGap, view.tMax) }
+    // Both branches approach tau=0 as |z| -> infinity. Keep that limiting
+    // boundary so their compactified drawings can reach z-hat = +/-1.
+    if (branch === 'slow') return { tMin: Math.max(0, view.tMin), tMax: view.tMax }
+    if (branch === 'fast') return { tMin: view.tMin, tMax: Math.min(0, view.tMax) }
     return { tMin: view.tMin, tMax: view.tMax }
   })()
 
@@ -88,7 +92,9 @@ export function solveInflectionSegments(params, view, samples = 640, branch = 'a
 
   let prev = null
   for (let i = 0; i < n; i += 1) {
-    const z = zMin + i * dz
+    const z = compactifiedZ
+      ? visualZToPhysical(visualZMin + (i * (visualZMax - visualZMin)) / Math.max(n - 1, 1))
+      : zMin + i * dz
     const raw = rawPointAt(z)
 
     if (!raw) {

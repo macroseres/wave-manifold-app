@@ -2,13 +2,13 @@ import { BACKWARD_HUGONIOT } from '../../../hugoniot/directions.js'
 import { computeLeftStateFromWavePoint } from '../../../surfaceImplicit/index.js'
 import {
   enforcePipelineOrientationFromAnchor,
+  pointObjectFromCoords,
   relevantStateForPoint,
   makeArc,
   hasUsableSegments,
   uniqueAnchors,
 } from '../../internal/pipelineShared.js'
 import {
-  initialAnchorsFromSegments,
   expandViewZForIntersections,
   terminalAnchorFromFirstSegment,
   trimSegmentsToPoint,
@@ -17,8 +17,8 @@ import {
   buildSolutionRarefactionToFastInflectionSegments,
   nonlocalSecondChainAdaptiveSettings,
   buildNonlocalRarefactionCurveData,
-  buildCompositeFromSpecifiedRarefactionCurve,
-  buildGlobalCompositeIntersectionSegments,
+  buildFirstIntersectionCompositeFromRarefactionArc,
+  anchorCompositeContinuationAtInflection,
   extractOrientedCompositeArcFromFullCurve,
   trimSegmentsToFirstSonic,
   buildGlobalCompositeIntersectionFromRarefactionCurve,
@@ -46,9 +46,9 @@ export function buildFastPipeline({ entry, sonicRarefactionAnchors: _sonicRarefa
   // Classical fast local chain, symmetric to the slow construction:
   //   J_+ = R_+(U_R) cap S^+,
   //   K_+ = Sat_{H_+}(R_+(U_R)) cap S^+.
-  // Build the local rarefaction and refine J_+ on that same polyline. Then
-  // select the connected component of the global composite through J_+ and
-  // trim it at the first intersection with the fixed leaf H_+(U_R).
+  // Build the local rarefaction and refine J_+ on that same polyline. Saturate
+  // only this restricted arc, so every point of K_+ comes from a Hugoniot leaf
+  // through R_loc and no continuation beyond J_+ contributes to the result.
   const localCompositeCalcView = expandViewZForIntersections(view, 0.35)
   const localRarefactionSegments = enforcePipelineOrientationFromAnchor(
     buildSolutionRarefactionToFastInflectionSegments(
@@ -65,22 +65,40 @@ export function buildFastPipeline({ entry, sonicRarefactionAnchors: _sonicRarefa
     FAST_R_ORIENTATION,
   )
   const localInflectionPoint = terminalAnchorFromFirstSegment(localRarefactionSegments) ?? null
-  const globalLocalCompositeSegments = buildGlobalCompositeIntersectionSegments(
+  const localCompositeSourceRarefactionSegments = localRarefactionSegments
+    .map((segment) => segment.map(pointObjectFromCoords).filter(Boolean))
+    .filter((segment) => segment.length >= 2)
+  const globalLocalCompositeSegments = buildGlobalCompositeIntersectionFromRarefactionCurve(
+    localCompositeSourceRarefactionSegments,
     entry.seed,
     params,
     localCompositeCalcView,
-    Math.max(resolution, 90),
     direction,
     'right',
     'fast',
   )
-  const orientedRawLocalCompositeSegments = extractOrientedCompositeArcFromFullCurve(
+  let orientedRawLocalCompositeSegments = extractOrientedCompositeArcFromFullCurve(
     globalLocalCompositeSegments,
     localInflectionPoint,
     params,
     localCompositeCalcView,
     FAST_K_ORIENTATION,
   )
+  if (!hasUsableSegments(orientedRawLocalCompositeSegments)) {
+    const leafContinuation = buildFirstIntersectionCompositeFromRarefactionArc(
+      localCompositeSourceRarefactionSegments,
+      params,
+      localCompositeCalcView,
+      direction,
+      'right',
+      'fast',
+    )
+    orientedRawLocalCompositeSegments = anchorCompositeContinuationAtInflection(
+      leafContinuation,
+      localInflectionPoint,
+      localCompositeCalcView,
+    )
+  }
   const localCompositeIntersection = firstHugoniotIntersectionOnComposite({
     compositeSegments: orientedRawLocalCompositeSegments,
     fixedState: entry.state,
@@ -179,33 +197,31 @@ export function buildFastPipeline({ entry, sonicRarefactionAnchors: _sonicRarefa
     const rarefactionEnd = rarefactionCurveData.arcEnd
       ?? terminalAnchorFromFirstSegment(rarefactionSegments)
       ?? null
+    const compositeSourceRarefactionSegments = rarefactionSegments
+      .map((segment) => segment.map(pointObjectFromCoords).filter(Boolean))
+      .filter((segment) => segment.length >= 2)
 
     // J_nloc is exactly the terminal point of the nonlocal rarefaction.
     // Without that terminal point there is no valid component of K_nloc to
     // select.
     let completeNonlocalCompositeSegments = rarefactionEnd
       ? buildGlobalCompositeIntersectionFromRarefactionCurve(
-        rarefactionSegments, anchor, params, nonlocalChainCalcView, direction, 'right', 'fast',
+        compositeSourceRarefactionSegments, anchor, params, nonlocalChainCalcView, direction, 'right', 'fast',
       )
       : []
-    if (rarefactionEnd && !hasUsableSegments(completeNonlocalCompositeSegments)) {
-      completeNonlocalCompositeSegments = buildGlobalCompositeIntersectionSegments(
-        anchor, params, nonlocalChainCalcView, nonlocalChainResolution, direction, 'right', 'fast',
-      )
-    }
-    let compositeSegmentsFromInflection = extractOrientedCompositeArcFromFullCurve(
-      completeNonlocalCompositeSegments, rarefactionEnd, params, nonlocalChainCalcView, FAST_K_ORIENTATION,
+    const leafContinuation = buildFirstIntersectionCompositeFromRarefactionArc(
+      compositeSourceRarefactionSegments, params, nonlocalChainCalcView, direction, 'right', 'fast',
+    )
+    let compositeSegmentsFromInflection = anchorCompositeContinuationAtInflection(
+      leafContinuation, rarefactionEnd, nonlocalChainCalcView,
     )
     if (rarefactionEnd && !hasUsableSegments(compositeSegmentsFromInflection)) {
-      compositeSegmentsFromInflection = buildCompositeFromSpecifiedRarefactionCurve(
-        rarefactionSegments, rarefactionEnd, params, nonlocalChainCalcView, nonlocalChainResolution,
-        direction, 'right', 'fast', FAST_K_ORIENTATION, null, null, anchor,
+      compositeSegmentsFromInflection = extractOrientedCompositeArcFromFullCurve(
+        completeNonlocalCompositeSegments, rarefactionEnd, params, nonlocalChainCalcView, FAST_K_ORIENTATION,
       )
     }
     const nonlocalCompositeStart = rarefactionEnd
-    const orientedCompositeSegments = enforcePipelineOrientationFromAnchor(
-      compositeSegmentsFromInflection, nonlocalCompositeStart, params, nonlocalChainCalcView, FAST_K_ORIENTATION,
-    )
+    const orientedCompositeSegments = compositeSegmentsFromInflection
     const compositeEndpoint = terminalAnchorFromFirstSegment(orientedCompositeSegments) ?? null
     return {
       anchor: nonlocalCompositeStart ?? anchor,
@@ -270,7 +286,7 @@ export function buildFastPipeline({ entry, sonicRarefactionAnchors: _sonicRarefa
   const nonlocalShockFromLocalCompositeArc = makeArc({ branch, family: 'shock', locality: SOLUTION_ARC_NONLOCAL, segments: nonlocalShockFromLocalCompositeSegments, orientation: firstChainNonlocalShockOrientation, sonicTarget: null, direction, stateRole: 'U_+', state: usableLocalCompositeShockPairs[0]?.fixedState ?? null, anchor: usableLocalCompositeShockPairs[0]?.start ?? null, metadata: { chain: 'firstChain', starts: usableLocalCompositeShockPairs.map((item) => ({ anchor: item.start, fixedState: item.fixedState, sourceAnchor: item.sourceAnchor, source: item.source })) }, params })
   const nonlocalShockFromNonlocalCompositeArc = makeArc({ branch, family: 'shock', locality: SOLUTION_ARC_NONLOCAL, segments: nonlocalShockFromNonlocalCompositeSegments, orientation: secondChainNonlocalShockOrientation, sonicTarget: null, direction, stateRole: 'U_+', state: nonlocalCompositeShockPairs[0]?.fixedState ?? null, anchor: nonlocalCompositeShockPairs[0]?.start ?? null, metadata: { chain: 'secondChain', starts: nonlocalCompositeShockPairs.map((item) => ({ anchor: item.start, fixedState: item.fixedState, sourceAnchor: item.sourceAnchor, source: item.source })) }, params })
   const nonlocalShockArc = makeArc({ branch, family: 'shock', locality: SOLUTION_ARC_NONLOCAL, segments: [], orientation: null, sonicTarget: null, direction, stateRole: 'U_+', state: null, anchor: null, metadata: { deprecated: true, reason: 'fast nonlocal shocks are split by numbered solution chains' }, params })
-  const localCompositeArc = makeArc({ branch, family: 'composite', locality: SOLUTION_ARC_LOCAL, segments: localCompositeSegments, orientation: fastLocalCompositeOrientation, sonicTarget: 'right', direction, stateRole: 'U_+', state: relevantStateForPoint(entry.seed, params, direction), anchor: entry.seed, metadata: { stopPoint: localCompositeStopPoint, inflectionPoint: localInflectionPoint, construction: 'component of Sat_{H_+}(R_+(U_R)) cap S^+ through J_+' }, params })
+  const localCompositeArc = makeArc({ branch, family: 'composite', locality: SOLUTION_ARC_LOCAL, segments: localCompositeSegments, orientation: fastLocalCompositeOrientation, sonicTarget: 'right', direction, stateRole: 'U_+', state: relevantStateForPoint(entry.seed, params, direction), anchor: entry.seed, metadata: { stopPoint: localCompositeStopPoint, inflectionPoint: localInflectionPoint, construction: 'A_loc(K_+) = Sat_{H_+}(R_loc) cap S^+ is generated only by leaves through the restricted local rarefaction arc', sourceRarefactionArc: 'localRarefactionSegments' }, params })
   const nonlocalCompositeArc = makeArc({ branch, family: 'composite', locality: SOLUTION_ARC_NONLOCAL, segments: nonlocalCompositeSegments, orientation: FAST_K_ORIENTATION, sonicTarget: 'right', direction, stateRole: 'U_+', state: relevantStateForPoint(hMinusCfPoint, params, direction), anchor: hMinusCfPoint, metadata: { anchors: projectedRarefactionAnchors, hMinusCfPoint, baseArc: 'nonlocalRarefactionArc', construction: 'mathcal K_nloc = Sat_H(mathcal R_nloc) cap S; K_nloc is extracted from the full nonlocal fast rarefaction curve', pairs: nonlocalCompositePairs, trimmedPairs: trimmedNonlocalCompositePairs }, params })
   const localRarefactionArc = makeArc({ branch, family: 'rarefaction', locality: SOLUTION_ARC_LOCAL, segments: localRarefactionSegments, orientation: FAST_R_ORIENTATION, sonicTarget: 'right', direction, stateRole: 'U_+', state: relevantStateForPoint(entry.seed, params, direction), anchor: entry.seed, params })
   const nonlocalRarefactionArc = makeArc({ branch, family: 'rarefaction', locality: SOLUTION_ARC_NONLOCAL, segments: nonlocalRarefactionSegments, orientation: FAST_R_ORIENTATION, sonicTarget: 'right', direction, stateRole: 'U_+', state: relevantStateForPoint(hMinusCfPoint, params, direction), anchor: hMinusCfPoint, metadata: { anchors: projectedRarefactionAnchors, hMinusCfPoint, curveSegments: nonlocalCompositePairs.flatMap((item) => item.rarefactionCurveSegments ?? []), compositePairs: nonlocalCompositePairs }, params })
@@ -341,4 +357,3 @@ export function buildFastPipeline({ entry, sonicRarefactionAnchors: _sonicRarefa
     diagnosticPoints: diagnosticsFromPieces(solutionChains.flatMap((chain) => chain.pieces)),
   }
 }
-

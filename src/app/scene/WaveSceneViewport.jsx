@@ -32,6 +32,7 @@ function SelectedRarefactionCurves({ curveEntries, params, calcView, resolution,
       lineWidth={entry.lineWidth}
       constrainZ={true}
       direction={entry.direction}
+      compactifiedZ={entry.branch === 'slow'}
     />
   ))
 }
@@ -117,6 +118,7 @@ function SelectedHugoniotCurves({ curveEntries, params, calcView, resolution, ma
       onInspectPoint={onInspectPoint}
       onHoverPoint={inspectionModeEnabled ? onHoverPoint : null}
       interactive={true}
+      compactifiedZ={entry.branch === 'slow'}
     />
   ))
 }

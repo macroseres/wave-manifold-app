@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { FORWARD_HUGONIOT, BACKWARD_HUGONIOT } from '../../entities/hugoniot/directions'
 import { waveColors } from '../../config/waveColors'
 import { buildCompositeSaturatedSurfaceGeometry } from '../../geometry/compositeSaturatedSurfaceGeometry'
+import { ZCompactifiedMesh } from '../../app/scene/ZCompactification'
 
 function CompositeSaturatedSurfaceBase({
   fixedState,
@@ -23,7 +24,7 @@ function CompositeSaturatedSurfaceBase({
   if (!visible || !fixedState || !geometry || geometry.attributes.position?.count === 0) return null
 
   return (
-    <mesh geometry={geometry} renderOrder={2}>
+    <ZCompactifiedMesh geometry={geometry} renderOrder={2}>
       <meshStandardMaterial
         color={color}
         side={THREE.DoubleSide}
@@ -34,7 +35,7 @@ function CompositeSaturatedSurfaceBase({
         metalness={0.0}
         depthWrite={false}
       />
-    </mesh>
+    </ZCompactifiedMesh>
   )
 }
 

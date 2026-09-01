@@ -2,6 +2,7 @@ import { FORWARD_HUGONIOT, normalizeHugoniotDirection } from '../hugoniot/direct
 import { rarefactionDerivativeDtDz, waveSpeed, sonicImplicitF, sonicLeftImplicitF } from '../surfaceImplicit/index.js'
 import { makeWaveCurve, makeWaveLeaf } from '../shared/types/mathTypes.js'
 import { annotateSpeedsAndAdmissibility, orientSegmentsBySpeed, orientationFromDirection, splitSegmentsAtLargeJumps } from './orientation.js'
+import { VISUAL_Z_MAX, VISUAL_Z_MIN, physicalZToVisual, visualZToPhysical } from '../../geometry/zCompactification.js'
 
 function rk4Step(z, t, h, params) {
   const k1 = rarefactionDerivativeDtDz(z, t, params)
@@ -164,7 +165,14 @@ function integrateBranchAdaptive(z0, t0, params, view, direction, options = {}) 
     const remaining = Math.abs(zEnd - z)
     if (remaining <= 1e-12) break
 
-    const absH = Math.min(Math.abs(h), remaining, maxAbsStep)
+    const maxVisualStep = Number.isFinite(options.maxVisualStep) ? Math.max(1e-5, options.maxVisualStep) : null
+    const visualStepCap = maxVisualStep
+      ? Math.abs(visualZToPhysical(Math.max(
+        VISUAL_Z_MIN + 1e-4,
+        Math.min(VISUAL_Z_MAX - 1e-4, physicalZToVisual(z) + direction * maxVisualStep),
+      )) - z)
+      : Number.POSITIVE_INFINITY
+    const absH = Math.min(Math.abs(h), remaining, maxAbsStep, visualStepCap)
     h = direction * Math.max(minAbsStep, absH)
 
     const candidate = tryAdaptiveStep(z, t, h, params, scales)
@@ -242,7 +250,7 @@ function waveDirectionFromAppDirection(direction) {
   return normalizeHugoniotDirection(direction) === FORWARD_HUGONIOT ? 'minus' : 'plus'
 }
 
-export function buildRarefactionLeaf({ fixedState, params, view, samples = 500, direction = FORWARD_HUGONIOT, constrainZ: _constrainZ = false, continuation = false }) {
+export function buildRarefactionLeaf({ fixedState, params, view, samples = 500, direction = FORWARD_HUGONIOT, constrainZ: _constrainZ = false, continuation = false, compactifiedZ = false }) {
   const waveDirection = waveDirectionFromAppDirection(direction)
   const orientation = orientationFromDirection({ family: 'rarefaction', direction: waveDirection })
   const name = waveDirection === 'plus' ? 'R_+' : 'R_-'
@@ -257,10 +265,19 @@ export function buildRarefactionLeaf({ fixedState, params, view, samples = 500, 
   // - computeView: dominio computacional da curva integral da EDO.
   // A continuacao da variedade deve usar continuation=true; nesse modo o
   // dominio computacional e proprio da EDO e nao depende da camera/eixos.
-  const drawView = expandedRarefactionView(view, 1.0, 0)
-  const computeView = continuation
-    ? rarefactionContinuationView(fixedState, view)
-    : drawView
+  const compactMargin = 1e-4
+  const drawView = compactifiedZ
+    ? {
+      ...expandedRarefactionView(view, 1.0, 0),
+      zMin: visualZToPhysical(VISUAL_Z_MIN + compactMargin),
+      zMax: visualZToPhysical(VISUAL_Z_MAX - compactMargin),
+    }
+    : expandedRarefactionView(view, 1.0, 0)
+  const computeView = compactifiedZ
+    ? drawView
+    : continuation
+      ? rarefactionContinuationView(fixedState, view)
+      : drawView
 
   const isMinus = waveDirection === 'minus'
   const targetSamples = continuation
@@ -277,15 +294,16 @@ export function buildRarefactionLeaf({ fixedState, params, view, samples = 500, 
     // A continuação global da rarefação precisa de muitos pontos porque ela é
     // a geratriz da superfície Sat_H(R).  R_- recebe orçamento maior, pois é a
     // região onde apareceram triângulos grandes perto da inflexão e de z=0.
-    maxPoints: Math.max(256, Math.min(continuation ? (isMinus ? 4200 : 3400) : 2600, Math.max(branchBudget, targetSamples))),
-    initialAbsStep: zSpan / Math.max(continuation ? (isMinus ? 680 : 560) : 260, branchBudget * (continuation ? 2.6 : 1.8)),
-    maxAbsStep: zSpan / (continuation ? (isMinus ? 260 : 220) : 96),
-    minAbsStep: zSpan / (continuation ? 180000 : 60000),
+    maxPoints: compactifiedZ ? 8000 : Math.max(256, Math.min(continuation ? (isMinus ? 4200 : 3400) : 2600, Math.max(branchBudget, targetSamples))),
+    initialAbsStep: compactifiedZ ? 0.01 : zSpan / Math.max(continuation ? (isMinus ? 680 : 560) : 260, branchBudget * (continuation ? 2.6 : 1.8)),
+    maxAbsStep: compactifiedZ ? Math.max(8, zSpan / 64) : zSpan / (continuation ? (isMinus ? 260 : 220) : 96),
+    minAbsStep: compactifiedZ ? 1e-6 : zSpan / (continuation ? 180000 : 60000),
     tolerance: continuation ? (isMinus ? 8.0e-4 : 1.0e-3) : 5.0e-4,
     maxJumpT: continuation ? Math.max(80, 0.45 * tSpan) : 0.10 * tSpan,
-    collectAll: continuation,
+    collectAll: continuation || compactifiedZ,
     clipView: drawView,
     sonicFn: continuation ? sonicFn : null,
+    maxVisualStep: compactifiedZ ? 0.004 : null,
   }
 
   const backward = integrateBranchAdaptive(fixedState.z, fixedState.t, params, computeView, -1, integratorOptions).reverse()
@@ -303,7 +321,7 @@ export function buildRarefactionLeaf({ fixedState, params, view, samples = 500, 
   const segments = splitSegmentsAtLargeJumps(raw, {
     maxJumpT: jumpTMax,
     maxJumpY: 1e-8,
-    maxJumpZ: Math.max(zSpan / 64, 1e-6),
+    maxJumpZ: compactifiedZ ? Number.POSITIVE_INFINITY : Math.max(zSpan / 64, 1e-6),
   })
 
   const speedFn = (point) => waveSpeed(point.t, point.z, params)
@@ -327,7 +345,7 @@ export function buildRarefactionLeaf({ fixedState, params, view, samples = 500, 
     metadata: {
       fixedState,
       originalDirection: direction,
-      sampler: continuation ? 'adaptive-rk4-dtdz-continuation' : 'adaptive-rk4-dtdz-visual',
+      sampler: compactifiedZ ? 'adaptive-rk4-dtdz-compactified' : continuation ? 'adaptive-rk4-dtdz-continuation' : 'adaptive-rk4-dtdz-visual',
       sampledPointCount: validRawPoints.length,
     },
   })
@@ -341,7 +359,7 @@ export function buildRarefactionLeaf({ fixedState, params, view, samples = 500, 
     curve,
     metadata: {
       fixedState,
-      sampler: continuation ? 'adaptive-rk4-dtdz-continuation' : 'adaptive-rk4-dtdz-visual',
+      sampler: compactifiedZ ? 'adaptive-rk4-dtdz-compactified' : continuation ? 'adaptive-rk4-dtdz-continuation' : 'adaptive-rk4-dtdz-visual',
       sampledPointCount: validRawPoints.length,
     },
   })

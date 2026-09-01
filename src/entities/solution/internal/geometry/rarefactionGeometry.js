@@ -117,7 +117,34 @@ export function buildSolutionRarefactionToInflectionSegments(
     }
   }
 
-  if (!candidates.length) return []
+  // A coarse sampled leaf can miss a narrow crossing. Do not replace J by a
+  // merely nearby point: integrate both intrinsic z-directions and accept only
+  // a trajectory that actually brackets and refines a zero of S^-.
+  if (!candidates.length) {
+    const integrated = []
+    for (const sign of [1, -1]) {
+      const candidate = traceNonlocalRarefactionSide(
+        anchorPoint,
+        params,
+        view,
+        Math.max(resolution, 90),
+        sign,
+        { stopAtInflection: true },
+      )
+      if (!candidate?.hitInflection || !Array.isArray(candidate.segment) || candidate.segment.length < 2) continue
+      if (!pointOnCharacteristicSide(candidate.endPoint, branch)) continue
+      const orientationMatches = orientation === SPEED_DECREASES
+        ? candidate.speedDelta <= 1e-8
+        : candidate.speedDelta >= -1e-8
+      if (!orientationMatches) continue
+      const endResidual = slowInflectionResidual(candidate.endPoint, params)
+      if (!finite(endResidual) || Math.abs(endResidual) > 1e-8) continue
+      integrated.push(candidate)
+    }
+    integrated.sort((a, b) => a.length - b.length)
+    if (integrated.length) return [integrated[0].segment]
+    return []
+  }
   candidates.sort((a, b) => scaledSegmentLength(a, view) - scaledSegmentLength(b, view))
   return [candidates[0]]
 }
@@ -414,4 +441,3 @@ export function buildNonlocalRarefactionCurveData(anchorPoint, endpointPoint, pa
     candidates: normalizedCandidate ? [normalizedCandidate] : [],
   }
 }
-

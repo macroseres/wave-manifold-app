@@ -1,4 +1,4 @@
-import { Line } from '@react-three/drei'
+import { ZCompactifiedLine as Line } from '../../../../app/scene/ZCompactification'
 import { FORWARD_HUGONIOT, BACKWARD_HUGONIOT } from '../../../hugoniot/directions.js'
 import AdmissibleArcCurve from '../../../../components/curves/AdmissibleArcCurve.jsx'
 import { CompositeSlowCurve, CompositeFastCurve } from '../../../../components/curves/CompositeCurve.jsx'

@@ -6,11 +6,13 @@ import OverlaySettingsPanel from './OverlaySettingsPanel'
 import { AboutCard, HelpCard } from './FloatingInfoCards'
 import OverlayStage from './OverlayStage'
 import useOverlayPanelController from './useOverlayPanelController'
+import WorkspaceStatusBar from './WorkspaceStatusBar'
 
 export default function OverlayPanel(props) {
   const {
     params,
     view,
+    calculationView,
     yScale,
     setYScale,
     tScale,
@@ -28,6 +30,9 @@ export default function OverlayPanel(props) {
     autoRotate3D = false,
     setAutoRotate3D,
     inspectionModeEnabled = false,
+    inspectionProbesByBranch = { slow: null, fast: null },
+    inspectionCurveVisibility = null,
+    onMoveInspectionProbe,
     setInspectionModeEnabled,
     canEnableInspectionMode = false,
     solutionModeEnabled = false,
@@ -35,7 +40,9 @@ export default function OverlayPanel(props) {
     canEnableSolutionMode = false,
     showInflectionSlow,
     showInflectionFast,
+    showCoincidence,
     showHysteresis,
+    showHugoniotMinus,
     solutionDiagnostics = [],
     onSelectCharacteristicPoint,
     onExportSnapshot,
@@ -101,12 +108,19 @@ export default function OverlayPanel(props) {
         activeView={activeView}
         params={params}
         view={view}
+        probeView={calculationView ?? view}
         selectedEntries={selectedEntries}
         onSelectCharacteristicPoint={onSelectCharacteristicPoint}
         showInflectionSlow={showInflectionSlow}
         showInflectionFast={showInflectionFast}
+        showCoincidence={showCoincidence}
         showHysteresis={showHysteresis}
+        showHugoniotMinus={showHugoniotMinus}
         inspectionModeEnabled={inspectionModeEnabled}
+        inspectionProbesByBranch={inspectionProbesByBranch}
+        inspectionCurveVisibility={inspectionCurveVisibility}
+        onMoveInspectionProbe={onMoveInspectionProbe}
+        resolution={resolution}
         solutionDiagnostics={solutionDiagnostics}
         formatNumber={controller.formatNumber}
         parameterMapProps={{
@@ -131,6 +145,11 @@ export default function OverlayPanel(props) {
 
       <RightInfoPanel {...controller.rightInfoPanelProps} />
       <VisualizationControlsPanel {...controller.visualizationPanelProps} />
+      <WorkspaceStatusBar
+        selectedEntries={selectedEntries}
+        inspectionModeEnabled={inspectionModeEnabled}
+        solutionModeEnabled={solutionModeEnabled}
+      />
     </div>
   )
 }

@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises'
 
 const fastPipelineUrl = new URL('../src/entities/solution/branches/pipelines/fastPipeline.js', import.meta.url)
 
-test('fast local chain uses the same global-curve restriction logic as the slow chain', async () => {
+test('fast local chain is generated only from the restricted local rarefaction arc', async () => {
   const source = await readFile(fastPipelineUrl, 'utf8')
   const localStart = source.indexOf('// Classical fast local chain')
   const localEnd = source.indexOf('const rawLocalShockSegments =', localStart)
@@ -12,8 +12,11 @@ test('fast local chain uses the same global-curve restriction logic as the slow 
 
   assert.ok(localStart >= 0 && localEnd > localStart)
   assert.match(local, /buildSolutionRarefactionToFastInflectionSegments\(/)
-  assert.match(local, /buildGlobalCompositeIntersectionSegments\(\s*entry\.seed,/)
-  assert.match(local, /extractOrientedCompositeArcFromFullCurve\(/)
+  assert.match(local, /buildGlobalCompositeIntersectionFromRarefactionCurve\(\s*localCompositeSourceRarefactionSegments,/)
+  assert.match(local, /segment\.map\(pointObjectFromCoords\)/)
+  assert.doesNotMatch(local, /buildGlobalCompositeIntersectionSegments\(\s*entry\.seed,/)
+  assert.match(local, /extractOrientedCompositeArcFromFullCurve\([\s\S]*?localInflectionPoint/)
+  assert.match(local, /anchorCompositeContinuationAtInflection\([\s\S]*?localInflectionPoint/)
   assert.match(local, /localInflectionPoint/)
   assert.match(local, /firstHugoniotIntersectionOnComposite\(/)
   assert.doesNotMatch(local, /buildSolutionCompositeSegments\(/)
@@ -32,7 +35,10 @@ test('fast nonlocal composite displays only the component through inflection', a
   const section = source.slice(start, end)
 
   assert.ok(start >= 0 && end > start)
-  assert.match(section, /extractOrientedCompositeArcFromFullCurve\(/)
+  assert.match(section, /buildGlobalCompositeIntersectionFromRarefactionCurve\(\s*compositeSourceRarefactionSegments,/)
+  assert.match(section, /anchorCompositeContinuationAtInflection\([\s\S]*?rarefactionEnd/)
+  assert.match(section, /if \(rarefactionEnd && !hasUsableSegments\(compositeSegmentsFromInflection\)\)[\s\S]*?extractOrientedCompositeArcFromFullCurve/)
+  assert.doesNotMatch(section, /buildGlobalCompositeIntersectionSegments\(\s*anchor,/)
   assert.match(section, /involvedCompositeSegments: compositeSegmentsFromInflection/)
   assert.doesNotMatch(section, /involvedCompositeSegments: completeNonlocalCompositeSegments/)
 })

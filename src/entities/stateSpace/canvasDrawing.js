@@ -1,5 +1,9 @@
 import { waveColors } from '../../config/waveColors.js'
-import { branchCharacteristicWindow, projectedStateForTZ } from '../../geometry/stateSpaceProjection.js'
+import {
+  branchCharacteristicWindow,
+  characteristicBoundaryZAtFraction,
+  projectedStateForTZ,
+} from '../../geometry/stateSpaceProjection.js'
 
 function resizeCanvasForDpr(canvas) {
   const rect = canvas.getBoundingClientRect()
@@ -25,46 +29,105 @@ function drawGrid(ctx, rect, axisU, axisV) {
   ctx.beginPath(); ctx.moveTo(axisU, 0); ctx.lineTo(axisU, rect.height); ctx.stroke()
 }
 
+function clipLineToRect(a, b, rect, margin = 2) {
+  const xMin = -margin
+  const xMax = rect.width + margin
+  const yMin = -margin
+  const yMax = rect.height + margin
+  const dx = b.x - a.x
+  const dy = b.y - a.y
+  let t0 = 0
+  let t1 = 1
+  for (const [p, q] of [[-dx, a.x - xMin], [dx, xMax - a.x], [-dy, a.y - yMin], [dy, yMax - a.y]]) {
+    if (Math.abs(p) < 1e-14) {
+      if (q < 0) return null
+      continue
+    }
+    const ratio = q / p
+    if (p < 0) t0 = Math.max(t0, ratio)
+    else t1 = Math.min(t1, ratio)
+    if (t0 > t1) return null
+  }
+  return [
+    { x: a.x + t0 * dx, y: a.y + t0 * dy },
+    { x: a.x + t1 * dx, y: a.y + t1 * dy },
+  ]
+}
+
 function drawBoundary(ctx, { branch, color, view, params, toScreen, rect }) {
   const win = branchCharacteristicWindow(view, branch)
   if (!win.valid) return
+  const compactZMin = characteristicBoundaryZAtFraction(win, 0)
+  const compactZMax = characteristicBoundaryZAtFraction(win, 1)
   const edges = [
     { fixed: 't', value: win.tMin },
     { fixed: 't', value: win.tMax },
-    { fixed: 'z', value: win.zMin },
-    { fixed: 'z', value: win.zMax },
+    { fixed: 'z', value: compactZMin },
+    { fixed: 'z', value: compactZMax },
   ]
   ctx.save()
-  ctx.strokeStyle = color
-  ctx.globalAlpha = 0.9
-  ctx.lineWidth = 2
-  ctx.setLineDash([5, 4])
+  ctx.fillStyle = color
+  ctx.globalAlpha = 0.52
   for (const edge of edges) {
+    // tau=0 é desenhada uma única vez pela equação implícita da
+    // coincidência; omitir esta aresta evita duas aproximações sobrepostas.
+    if (edge.fixed === 't' && Math.abs(edge.value) < 1e-14) continue
     ctx.beginPath()
-    let started = false
-    const steps = 160
+    let previousScreen = null
+    let distanceSinceDot = 0
+    const dotSpacing = 6.5
+    const steps = 640
     for (let i = 0; i <= steps; i += 1) {
       const a = i / steps
       const t = edge.fixed === 't' ? edge.value : win.tMin + a * (win.tMax - win.tMin)
-      const z = edge.fixed === 'z' ? edge.value : win.zMin + a * (win.zMax - win.zMin)
+      const z = edge.fixed === 'z' ? edge.value : characteristicBoundaryZAtFraction(win, a)
       const projected = projectedStateForTZ(t, z, params, branch)
-      if (!projected) { started = false; continue }
-      const { x, y } = toScreen(projected.state, rect)
-      if (!started) { ctx.moveTo(x, y); started = true }
-      else ctx.lineTo(x, y)
+      if (!projected) { previousScreen = null; distanceSinceDot = 0; continue }
+      const screen = toScreen(projected.state, rect)
+      if (previousScreen) {
+        const clipped = clipLineToRect(previousScreen, screen, rect)
+        if (clipped) {
+          const [start, end] = clipped
+          const dx = end.x - start.x
+          const dy = end.y - start.y
+          const length = Math.hypot(dx, dy)
+          let distance = distanceSinceDot > 0 ? dotSpacing - distanceSinceDot : 0
+          while (distance <= length) {
+            const ratio = length > 1e-12 ? distance / length : 0
+            const x = start.x + ratio * dx
+            const y = start.y + ratio * dy
+            ctx.moveTo(x + 0.9, y)
+            ctx.arc(x, y, 0.9, 0, 2 * Math.PI)
+            distance += dotSpacing
+          }
+          distanceSinceDot = (distanceSinceDot + length) % dotSpacing
+        } else {
+          distanceSinceDot = 0
+        }
+      }
+      previousScreen = screen
     }
-    ctx.stroke()
+    ctx.fill()
   }
   ctx.restore()
 }
 
-function drawProjectedSegments(ctx, { segments, color, lineWidth = 2.8, toScreen, rect }) {
+function drawProjectedSegments(ctx, {
+  segments,
+  color,
+  lineWidth = 2.8,
+  dashed = false,
+  dotted = false,
+  alpha = 0.98,
+  toScreen,
+  rect,
+}) {
   if (!segments?.length) return
   ctx.save()
   ctx.strokeStyle = color
-  ctx.globalAlpha = 0.98
+  ctx.globalAlpha = alpha
   ctx.lineWidth = lineWidth
-  ctx.setLineDash([])
+  ctx.setLineDash(dotted ? [2, 5] : dashed ? [7, 5] : [])
   for (const segment of segments) {
     ctx.beginPath()
     let started = false
@@ -81,6 +144,53 @@ function drawProjectedSegments(ctx, { segments, color, lineWidth = 2.8, toScreen
     if (started) ctx.stroke()
   }
   ctx.restore()
+}
+
+function drawProbeProjection(ctx, { probeProjection, toScreen, rect }) {
+  for (const branch of ['slow', 'fast']) {
+    const projection = probeProjection?.[branch]
+    if (!projection) continue
+    drawProjectedSegments(ctx, { segments: projection.minusSegments, color: waveColors.hugoniotMinus, lineWidth: 3, dashed: true, toScreen, rect })
+    drawProjectedSegments(ctx, { segments: projection.plusSegments, color: waveColors.hugoniotPlus, lineWidth: 3, dashed: true, toScreen, rect })
+    drawProjectedSegments(ctx, {
+      segments: projection.rarefactionSegments,
+      color: branch === 'slow' ? waveColors.rarefactionSlow : waveColors.rarefactionFast,
+      lineWidth: 3,
+      dashed: true,
+      toScreen,
+      rect,
+    })
+
+  }
+}
+
+function drawProbeMarkers(ctx, { probeProjection, toScreen, rect }) {
+  for (const branch of ['slow', 'fast']) {
+    const projection = probeProjection?.[branch]
+    if (!projection) continue
+    const states = [
+      { u: projection.point?.uMinus, v: projection.point?.vMinus },
+      { u: projection.point?.uPlus, v: projection.point?.vPlus },
+    ].filter((state, index, all) => Number.isFinite(state.u) && Number.isFinite(state.v) && (
+      index === 0 || Math.hypot(state.u - all[0].u, state.v - all[0].v) > 1e-8
+    ))
+    for (const state of states) {
+      const { x, y } = toScreen(state, rect)
+      ctx.save()
+      ctx.fillStyle = branch === 'slow' ? waveColors.characteristicSlow : waveColors.characteristicFast
+      ctx.strokeStyle = '#facc15'
+      ctx.lineWidth = 3
+      ctx.beginPath(); ctx.arc(x, y, 9, 0, 2 * Math.PI); ctx.fill(); ctx.stroke()
+      ctx.beginPath(); ctx.arc(x, y, 14, 0, 2 * Math.PI)
+      ctx.strokeStyle = 'rgba(250, 204, 21, 0.55)'
+      ctx.lineWidth = 2
+      ctx.stroke()
+      ctx.fillStyle = '#f8fafc'
+      ctx.font = '600 12px system-ui, sans-serif'
+      ctx.fillText(branch === 'slow' ? 'Pₛ' : 'Pᶠ', x + 13, y - 12)
+      ctx.restore()
+    }
+  }
 }
 
 function drawSelectedPoint(ctx, { branch, color, selectedMap, hoverBranch, draggingBranch, toScreen, rect }) {
@@ -106,7 +216,7 @@ export function drawStateSpaceCanvas(canvas, options) {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
   const { rect, dpr } = resizeCanvasForDpr(canvas)
-  const { bounds, selectedMap, hoverBranch, draggingBranch, view, params, toScreen, implicitInflectionSegments, hysPlusProjectionSegments } = options
+  const { bounds, selectedMap, hoverBranch, draggingBranch, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, hysPlusProjectionSegments, probeProjection } = options
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
   ctx.clearRect(0, 0, rect.width, rect.height)
 
@@ -120,11 +230,36 @@ export function drawStateSpaceCanvas(canvas, options) {
   drawGrid(ctx, rect, axisU, axisV)
   drawBoundary(ctx, { branch: 'slow', color: waveColors.characteristicSlow, view, params, toScreen, rect })
   drawBoundary(ctx, { branch: 'fast', color: waveColors.characteristicFast, view, params, toScreen, rect })
+  // A coincidência também é a borda comum das duas características.
+  // Primeiro desenhamos sua versão-guia com o mesmo estilo discreto.
+  drawProjectedSegments(ctx, {
+    segments: implicitCoincidenceSegments,
+    color: waveColors.coincidenceState,
+    lineWidth: 1.25,
+    dotted: true,
+    alpha: 0.46,
+    toScreen,
+    rect,
+  })
+  // Se E estiver habilitada, a curva matemática é destacada separadamente
+  // sobre a fronteira-guia.
+  if (showCoincidence) {
+    drawProjectedSegments(ctx, {
+      segments: implicitCoincidenceSegments,
+      color: waveColors.coincidenceState,
+      lineWidth: 3.2,
+      toScreen,
+      rect,
+    })
+  }
   drawProjectedSegments(ctx, { segments: implicitInflectionSegments, color: waveColors.inflection ?? '#facc15', lineWidth: 3.4, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: implicitHugoniotMinusSegments, color: waveColors.hugoniotMinus, lineWidth: 3.2, toScreen, rect })
   drawProjectedSegments(ctx, { segments: hysPlusProjectionSegments.minus, color: '#c4b5fd', lineWidth: 2.8, toScreen, rect })
   drawProjectedSegments(ctx, { segments: hysPlusProjectionSegments.plus, color: '#bae6fd', lineWidth: 2.8, toScreen, rect })
+  drawProbeProjection(ctx, { probeProjection, toScreen, rect })
   drawSelectedPoint(ctx, { branch: 'slow', color: waveColors.characteristicSlow, selectedMap, hoverBranch, draggingBranch, toScreen, rect })
   drawSelectedPoint(ctx, { branch: 'fast', color: waveColors.characteristicFast, selectedMap, hoverBranch, draggingBranch, toScreen, rect })
+  drawProbeMarkers(ctx, { probeProjection, toScreen, rect })
 }
 
 export function drawSolutionCanvas(canvas) {

@@ -345,6 +345,27 @@ export function buildFirstIntersectionCompositeFromRarefactionArc(
     .filter((segment) => keepDrawableSegment(segment, view))
 }
 
+/**
+ * Accept a leaf-by-leaf continuation only when it belongs to the local
+ * component through J. The exact anchor is prepended so rendering cannot show
+ * a numerical gap between the rarefaction endpoint and the composite start.
+ */
+export function anchorCompositeContinuationAtInflection(
+  segments,
+  inflectionPoint,
+  view,
+  maxDistance = 0.075,
+) {
+  const anchor = coordsOf(inflectionPoint)
+  if (!anchor || !hasUsableSegments(segments)) return []
+  const firstSegment = (segments ?? []).find((segment) => Array.isArray(segment) && segment.length >= 2)
+  const first = coordsOf(firstSegment?.[0])
+  if (!first || normalizedDistance3(anchor, first, view) > maxDistance) return []
+  const anchored = [anchor, ...firstSegment.map(coordsOf).filter(Boolean)]
+    .filter((point, index, points) => index === 0 || normalizedDistance3(point, points[index - 1], view) > 1e-12)
+  return anchored.length >= 2 ? [anchored] : []
+}
+
 export function normalizedCompositeTortuosity(segment, view) {
   if (!Array.isArray(segment) || segment.length < 2) return Number.POSITIVE_INFINITY
   const length = scaledSegmentLength(segment, view)
@@ -771,4 +792,3 @@ export function trimSegmentsToFirstSonic(
     sonicBranch: hit.branch ?? (sonicTarget === 'right' ? sonicRightBranch(hit.point, params) : null),
   }
 }
-

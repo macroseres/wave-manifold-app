@@ -36,7 +36,7 @@ export default function OverlayTopBar({
       <nav className="wm-tabs" aria-label="Navegação principal">
         <button type="button" className={`wm-tab ${activeView === '3d' ? 'active' : ''}`} onClick={() => setActiveView?.('3d')}>
           <span className="wm-tab-icon">⟐</span>
-          <span>3D</span>
+          <span>Exploração</span>
         </button>
         <button type="button" className={`wm-tab ${activeView === 'state' ? 'active' : ''}`} disabled={!canOpenStateView} title={canOpenStateView ? 'Abrir espaço de estados' : 'Selecione C_s e C_f primeiro'} onClick={() => setActiveView?.('state')}>
           <span className="wm-tab-icon">uv</span>
@@ -44,7 +44,7 @@ export default function OverlayTopBar({
         </button>
         <button type="button" className={`wm-tab ${activeView === 'solution' ? 'active' : ''}`} onClick={() => setActiveView?.('solution')}>
           <span className="wm-tab-icon">Σ</span>
-          <span>Solução</span>
+          <span>Perfil</span>
         </button>
         <button type="button" className={`wm-tab ${activeView === 'params' ? 'active' : ''}`} onClick={() => setActiveView?.('params')}>
           <span className="wm-tab-icon">β</span>

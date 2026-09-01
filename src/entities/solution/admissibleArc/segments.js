@@ -9,6 +9,7 @@ import {
   solveBackwardHugoniotPointForFixedRightState,
 } from '../../waves/index.js'
 import { HUGONIOT } from '../../../config/numerics.js'
+import { visualZToPhysical } from '../../../geometry/zCompactification.js'
 
 export function coordsOf(point) {
   if (Array.isArray(point)) return point
@@ -27,7 +28,7 @@ export function solutionProbePointFromLineEvent(event, fallbackBranch, attachedC
   const local = event.object.worldToLocal(event.point.clone())
   const t = local.x
   const Y = local.y
-  const z = local.z
+  const z = visualZToPhysical(local.z)
   return {
     t,
     Y,
@@ -378,4 +379,3 @@ export function buildAdmissibleArcSegmentsForSolution({
     : admissibleSegments
   return clippedSegments.filter((segment) => keepDrawableSegment(segment, view))
 }
-

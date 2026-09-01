@@ -1,5 +1,6 @@
 import React from 'react'
 import * as THREE from 'three'
+import { physicalPointToVisual } from '../../../../geometry/zCompactification'
 
 const SOLUTION_POINT_RADIUS = 0.034
 const SOLUTION_RING_RADIUS = 0.075
@@ -19,7 +20,7 @@ export default function HoverableSolutionPoint({
   const [hovered, setHovered] = React.useState(false)
   const hoverColor = '#22d3ee'
   return (
-    <group position={position} scale={markerScale}>
+    <group position={physicalPointToVisual(position)} scale={markerScale}>
       <mesh
         renderOrder={renderOrder}
         onPointerOver={(event) => {

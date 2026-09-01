@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Line } from '@react-three/drei'
+import { ZCompactifiedLine as Line } from '../../app/scene/ZCompactification'
 import OrientedArcMarkers from './OrientedArcMarkers'
 import { buildShockSegments } from './ShockCurve'
 import { buildRarefactionArcSegments } from './rarefactionArcUtils'

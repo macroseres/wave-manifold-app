@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import * as THREE from 'three'
 import { waveColors } from '../../config/waveColors'
 import { buildSaturatedCoincidenceGeometry } from '../../geometry/saturatedCoincidenceSurfaceGeometry'
+import { ZCompactifiedMesh } from '../../app/scene/ZCompactification'
 
 export default function SaturatedCoincidenceSurface({
   params,
@@ -19,7 +20,7 @@ export default function SaturatedCoincidenceSurface({
   if (!geometry || geometry.attributes.position?.count === 0) return null
 
   return (
-    <mesh geometry={geometry} renderOrder={2}>
+    <ZCompactifiedMesh geometry={geometry} renderOrder={2}>
       <meshStandardMaterial
         color={waveColors.saturatedCoincidence}
         side={THREE.DoubleSide}
@@ -30,6 +31,6 @@ export default function SaturatedCoincidenceSurface({
         roughness={0.45}
         metalness={0.0}
       />
-    </mesh>
+    </ZCompactifiedMesh>
   )
 }

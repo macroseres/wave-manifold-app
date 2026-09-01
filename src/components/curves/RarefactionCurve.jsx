@@ -1,5 +1,7 @@
 import React, { Fragment, useMemo } from 'react'
-import { Line } from '@react-three/drei'
+import { Line as VisualLine } from '@react-three/drei'
+import { ZCompactifiedLine as Line } from '../../app/scene/ZCompactification'
+import { physicalPointToVisual } from '../../geometry/zCompactification'
 import RarefactionSegmentsWorker from '../../workers/rarefactionSegments.worker?worker'
 import { smoothCurveCoords } from './smoothCurve'
 import { useWorkerTask } from '../hooks/useWorkerTask'
@@ -16,6 +18,7 @@ function RarefactionCurve({
   lineWidth = 1.35,
   constrainZ = false,
   direction = undefined,
+  compactifiedZ = false,
 }) {
   const payload = useMemo(() => ({
     fixedState,
@@ -24,7 +27,8 @@ function RarefactionCurve({
     resolution,
     constrainZ,
     direction,
-  }), [fixedState, params, view, resolution, constrainZ, direction])
+    compactifiedZ,
+  }), [fixedState, params, view, resolution, constrainZ, direction, compactifiedZ])
 
   const { data } = useWorkerTask(
     createRarefactionSegmentsWorker,
@@ -34,19 +38,23 @@ function RarefactionCurve({
   const smoothedSegments = useMemo(() => (
     (Array.isArray(data) ? data : [])
       .filter((segment) => segment.length >= 2)
-      .map((segment) => smoothCurveCoords(segment, {
-        minPoints: 72,
-        samplesPerEdge: 4,
-        maxPoints: Math.max(140, resolution * 5),
+      .map((segment) => smoothCurveCoords(
+        compactifiedZ ? segment.map(physicalPointToVisual) : segment,
+        {
+        minPoints: compactifiedZ ? 720 : 72,
+        samplesPerEdge: compactifiedZ ? 3 : 4,
+        maxPoints: compactifiedZ ? Math.max(1800, resolution * 36) : Math.max(140, resolution * 5),
+        maxRawPoints: compactifiedZ ? 9000 : 900,
       }))
-  ), [data, resolution])
+  ), [data, resolution, compactifiedZ])
 
   if (!visible || !fixedState || !smoothedSegments.length) return null
+  const RenderLine = compactifiedZ ? VisualLine : Line
 
   return (
     <Fragment>
       {smoothedSegments.map((points, index) => (
-        <Line
+        <RenderLine
           key={`rarefaction-${index}`}
           points={points}
           color={color}
