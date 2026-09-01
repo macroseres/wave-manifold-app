@@ -6,7 +6,6 @@ import OverlaySettingsPanel from './OverlaySettingsPanel'
 import { AboutCard, HelpCard } from './FloatingInfoCards'
 import OverlayStage from './OverlayStage'
 import useOverlayPanelController from './useOverlayPanelController'
-import WorkspaceStatusBar from './WorkspaceStatusBar'
 
 export default function OverlayPanel(props) {
   const {
@@ -145,11 +144,6 @@ export default function OverlayPanel(props) {
 
       <RightInfoPanel {...controller.rightInfoPanelProps} />
       <VisualizationControlsPanel {...controller.visualizationPanelProps} />
-      <WorkspaceStatusBar
-        selectedEntries={selectedEntries}
-        inspectionModeEnabled={inspectionModeEnabled}
-        solutionModeEnabled={solutionModeEnabled}
-      />
     </div>
   )
 }
