@@ -1,16 +1,25 @@
 import * as THREE from 'three'
-import { computeLeftStateFromWavePoint } from '../entities/surfaceImplicit/index.js'
-import { solveHugoniotPointForFixedState } from '../entities/waves/index.js'
+import { computeLeftStateFromWavePoint, computeRightStateFromWavePoint } from '../entities/surfaceImplicit/index.js'
+import { solveBackwardHugoniotPointForFixedRightState, solveHugoniotPointForFixedState } from '../entities/waves/index.js'
+import { VISUAL_Z_MAX, VISUAL_Z_MIN, visualZToPhysical } from './zCompactification.js'
 
 const EXTENSION_FACTOR = 2.5
 const CONNECTION_FACTOR = 3.0
-const COINCIDENCE_Z_EXTENSION_FACTOR = 400.0
-const HUGONIOT_Z_EXTENSION_FACTOR = 1.0
+const VISUAL_Z_MARGIN = 1e-4
 
 function sampleInterval(min, span, count) {
   return Array.from({ length: count }, (_, index) => (
     min + (index / Math.max(count - 1, 1)) * span
   ))
+}
+
+function sampleCompactifiedZ(count) {
+  const zHatMin = VISUAL_Z_MIN + VISUAL_Z_MARGIN
+  const zHatSpan = VISUAL_Z_MAX - VISUAL_Z_MIN - 2 * VISUAL_Z_MARGIN
+  return Array.from({ length: count }, (_, index) => {
+    const fraction = index / Math.max(count - 1, 1)
+    return visualZToPhysical(zHatMin + fraction * zHatSpan)
+  })
 }
 
 function mergeSamples(...sampleGroups) {
@@ -21,19 +30,17 @@ function mergeSamples(...sampleGroups) {
     .filter((value, index, values) => index === 0 || Math.abs(value - values[index - 1]) > 1e-10)
 }
 
-function inView(point, view, tTol, yTol, zTol) {
+function inView(point, view, tTol, yTol) {
   return (
     point &&
     point.t >= view.tMin - tTol &&
     point.t <= view.tMax + tTol &&
     point.Y >= view.yMin - yTol &&
-    point.Y <= view.yMax + yTol &&
-    point.z >= view.zMin - zTol &&
-    point.z <= view.zMax + zTol
+    point.Y <= view.yMax + yTol
   )
 }
 
-export function buildSaturatedCoincidenceGeometry(params, view, resolution = 40) {
+export function buildSaturatedCoincidenceGeometry(params, view, resolution = 40, direction = 'minus') {
   const geometry = new THREE.BufferGeometry()
 
   const localSeedSamples = Math.max(120, Math.floor(resolution * 2.8))
@@ -45,24 +52,22 @@ export function buildSaturatedCoincidenceGeometry(params, view, resolution = 40)
 
   if (zSpan <= 0) return geometry
 
-  const zCenter = 0.5 * (zMin + zMax)
-  const seedZSpan = COINCIDENCE_Z_EXTENSION_FACTOR * zSpan
-  const seedZMin = zCenter - 0.5 * seedZSpan
-  const hugoniotZSpan = HUGONIOT_Z_EXTENSION_FACTOR * zSpan
-  const hugoniotZMin = zCenter - 0.5 * hugoniotZSpan
   const tSpan = Math.max(1, view.tMax - view.tMin)
   const ySpan = Math.max(1, view.yMax - view.yMin)
   const tTol = EXTENSION_FACTOR * tSpan
   const yTol = EXTENSION_FACTOR * ySpan
-  const zTol = 0.5 * (Math.max(COINCIDENCE_Z_EXTENSION_FACTOR, HUGONIOT_Z_EXTENSION_FACTOR) - 1) * zSpan
   const maxJumpT = CONNECTION_FACTOR * tSpan
   const maxJumpY = CONNECTION_FACTOR * ySpan
 
-  const curveZValues = sampleInterval(hugoniotZMin, hugoniotZSpan, curveSamples)
+  // Tanto a geratriz E quanto cada folha H_± percorrem todo o eixo
+  // compactificado. As amostras físicas locais reforçam a região central.
+  const curveZValues = mergeSamples(
+    sampleCompactifiedZ(Math.max(220, Math.floor(curveSamples * 1.5))),
+    sampleInterval(zMin, zSpan, curveSamples),
+  )
   const seedZValues = mergeSamples(
-    sampleInterval(seedZMin, seedZSpan, extendedSeedSamples),
+    sampleCompactifiedZ(extendedSeedSamples),
     sampleInterval(zMin, zSpan, localSeedSamples),
-    curveZValues,
   )
 
   const vertices = []
@@ -70,13 +75,17 @@ export function buildSaturatedCoincidenceGeometry(params, view, resolution = 40)
 
   for (let i = 0; i < seedZValues.length; i += 1) {
     const zSeed = seedZValues[i]
-    const fixedState = computeLeftStateFromWavePoint(0, 0, zSeed, params)
+    const fixedState = direction === 'plus'
+      ? computeRightStateFromWavePoint(0, 0, zSeed, params)
+      : computeLeftStateFromWavePoint(0, 0, zSeed, params)
     if (!fixedState) continue
 
     for (let j = 0; j < curveZValues.length; j += 1) {
       const z = curveZValues[j]
-      const point = solveHugoniotPointForFixedState(z, fixedState, params)
-      if (!inView(point, view, tTol, yTol, zTol)) continue
+      const point = direction === 'plus'
+        ? solveBackwardHugoniotPointForFixedRightState(z, fixedState, params)
+        : solveHugoniotPointForFixedState(z, fixedState, params)
+      if (!inView(point, view, tTol, yTol)) continue
 
       const index = vertices.length / 3
       vertices.push(point.t, point.Y, point.z)

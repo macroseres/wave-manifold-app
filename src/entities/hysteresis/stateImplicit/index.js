@@ -1,6 +1,6 @@
 function finite(x) { return Number.isFinite(x) }
 
-function hysPlusPlusImplicit(u, v, params) {
+export function hysPlusPlusImplicit(u, v, params) {
   const b1 = params?.b1
   const b2 = params?.b2
   const c = params?.c
@@ -53,7 +53,7 @@ function hysPlusPlusImplicit(u, v, params) {
   )
 }
 
-function hysPlusMinusImplicit(u, v, params) {
+export function hysPlusMinusImplicit(u, v, params) {
   const b1 = params?.b1
   const b2 = params?.b2
   const c = params?.c

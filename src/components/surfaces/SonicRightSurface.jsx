@@ -1,17 +1,15 @@
-import React, { useMemo, useRef } from 'react'
+import React, { useRef } from 'react'
+import { useSurfaceGeometry } from '../hooks/useSurfaceGeometry'
 import * as THREE from 'three'
-import { ZCompactifiedLine as Line, ZCompactifiedMesh } from '../../app/scene/ZCompactification'
+import { ZCompactifiedMesh } from '../../app/scene/ZCompactification'
 import { visualZToPhysical } from '../../geometry/zCompactification'
 import { waveColors } from '../../config/waveColors'
 import {
-  buildSonicBranchGeometries,
-  buildSonicSeparatorSegments,
   classifySonicPoint,
 } from '../../entities/sonic/surfaceModel'
 
 const CLICK_DRAG_TOLERANCE_PX = 5
 const SONIC_SURFACE_OPACITY = 0.33
-const SONIC_LINE_OPACITY = 0.96
 
 export default function SonicRightSurface({
   params,
@@ -23,10 +21,7 @@ export default function SonicRightSurface({
   onHoverPoint,
   interactive = true,
 }) {
-  const geometries = useMemo(() => (
-    buildSonicBranchGeometries('right', params, view, resolution)
-  ), [params, view, resolution])
-  const separatorSegments = useMemo(() => buildSonicSeparatorSegments('right', params, view), [params, view])
+  const geometries = useSurfaceGeometry('sonic-right', params, view, resolution)
   const pointerDownRef = useRef(null)
 
   const decoratedPointFromEvent = (event, status = 'inspection') => {
@@ -103,6 +98,7 @@ export default function SonicRightSurface({
     onHoverPoint?.(null)
   }
 
+  if (!geometries) return null
   return (
     <group>
       <ZCompactifiedMesh
@@ -153,19 +149,6 @@ export default function SonicRightSurface({
           polygonOffsetUnits={1}
         />
       </ZCompactifiedMesh>
-      {!wireframe && separatorSegments.map((segment, index) => (
-        <Line
-          key={`sonic-right-separator-${index}`}
-          points={segment}
-          color={waveColors.sonicRightNeutral}
-          lineWidth={1.35}
-          transparent
-          opacity={SONIC_LINE_OPACITY}
-          depthTest={true}
-          depthWrite={false}
-          renderOrder={16}
-        />
-      ))}
     </group>
   )
 }

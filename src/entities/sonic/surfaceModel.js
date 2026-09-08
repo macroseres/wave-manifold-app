@@ -2,12 +2,11 @@ import { buildImplicitSurfaceGeometry } from '../implicitGeometry/index.js'
 import {
   sonicImplicitF,
   sonicLeftImplicitF,
-  sonicLineConst,
-  sonicLineTCoeff,
-  sonicLineYCoeff,
+  solveSonicBranchSeparatorPoint,
 } from '../surfaceImplicit/index.js'
 import { SONIC_SURFACE } from '../../config/numerics.js'
 import { buildClippedBranchGeometry } from './branchGeometry.js'
+import { VISUAL_Z_MAX, VISUAL_Z_MIN, visualZToPhysical } from '../../geometry/zCompactification.js'
 
 export const BRANCH_INDICATOR_EPS = 1e-7
 export const SEPARATOR_SAMPLES = SONIC_SURFACE.SEPARATOR_SAMPLES ?? 1400
@@ -27,20 +26,21 @@ export function sonicSurfaceResolution(resolution) {
   )
 }
 
-function buildSonicBaseGeometry(implicitFn, params, view, resolution) {
+function buildSonicBaseGeometry(implicitFn, params, view, resolution, compactifiedZ = false) {
   const effectiveResolution = sonicSurfaceResolution(resolution)
   return buildImplicitSurfaceGeometry(implicitFn, params, view, effectiveResolution, 0.0, {
     zClusterNearZero: true,
     zClusterFraction: SONIC_SURFACE.Z_CLUSTER_FRACTION,
     zClusterPower: SONIC_SURFACE.Z_CLUSTER_POWER,
+    compactifiedZ,
   })
 }
 
 export function buildSonicBranchGeometries(side, params, view, resolution) {
   const indicatorFn = side === 'left' ? sonicLeftBranchIndicator : sonicRightBranchIndicator
   const implicitFn = side === 'left' ? sonicLeftImplicitF : sonicImplicitF
-  const baseGeometry = buildSonicBaseGeometry(implicitFn, params, view, resolution)
-  return {
+  const baseGeometry = buildSonicBaseGeometry(implicitFn, params, view, resolution, side === 'left')
+  const geometries = {
     slow: buildClippedBranchGeometry(
       baseGeometry,
       params,
@@ -56,6 +56,8 @@ export function buildSonicBranchGeometries(side, params, view, resolution) {
       indicatorFn,
     ),
   }
+  baseGeometry.dispose()
+  return geometries
 }
 
 export function classifySonicPoint(side, point, params) {
@@ -78,35 +80,15 @@ export function classifySonicPoint(side, point, params) {
     : { label: 'sônica direita rápida', tex: '\\mathcal{S}^+_f', indicator }
 }
 
-function separatorPointAtZ(side, z, params) {
-  const tCoeff = sonicLineTCoeff(z, params)
-  const yCoeff = sonicLineYCoeff(z, params)
-  const constTerm = sonicLineConst(z, params)
-  const indicatorTCoeff = -2 * params.b1 * (1 + z * z)
-  const indicatorYCoeff = side === 'left'
-    ? params.b1 * z - params.b2 + 2 * z
-    : -(params.b1 * z - params.b2 + 2 * z)
-
-  const det = side === 'left'
-    ? tCoeff * indicatorYCoeff + yCoeff * indicatorTCoeff
-    : tCoeff * indicatorYCoeff - yCoeff * indicatorTCoeff
-  if (!Number.isFinite(det) || Math.abs(det) < 1e-10) return null
-
-  const t = (-constTerm * indicatorYCoeff) / det
-  const Y = (indicatorTCoeff * constTerm) / det
-  if (![t, Y, z].every(Number.isFinite)) return null
-  return [t, Y, z]
-}
-
-function inView([t, Y, z], view) {
+function inView([t, Y, z], view, ignoreZ = false) {
   return (
     t >= view.tMin && t <= view.tMax &&
     Y >= view.yMin && Y <= view.yMax &&
-    z >= view.zMin && z <= view.zMax
+    (ignoreZ || (z >= view.zMin && z <= view.zMax))
   )
 }
 
-export function buildSonicSeparatorSegments(side, params, view) {
+export function buildSonicSeparatorSegments(side, params, view, { compactifiedZ = false } = {}) {
   const points = []
   const segments = []
   const pushCurrent = () => {
@@ -115,9 +97,14 @@ export function buildSonicSeparatorSegments(side, params, view) {
   }
 
   for (let i = 0; i <= SEPARATOR_SAMPLES; i += 1) {
-    const z = view.zMin + (i / SEPARATOR_SAMPLES) * (view.zMax - view.zMin)
-    const point = separatorPointAtZ(side, z, params)
-    if (!point || !inView(point, view)) {
+    const fraction = i / SEPARATOR_SAMPLES
+    const visualMargin = 1e-4
+    const z = compactifiedZ
+      ? visualZToPhysical(VISUAL_Z_MIN + visualMargin + fraction * (VISUAL_Z_MAX - VISUAL_Z_MIN - 2 * visualMargin))
+      : view.zMin + fraction * (view.zMax - view.zMin)
+    const solved = solveSonicBranchSeparatorPoint(side, z, params)
+    const point = solved ? [solved.t, solved.Y, solved.z] : null
+    if (!point || !inView(point, view, compactifiedZ)) {
       pushCurrent()
       continue
     }

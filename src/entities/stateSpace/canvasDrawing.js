@@ -216,7 +216,7 @@ export function drawStateSpaceCanvas(canvas, options) {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
   const { rect, dpr } = resizeCanvasForDpr(canvas)
-  const { bounds, selectedMap, hoverBranch, draggingBranch, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, hysPlusProjectionSegments, probeProjection } = options
+  const { bounds, selectedMap, hoverBranch, draggingBranch, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, sonicRightSeparatorMinusSegments, sonicLeftSeparatorPlusSegments, hysPlusProjectionSegments, probeProjection } = options
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
   ctx.clearRect(0, 0, rect.width, rect.height)
 
@@ -253,6 +253,8 @@ export function drawStateSpaceCanvas(canvas, options) {
     })
   }
   drawProjectedSegments(ctx, { segments: implicitInflectionSegments, color: waveColors.inflection ?? '#facc15', lineWidth: 3.4, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: sonicRightSeparatorMinusSegments, color: waveColors.sonicRightNeutral, lineWidth: 3, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: sonicLeftSeparatorPlusSegments, color: waveColors.sonicLeftNeutral, lineWidth: 3, toScreen, rect })
   drawProjectedSegments(ctx, { segments: implicitHugoniotMinusSegments, color: waveColors.hugoniotMinus, lineWidth: 3.2, toScreen, rect })
   drawProjectedSegments(ctx, { segments: hysPlusProjectionSegments.minus, color: '#c4b5fd', lineWidth: 2.8, toScreen, rect })
   drawProjectedSegments(ctx, { segments: hysPlusProjectionSegments.plus, color: '#bae6fd', lineWidth: 2.8, toScreen, rect })

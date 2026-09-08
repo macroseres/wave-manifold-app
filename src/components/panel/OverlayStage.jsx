@@ -17,6 +17,8 @@ export default function OverlayStage({
   showCoincidence,
   showHysteresis,
   showHugoniotMinus,
+  showExtensionCoincidenceMinus,
+  showExtensionCoincidencePlus,
   inspectionModeEnabled,
   inspectionProbesByBranch,
   inspectionCurveVisibility,
@@ -48,6 +50,8 @@ export default function OverlayStage({
                 showCoincidence={showCoincidence}
                 showHysteresis={showHysteresis}
                 showHugoniotMinus={showHugoniotMinus}
+                showExtensionCoincidenceMinus={showExtensionCoincidenceMinus}
+                showExtensionCoincidencePlus={showExtensionCoincidencePlus}
                 inspectionModeEnabled={inspectionModeEnabled}
                 inspectionProbesByBranch={inspectionProbesByBranch}
                 inspectionCurveVisibility={inspectionCurveVisibility}

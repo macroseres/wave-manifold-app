@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import * as THREE from 'three'
 import { waveColors } from '../../config/waveColors'
-import { buildSaturatedCoincidenceGeometry } from '../../geometry/saturatedCoincidenceSurfaceGeometry'
+import { useSurfaceGeometry } from '../hooks/useSurfaceGeometry'
 import { ZCompactifiedMesh } from '../../app/scene/ZCompactification'
 
 export default function SaturatedCoincidenceSurface({
@@ -11,18 +11,16 @@ export default function SaturatedCoincidenceSurface({
   opacity,
   wireframe,
   visible = true,
+  direction = 'minus',
 }) {
-  const geometry = useMemo(() => {
-    if (!visible) return null
-    return buildSaturatedCoincidenceGeometry(params, view, resolution)
-  }, [params, view, resolution, visible])
+  const geometry = useSurfaceGeometry('saturated-coincidence', params, view, resolution, visible, direction)?.surface
 
   if (!geometry || geometry.attributes.position?.count === 0) return null
 
   return (
     <ZCompactifiedMesh geometry={geometry} renderOrder={2}>
       <meshStandardMaterial
-        color={waveColors.saturatedCoincidence}
+        color={direction === 'plus' ? waveColors.saturatedCoincidencePlus : waveColors.saturatedCoincidence}
         side={THREE.DoubleSide}
         transparent
         opacity={Math.min(0.62, opacity * 0.72)}

@@ -5,7 +5,10 @@ import { VISUAL_Z_MAX, VISUAL_Z_MIN, visualZToPhysical } from '../../geometry/zC
 
 export function solveCoincidenceSegments(view) {
   if (view.tMin > 0 || view.tMax < 0 || view.yMin > 0 || view.yMax < 0) return []
-  return [[[0, 0, view.zMin], [0, 0, view.zMax]]]
+  const visualMargin = 1e-4
+  const zMin = visualZToPhysical(VISUAL_Z_MIN + visualMargin)
+  const zMax = visualZToPhysical(VISUAL_Z_MAX - visualMargin)
+  return [[[0, 0, zMin], [0, 0, zMax]]]
 }
 
 export function solveSecondaryRightBifurcationSegments(params, view, samples = 260) {

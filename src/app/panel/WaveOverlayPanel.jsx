@@ -43,10 +43,20 @@ export default function WaveOverlayPanel({
       setShowSonicRight={actions.setShowSonicRight}
       showSonicLeft={visibility.showSonicLeft}
       setShowSonicLeft={actions.setShowSonicLeft}
+      showHysteresisSelfIntersection={visibility.showHysteresisSelfIntersection}
+      setShowHysteresisSelfIntersection={actions.setShowHysteresisSelfIntersection}
+      showSaturatedPlus={visibility.showSaturatedPlus}
+      setShowSaturatedPlus={actions.setShowSaturatedPlus}
       showSaturated={visibility.showSaturated}
       setShowSaturated={actions.setShowSaturated}
       showSaturatedCoincidence={visibility.showSaturatedCoincidence}
       setShowSaturatedCoincidence={actions.setShowSaturatedCoincidence}
+      showSaturatedCoincidencePlus={visibility.showSaturatedCoincidencePlus}
+      setShowSaturatedCoincidencePlus={actions.setShowSaturatedCoincidencePlus}
+      showExtensionCoincidenceMinus={visibility.showExtensionCoincidenceMinus}
+      setShowExtensionCoincidenceMinus={actions.setShowExtensionCoincidenceMinus}
+      showExtensionCoincidencePlus={visibility.showExtensionCoincidencePlus}
+      setShowExtensionCoincidencePlus={actions.setShowExtensionCoincidencePlus}
       showRarefactionSlow={visibility.showRarefactionSlow}
       setShowRarefactionSlow={actions.setShowRarefactionSlow}
       showRarefactionFast={visibility.showRarefactionFast}
@@ -110,3 +120,5 @@ export default function WaveOverlayPanel({
     />
   )
 }
+
+

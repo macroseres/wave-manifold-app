@@ -1,17 +1,15 @@
-import React, { useMemo, useRef } from 'react'
+import React, { useRef } from 'react'
+import { useSurfaceGeometry } from '../hooks/useSurfaceGeometry'
 import * as THREE from 'three'
-import { ZCompactifiedLine as Line, ZCompactifiedMesh } from '../../app/scene/ZCompactification'
+import { ZCompactifiedMesh } from '../../app/scene/ZCompactification'
 import { visualZToPhysical } from '../../geometry/zCompactification'
 import { waveColors } from '../../config/waveColors'
 import {
-  buildSonicBranchGeometries,
-  buildSonicSeparatorSegments,
   classifySonicPoint,
 } from '../../entities/sonic/surfaceModel'
 
 const CLICK_DRAG_TOLERANCE_PX = 5
 const SONIC_SURFACE_OPACITY = 0.32
-const SONIC_LINE_OPACITY = 0.74
 
 export default function SonicLeftSurface({
   params,
@@ -23,10 +21,7 @@ export default function SonicLeftSurface({
   onInspectPoint,
   interactive = true,
 }) {
-  const geometries = useMemo(() => {
-    return buildSonicBranchGeometries('left', params, view, resolution)
-  }, [params, view, resolution])
-  const separatorSegments = useMemo(() => buildSonicSeparatorSegments('left', params, view), [params, view])
+  const geometries = useSurfaceGeometry('sonic-left', params, view, resolution)
 
   const pointerDownRef = useRef(null)
 
@@ -103,6 +98,7 @@ export default function SonicLeftSurface({
     event.stopPropagation()
   }
 
+  if (!geometries) return null
   return (
     <group>
       <ZCompactifiedMesh
@@ -149,19 +145,6 @@ export default function SonicLeftSurface({
           polygonOffsetUnits={1}
         />
       </ZCompactifiedMesh>
-      {!wireframe && separatorSegments.map((segment, index) => (
-        <Line
-          key={`sonic-left-separator-${index}`}
-          points={segment}
-          color={waveColors.sonicLeftNeutral}
-          lineWidth={1.35}
-          transparent
-          opacity={SONIC_LINE_OPACITY}
-          depthTest={true}
-          depthWrite={false}
-          renderOrder={16}
-        />
-      ))}
     </group>
   )
 }

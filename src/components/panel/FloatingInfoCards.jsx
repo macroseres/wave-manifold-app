@@ -1,6 +1,6 @@
 import React from 'react'
 
-export function HelpCard({ open, onClose }) {
+export function HelpCard({ open, onClose, onOpenDocumentation }) {
   if (!open) return null
   return (
     <aside className="wm-floating-card wm-help-card wm-panel">
@@ -12,6 +12,9 @@ export function HelpCard({ open, onClose }) {
         <p><strong>3D:</strong> arraste para orbitar, use a roda do mouse para zoom e os botões para alternar modos.</p>
         <p><strong>Inspeção:</strong> clique em pontos da característica; use <kbd>Ctrl</kbd> ao arrastar a sonda para prender às curvas disponíveis.</p>
         <p><strong>Solução:</strong> ativa a camada de curvas admissíveis lenta/rápida e o reflexo correspondente na variedade.</p>
+        <button type="button" className="primary-button wm-open-documentation" onClick={onOpenDocumentation}>
+          Abrir documentação completa
+        </button>
       </div>
     </aside>
   )

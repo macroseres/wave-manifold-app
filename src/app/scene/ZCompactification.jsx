@@ -15,6 +15,7 @@ export function useVisualZPoint(point) {
 export function useZCompactifiedGeometry(geometry) {
   const visualGeometry = useMemo(() => {
     if (!geometry) return null
+    if (geometry.userData.zCompactified) return geometry
     const clone = geometry.clone()
     const position = clone.getAttribute('position')
     if (position?.array) {
@@ -25,7 +26,9 @@ export function useZCompactifiedGeometry(geometry) {
     }
     return clone
   }, [geometry])
-  useEffect(() => () => visualGeometry?.dispose(), [visualGeometry])
+  useEffect(() => () => {
+    if (visualGeometry !== geometry) visualGeometry?.dispose()
+  }, [visualGeometry, geometry])
   return visualGeometry
 }
 

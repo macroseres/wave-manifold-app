@@ -292,6 +292,16 @@ function WaveSceneViewport({
             visible={visibility.showSaturated}
           />
 
+          <ImplicitSurface type="saturated"
+            key={`${sceneKey}-saturated-plus`}
+            params={params}
+            view={view}
+            resolution={resolution}
+            opacity={opacity}
+            wireframe={showWireframe}
+            direction="plus"
+            visible={visibility.showSaturatedPlus}
+          />
           <ImplicitSurface type="saturated-coincidence"
             key={`${sceneKey}-saturated-coincidence`}
             params={params}
@@ -302,6 +312,17 @@ function WaveSceneViewport({
             visible={visibility.showSaturatedCoincidence}
           />
 
+          <ImplicitSurface type="saturated-coincidence"
+            key={`${sceneKey}-saturated-coincidence-plus`}
+            params={params}
+            view={view}
+            resolution={resolution}
+            opacity={opacity}
+            wireframe={showWireframe}
+            direction="plus"
+            visible={visibility.showSaturatedCoincidencePlus}
+          />
+
           <WaveCurve type="hysteresis-left" params={params} view={calcView} resolution={resolution} visible={visibility.showHysteresisLeft} />
           <WaveCurve type="hysteresis-right" params={params} view={calcView} resolution={resolution} visible={visibility.showHysteresisRight} />
           <WaveCurve type="coincidence" view={view} visible={visibility.showCoincidence} />
@@ -309,6 +330,9 @@ function WaveSceneViewport({
           <WaveCurve type="inflection-slow" params={params} view={calcView} resolution={resolution} visible={visibility.showInflectionSlow} />
           <WaveCurve type="inflection-fast" params={params} view={calcView} resolution={resolution} visible={visibility.showInflectionFast} />
           <WaveCurve type="double-sonic" params={params} view={calcView} resolution={resolution} visible={visibility.showDoubleSonic} />
+          <WaveCurve type="hysteresis-self-intersection" params={params} view={calcView} visible={visibility.showHysteresisSelfIntersection} />
+          <WaveCurve type="extension-coincidence-minus" params={params} view={calcView} visible={visibility.showExtensionCoincidenceMinus} />
+          <WaveCurve type="extension-coincidence-plus" params={params} view={calcView} visible={visibility.showExtensionCoincidencePlus} />
 
           <SelectedRarefactionCurves curveEntries={curveEntries} params={params} calcView={calcView} resolution={resolution} visibility={visibility} />
           <SelectedCompositeSurfaces curveEntries={curveEntries} params={params} calcView={calcView} resolution={resolution} opacity={opacity} showWireframe={showWireframe} visibility={visibility} />
@@ -351,3 +375,5 @@ function WaveSceneViewport({
 }
 
 export default memo(WaveSceneViewport)
+
+

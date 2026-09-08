@@ -7,6 +7,8 @@ import {
   buildImplicitInflectionStateSegments,
   buildImplicitHugoniotMinusStateSegments,
   buildImplicitCoincidenceStateSegments,
+  buildSonicRightSeparatorMinusProjection,
+  buildSonicLeftSeparatorPlusProjection,
   stateFromScreenPoint,
   refineCharacteristicProjectionFromState,
   projectionBounds,
@@ -41,6 +43,8 @@ function StateSpaceCanvas({
   showCoincidence = false,
   showHysteresis = false,
   showHugoniotMinus = false,
+  showExtensionCoincidenceMinus = false,
+  showExtensionCoincidencePlus = false,
   inspectionModeEnabled = false,
   inspectionProbesByBranch = { slow: null, fast: null },
   inspectionCurveVisibility = null,
@@ -123,6 +127,12 @@ function StateSpaceCanvas({
       ? buildImplicitHugoniotMinusStateSegments(bounds, selectedMap.slow?.selectedState, params, 260)
       : []
   ), [bounds, selectedMap, params, showHugoniotMinus])
+  const sonicRightSeparatorMinusSegments = useMemo(() => (
+    showExtensionCoincidencePlus ? buildSonicRightSeparatorMinusProjection(bounds, params) : []
+  ), [bounds, params, showExtensionCoincidencePlus])
+  const sonicLeftSeparatorPlusSegments = useMemo(() => (
+    showExtensionCoincidenceMinus ? buildSonicLeftSeparatorPlusProjection(bounds, params) : []
+  ), [bounds, params, showExtensionCoincidenceMinus])
 
   const statePercent = (state) => {
     if (!state || !Number.isFinite(state.uMinus) || !Number.isFinite(state.vMinus)) return null
@@ -350,6 +360,8 @@ function StateSpaceCanvas({
       implicitCoincidenceSegments,
       showCoincidence,
       implicitHugoniotMinusSegments,
+      sonicRightSeparatorMinusSegments,
+      sonicLeftSeparatorPlusSegments,
       hysPlusProjectionSegments,
       probeProjection,
     })
@@ -358,7 +370,7 @@ function StateSpaceCanvas({
     const observer = new ResizeObserver(draw)
     observer.observe(canvas)
     return () => observer.disconnect()
-  }, [bounds, selectedMap, hoverBranch, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, hysPlusProjectionSegments, probeProjection])
+  }, [bounds, selectedMap, hoverBranch, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, sonicRightSeparatorMinusSegments, sonicLeftSeparatorPlusSegments, hysPlusProjectionSegments, probeProjection])
 
   const cursor = draggingBranchRef.current || draggingProbeBranchRef.current ? 'grabbing' : hoverBranch ? 'grab' : 'default'
   const slowLabelPosition = selectedLabelPosition('slow')

@@ -72,7 +72,12 @@ export const initialWaveAppState = {
   showSonicRight: false,
   showSonicLeft: false,
   showSaturated: false,
+  showSaturatedPlus: false,
+  showHysteresisSelfIntersection: false,
   showSaturatedCoincidence: false,
+  showSaturatedCoincidencePlus: false,
+  showExtensionCoincidenceMinus: false,
+  showExtensionCoincidencePlus: false,
   showRarefactionSlow: false,
   showRarefactionFast: false,
   showCompositeSlow: false,
@@ -186,3 +191,5 @@ export function useWaveAppState() {
 
   return [state, actions]
 }
+
+

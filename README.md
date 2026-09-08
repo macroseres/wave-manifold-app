@@ -4,14 +4,16 @@ Interactive environment for the construction and visualization of wave manifolds
 
 ## Documentation
 
-The complete technical documentation is maintained in `docs/book/`.
+The application documentation is maintained in [`docs/`](docs/README.md) and is also available from the in-app **Ajuda** menu.
 
-### Volumes
+### Chapters
 
-- Volume I — Mathematical Foundations
-- Volume II — Numerical Algorithms
-- Volume III — Software Architecture
-- Volume IV — Developer Manual
+1. Introduction and foundations
+2. Interface and workflow
+3. Curve construction
+4. Surface construction
+5. Inspection and solution construction
+6. Computational methods and development
 
 ## Repository layout
 

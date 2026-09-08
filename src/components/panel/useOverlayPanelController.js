@@ -61,9 +61,19 @@ export default function useOverlayPanelController(props) {
     showSonicLeft,
     setShowSonicLeft,
     showSaturated,
+    showSaturatedPlus,
+    showHysteresisSelfIntersection,
     setShowSaturated,
+    setShowSaturatedPlus,
+    setShowHysteresisSelfIntersection,
     showSaturatedCoincidence,
     setShowSaturatedCoincidence,
+    showSaturatedCoincidencePlus,
+    setShowSaturatedCoincidencePlus,
+    showExtensionCoincidenceMinus,
+    setShowExtensionCoincidenceMinus,
+    showExtensionCoincidencePlus,
+    setShowExtensionCoincidencePlus,
     showRarefactionSlow,
     setShowRarefactionSlow,
     showRarefactionFast,
@@ -121,6 +131,7 @@ export default function useOverlayPanelController(props) {
   const activeEntry = activeBranch === 'slow' ? slowEntry : activeBranch === 'fast' ? fastEntry : null
   const [showSettingsPanel, setShowSettingsPanel] = useState(false)
   const [showHelpPanel, setShowHelpPanel] = useState(false)
+  const [showDocumentation, setShowDocumentation] = useState(false)
   const [showAboutPanel, setShowAboutPanel] = useState(false)
   const [parameterWindow, setParameterWindow] = useState(initialParameterWindow)
   const [visibleParameterCurves, setVisibleParameterCurves] = useState({ c1: true, c2: true, c3: true })
@@ -269,7 +280,12 @@ export default function useOverlayPanelController(props) {
     setShowSonicRight,
     setShowSonicLeft,
     setShowSaturated,
+    setShowSaturatedPlus,
+    setShowHysteresisSelfIntersection,
     setShowSaturatedCoincidence,
+    setShowSaturatedCoincidencePlus,
+    setShowExtensionCoincidenceMinus,
+    setShowExtensionCoincidencePlus,
     setShowRarefactionSlow,
     setShowRarefactionFast,
     setShowCompositeSlow,
@@ -353,7 +369,12 @@ export default function useOverlayPanelController(props) {
     setShowRarefactionFast,
     setShowRarefactionSlow,
     setShowSaturated,
+    setShowSaturatedPlus,
+    setShowHysteresisSelfIntersection,
     setShowSaturatedCoincidence,
+    setShowSaturatedCoincidencePlus,
+    setShowExtensionCoincidenceMinus,
+    setShowExtensionCoincidencePlus,
     setShowSonicLeft,
     setShowSonicRight,
     showAxes,
@@ -375,7 +396,12 @@ export default function useOverlayPanelController(props) {
     showRarefactionFast,
     showRarefactionSlow,
     showSaturated,
+    showSaturatedPlus,
+    showHysteresisSelfIntersection,
     showSaturatedCoincidence,
+    showSaturatedCoincidencePlus,
+    showExtensionCoincidenceMinus,
+    showExtensionCoincidencePlus,
     showSonicLeft,
     showSonicRight,
     waveColors,
@@ -390,7 +416,7 @@ export default function useOverlayPanelController(props) {
     ensureMathJaxLoaded()
     const timer = window.setTimeout(typesetMathJax, 80)
     return () => window.clearTimeout(timer)
-  }, [selectedEntries, selectedCharacteristicPoint, selectedClickSource, selectedState, hugoniotIntersections, inspectedCurvePoint, params, activeView, showSettingsPanel, inspectionModeEnabled, solutionModeEnabled, inspectionProbesByBranch])
+  }, [selectedEntries, selectedCharacteristicPoint, selectedClickSource, selectedState, hugoniotIntersections, inspectedCurvePoint, params, activeView, showSettingsPanel, showDocumentation, inspectionModeEnabled, solutionModeEnabled, inspectionProbesByBranch])
 
   return {
     activeParameterCase,
@@ -411,9 +437,11 @@ export default function useOverlayPanelController(props) {
     setHoveredParameterCase,
     setShowAboutPanel,
     setShowHelpPanel,
+    setShowDocumentation,
     setShowSettingsPanel,
     showAboutPanel,
     showHelpPanel,
+    showDocumentation,
     showSettingsPanel,
     updateParam,
     updateParameterPoint,
@@ -429,3 +457,6 @@ export default function useOverlayPanelController(props) {
     applySchaefferShearerCase,
   }
 }
+
+
+

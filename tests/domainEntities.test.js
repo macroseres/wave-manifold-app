@@ -48,5 +48,8 @@ test('coincidence and bifurcation entities expose segment builders', () => {
   const coincidence = buildCoincidenceCurveSegments(view)
   const secondary = buildSecondaryRightBifurcationSegments(params, view, 80)
   assert.ok(Array.isArray(coincidence))
+  const coincidencePoints = coincidence.flat()
+  assert.ok(physicalZToVisual(coincidencePoints[0][2]) < -0.999)
+  assert.ok(physicalZToVisual(coincidencePoints.at(-1)[2]) > 0.999)
   assert.ok(Array.isArray(secondary))
 })

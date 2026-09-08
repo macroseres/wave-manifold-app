@@ -25,7 +25,12 @@ export default function VisualizationControlsPanel({
   setShowRarefactionFast,
   setShowRarefactionSlow,
   setShowSaturated,
+  setShowSaturatedPlus,
+  setShowHysteresisSelfIntersection,
   setShowSaturatedCoincidence,
+  setShowSaturatedCoincidencePlus,
+  setShowExtensionCoincidenceMinus,
+  setShowExtensionCoincidencePlus,
   setShowSonicLeft,
   setShowSonicRight,
   showAxes,
@@ -47,7 +52,12 @@ export default function VisualizationControlsPanel({
   showRarefactionFast,
   showRarefactionSlow,
   showSaturated,
+  showSaturatedPlus,
+  showHysteresisSelfIntersection,
   showSaturatedCoincidence,
+  showSaturatedCoincidencePlus,
+  showExtensionCoincidenceMinus,
+  showExtensionCoincidencePlus,
   showSonicLeft,
   showSonicRight,
   waveColors,
@@ -73,8 +83,13 @@ export default function VisualizationControlsPanel({
           <Toggle checked={showHysteresisLeft ?? showHysteresis} onChange={setShowHysteresisLeft ?? setShowHysteresis} label={<><MathLabel tex={"\\operatorname{Hys}^-"} /><span> : Histerese Esquerda</span></>} color={waveColors.hysteresisLeft ?? '#64748b'} />
           <Toggle checked={showHysteresisRight ?? showHysteresis} onChange={setShowHysteresisRight ?? setShowHysteresis} label={<><MathLabel tex={"\\operatorname{Hys}^+"} /><span> : Histerese Direita</span></>} color={waveColors.hysteresisRight ?? '#111827'} />
           <Toggle checked={showBifurcationRight} onChange={setShowBifurcationRight} label={<><MathLabel tex={"\\mathcal{B}^+"} /><span> : Bifurcação Secundária Direita</span></>} color={waveColors.bifurcationRight} />
-          <Toggle checked={showSaturated} onChange={setShowSaturated} label={<><MathLabel tex={"\\operatorname{Sat}_-(\\operatorname{Hys}^+)"} /><span> : Saturada de </span><MathLabel tex={"\\operatorname{Hys}^+"} /> por <MathLabel tex={"H_-"} /></>} color="#f97316" />
-          <Toggle checked={showSaturatedCoincidence} onChange={setShowSaturatedCoincidence} label={<><MathLabel tex={"\\operatorname{Sat}_-(\\mathcal{E})"} /><span> : Saturada de </span> <MathLabel tex={"\\mathcal{E}"} /> por <MathLabel tex={"H_-"} /></>} color={waveColors.saturatedCoincidence} />
+          <Toggle checked={showSaturated} onChange={setShowSaturated} label={<><MathLabel tex={"\\operatorname{sat}_-(\\operatorname{Hys}^+)"} /><span> : Saturada de </span><MathLabel tex={"\\operatorname{Hys}^+"} /> por <MathLabel tex={"H_-"} /></>} color="#f97316" />
+          <Toggle checked={showSaturatedPlus} onChange={setShowSaturatedPlus} label={<><MathLabel tex={"\\operatorname{sat}_+(\\operatorname{Hys}^+)"} /><span> : Saturada de </span><MathLabel tex={"\\operatorname{Hys}^+"} /> por <MathLabel tex={"H_+"} /></>} color="#34d399" />
+          <Toggle checked={showHysteresisSelfIntersection} onChange={setShowHysteresisSelfIntersection} label={<><span>Autointerseção de </span><MathLabel tex={"\\operatorname{sat}_-(\\operatorname{Hys}^+)"} /></>} color="#fef08a" />
+          <Toggle checked={showSaturatedCoincidence} onChange={setShowSaturatedCoincidence} label={<><MathLabel tex={"\\operatorname{sat}_-(\\mathcal{E})"} /><span> : Saturada de </span> <MathLabel tex={"\\mathcal{E}"} /> por <MathLabel tex={"H_-"} /></>} color={waveColors.saturatedCoincidence} />
+          <Toggle checked={showSaturatedCoincidencePlus} onChange={setShowSaturatedCoincidencePlus} label={<><MathLabel tex={"\\operatorname{sat}_+(\\mathcal{E})"} /><span> : Saturada de </span> <MathLabel tex={"\\mathcal{E}"} /> por <MathLabel tex={"H_+"} /></>} color={waveColors.saturatedCoincidencePlus} />
+          <Toggle checked={showExtensionCoincidenceMinus} onChange={setShowExtensionCoincidenceMinus} label={<><MathLabel tex={"\\operatorname{ext}_-(\\mathcal{E})=\\operatorname{sat}_-(\\mathcal{E})\\cap\\mathcal{S}^-"} /></>} color={waveColors.extensionCoincidenceMinus} />
+          <Toggle checked={showExtensionCoincidencePlus} onChange={setShowExtensionCoincidencePlus} label={<><MathLabel tex={"\\operatorname{ext}_+(\\mathcal{E})=\\operatorname{sat}_+(\\mathcal{E})\\cap\\mathcal{S}^+"} /></>} color={waveColors.extensionCoincidencePlus} />
         </div>
       </Section>
       <Section title="Família lenta" defaultOpen={true} accent="#22c55e">
@@ -82,7 +97,7 @@ export default function VisualizationControlsPanel({
           <Toggle checked={showHugoniotMinus} onChange={setShowHugoniotMinus} label={<><MathLabel tex={"H_-(U_L)"} /><span> : Hugoniot Forward</span></>} color={waveColors.hugoniotMinus ?? '#0f172a'} />
           <Toggle checked={showRarefactionSlow} onChange={setShowRarefactionSlow} label={<><MathLabel tex={"\\mathcal{R}^-(U_L)"} /><span> : Rarefação Lenta </span></>} color={waveColors.rarefactionSlow} />
           <Toggle checked={showCompositeSlow} onChange={setShowCompositeSlow} label={<><MathLabel tex={"\\mathcal{K}_-(U_L)"} /><span> : Composta Lenta </span></>} color={waveColors.compositeSlow ?? waveColors.composite} />
-          <Toggle checked={showCompositeSaturatedSlow} onChange={setShowCompositeSaturatedSlow} label={<><MathLabel tex={"\\operatorname{Sat}_{H_-}(\\mathcal{R}^-)"} /><span> : Superfície saturada lenta </span></>} color={waveColors.compositeSaturatedSlow ?? '#60a5fa'} />
+          <Toggle checked={showCompositeSaturatedSlow} onChange={setShowCompositeSaturatedSlow} label={<><MathLabel tex={"\\operatorname{sat}_{H_-}(\\mathcal{R}^-)"} /><span> : Superfície saturada lenta </span></>} color={waveColors.compositeSaturatedSlow ?? '#60a5fa'} />
         </div>
       </Section>
       <Section title="Família rápida" defaultOpen={false} accent="#a78bfa">
@@ -90,7 +105,7 @@ export default function VisualizationControlsPanel({
           <Toggle checked={showHugoniotPlus} onChange={setShowHugoniotPlus} label={<><MathLabel tex={"H_+(U_R)"} /><span> : Hugoniot Backward</span></>} color={waveColors.hugoniotPlus ?? '#0f172a'} />
           <Toggle checked={showRarefactionFast} onChange={setShowRarefactionFast} label={<><MathLabel tex={"\\mathcal{R}^+(U_R)"} /><span> : Rarefação Rápida</span></>} color={waveColors.rarefactionFast} />
           <Toggle checked={showCompositeFast} onChange={setShowCompositeFast} label={<><MathLabel tex={"\\mathcal{K}_+(U_R)"} /><span> : Composta Rápida</span></>} color={waveColors.compositeFast ?? waveColors.composite} />
-          <Toggle checked={showCompositeSaturatedFast} onChange={setShowCompositeSaturatedFast} label={<><MathLabel tex={"\\operatorname{Sat}_{H_+}(\\mathcal{R}^+)"} /><span> : Superfície saturada rápida</span></>} color={waveColors.compositeSaturatedFast ?? '#f472b6'} />
+          <Toggle checked={showCompositeSaturatedFast} onChange={setShowCompositeSaturatedFast} label={<><MathLabel tex={"\\operatorname{sat}_{H_+}(\\mathcal{R}^+)"} /><span> : Superfície saturada rápida</span></>} color={waveColors.compositeSaturatedFast ?? '#f472b6'} />
           
           <div className="visualization-note">As curvas exibidas correspondem às folhas completas das bifolheações ativas.</div>
         </div>
@@ -109,3 +124,8 @@ export default function VisualizationControlsPanel({
     </aside>
   )
 }
+
+
+
+
+

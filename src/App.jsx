@@ -63,7 +63,12 @@ export default function App() {
     showSonicRight: waveState.showSonicRight,
     showSonicLeft: waveState.showSonicLeft,
     showSaturated: waveState.showSaturated,
+    showSaturatedPlus: waveState.showSaturatedPlus,
+    showHysteresisSelfIntersection: waveState.showHysteresisSelfIntersection,
     showSaturatedCoincidence: waveState.showSaturatedCoincidence,
+    showSaturatedCoincidencePlus: waveState.showSaturatedCoincidencePlus,
+    showExtensionCoincidenceMinus: waveState.showExtensionCoincidenceMinus,
+    showExtensionCoincidencePlus: waveState.showExtensionCoincidencePlus,
     showRarefactionSlow: waveState.showRarefactionSlow,
     showRarefactionFast: waveState.showRarefactionFast,
     showCompositeSlow: waveState.showCompositeSlow,
@@ -96,7 +101,12 @@ export default function App() {
     waveState.showRarefactionFast,
     waveState.showRarefactionSlow,
     waveState.showSaturated,
+    waveState.showSaturatedPlus,
+    waveState.showHysteresisSelfIntersection,
     waveState.showSaturatedCoincidence,
+    waveState.showSaturatedCoincidencePlus,
+    waveState.showExtensionCoincidenceMinus,
+    waveState.showExtensionCoincidencePlus,
     waveState.showSonicLeft,
     waveState.showSonicRight,
   ])
@@ -314,3 +324,5 @@ export default function App() {
     </>
   )
 }
+
+

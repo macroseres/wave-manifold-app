@@ -27,6 +27,26 @@ export function sonicRightBranchIndicator(Y, t, z, { b1, b2 }) {
   return -Y * (b1 * z - b2 + 2 * z) - 2 * b1 * t * (1 + z * z)
 }
 
+export function solveSonicBranchSeparatorPoint(side, z, params) {
+  const tCoeff = sonicLineTCoeff(z, params)
+  const yCoeff = sonicLineYCoeff(z, params)
+  const constTerm = sonicLineConst(z, params)
+  const indicatorTCoeff = -2 * params.b1 * (1 + z * z)
+  const indicatorYCoeff = side === 'left'
+    ? params.b1 * z - params.b2 + 2 * z
+    : -(params.b1 * z - params.b2 + 2 * z)
+
+  const det = side === 'left'
+    ? tCoeff * indicatorYCoeff + yCoeff * indicatorTCoeff
+    : tCoeff * indicatorYCoeff - yCoeff * indicatorTCoeff
+  if (!Number.isFinite(det) || Math.abs(det) < 1e-10) return null
+
+  const t = (-constTerm * indicatorYCoeff) / det
+  const Y = (indicatorTCoeff * constTerm) / det
+  if (![t, Y, z].every(Number.isFinite)) return null
+  return { t, Y, z }
+}
+
 export function hysteresisRightImplicitF(Y, t, z, { b1, b2, c }) {
   const q = Q(z, b1, b2)
 

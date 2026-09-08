@@ -5,6 +5,7 @@ import OverlayTopBar from './OverlayTopBar'
 import OverlaySettingsPanel from './OverlaySettingsPanel'
 import { AboutCard, HelpCard } from './FloatingInfoCards'
 import OverlayStage from './OverlayStage'
+import DocumentationViewer from './DocumentationViewer'
 import useOverlayPanelController from './useOverlayPanelController'
 
 export default function OverlayPanel(props) {
@@ -42,6 +43,8 @@ export default function OverlayPanel(props) {
     showCoincidence,
     showHysteresis,
     showHugoniotMinus,
+    showExtensionCoincidenceMinus,
+    showExtensionCoincidencePlus,
     solutionDiagnostics = [],
     onSelectCharacteristicPoint,
     onExportSnapshot,
@@ -75,8 +78,16 @@ export default function OverlayPanel(props) {
         setShowSettingsPanel={controller.setShowSettingsPanel}
       />
 
-      <HelpCard open={controller.showHelpPanel} onClose={() => controller.setShowHelpPanel(false)} />
+      <HelpCard
+        open={controller.showHelpPanel}
+        onClose={() => controller.setShowHelpPanel(false)}
+        onOpenDocumentation={() => {
+          controller.setShowHelpPanel(false)
+          controller.setShowDocumentation(true)
+        }}
+      />
       <AboutCard open={controller.showAboutPanel} onClose={() => controller.setShowAboutPanel(false)} />
+      <DocumentationViewer open={controller.showDocumentation} onClose={() => controller.setShowDocumentation(false)} />
 
       {controller.showSettingsPanel ? (
         <OverlaySettingsPanel
@@ -115,6 +126,8 @@ export default function OverlayPanel(props) {
         showCoincidence={showCoincidence}
         showHysteresis={showHysteresis}
         showHugoniotMinus={showHugoniotMinus}
+        showExtensionCoincidenceMinus={showExtensionCoincidenceMinus}
+        showExtensionCoincidencePlus={showExtensionCoincidencePlus}
         inspectionModeEnabled={inspectionModeEnabled}
         inspectionProbesByBranch={inspectionProbesByBranch}
         inspectionCurveVisibility={inspectionCurveVisibility}

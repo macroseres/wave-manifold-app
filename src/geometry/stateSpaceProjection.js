@@ -1,6 +1,7 @@
 import { solveInflectionSegments } from '../entities/inflection/index.js'
 import { solveRightHysteresisPoint } from '../entities/hysteresis/index.js'
 import { projectPointMinus, projectPointPlus } from '../entities/geometry/stateProjections.js'
+import { solveSonicBranchSeparatorPoint } from '../entities/surfaceImplicit/sonic.js'
 import { hugoniotMinusImplicit } from './hugoniotStateImplicit.js'
 import { coincidenceStateImplicit } from './coincidenceStateImplicit.js'
 import { visualZToPhysical } from './zCompactification.js'
@@ -113,6 +114,61 @@ export function buildImplicitHugoniotMinusStateSegments(bounds, fixedLeftState, 
     resolution,
     (u, v) => hugoniotMinusImplicit(u, v, fixedLeftState, params),
   )
+}
+
+function buildSonicSeparatorStateProjection(bounds, params, side, projectionSide, samples) {
+  if (!bounds || !params) return []
+  const clipBounds = expandedStateBounds(bounds, 0.06)
+  const span = Math.max(1, bounds.uMax - bounds.uMin, bounds.vMax - bounds.vMin)
+  const maxJump = 0.2 * span
+  const segments = []
+  let current = []
+  let previous = null
+
+  const flush = () => {
+    if (current.length >= 2) segments.push(current)
+    current = []
+  }
+
+  for (let i = 0; i < samples; i += 1) {
+    const fraction = i / Math.max(1, samples - 1)
+    const zHat = -1 + CHARACTERISTIC_Z_HAT_MARGIN
+      + fraction * (2 - 2 * CHARACTERISTIC_Z_HAT_MARGIN)
+    const z = visualZToPhysical(zHat)
+    const manifold = solveSonicBranchSeparatorPoint(side, z, params)
+    const projected = manifold
+      ? projectionSide === 'plus' ? projectPointPlus(manifold, params) : projectPointMinus(manifold, params)
+      : null
+    if (!projected || !Number.isFinite(projected.u) || !Number.isFinite(projected.v)) {
+      flush(); previous = null; continue
+    }
+
+    const sample = { manifold, state: { u: projected.u, v: projected.v } }
+    const inside = stateInsideBounds(sample.state, clipBounds)
+    const previousInside = previous ? stateInsideBounds(previous.state, clipBounds) : false
+    if (!inside) {
+      if (current.length && previousInside) current.push(sample)
+      flush(); previous = sample; continue
+    }
+
+    if (!current.length && previous && !previousInside) current.push(previous)
+    const last = current[current.length - 1]
+    if (last && Math.hypot(sample.state.u - last.state.u, sample.state.v - last.state.v) > maxJump) {
+      flush()
+    }
+    current.push(sample)
+    previous = sample
+  }
+  flush()
+  return segments
+}
+
+export function buildSonicRightSeparatorMinusProjection(bounds, params, samples = 3200) {
+  return buildSonicSeparatorStateProjection(bounds, params, 'right', 'minus', samples)
+}
+
+export function buildSonicLeftSeparatorPlusProjection(bounds, params, samples = 3200) {
+  return buildSonicSeparatorStateProjection(bounds, params, 'left', 'plus', samples)
 }
 
 export function buildCharacteristicProjectionSamples(view, params, branch, samplesT = 181, samplesZ = 181) {
