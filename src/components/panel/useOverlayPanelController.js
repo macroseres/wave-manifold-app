@@ -61,9 +61,43 @@ export default function useOverlayPanelController(props) {
     showSonicLeft,
     setShowSonicLeft,
     showSaturated,
+    showDoubleSonicMinusProjection,
+    showDoubleSonicPlusProjection,
+    showExtensionMinusMinusProjection,
+    showExtensionPlusMinusProjection,
+    showExtensionMinusPlusProjection,
+    showExtensionPlusPlusProjection,
+    showInflectionMinusProjection,
+    showInflectionPlusProjection,
+    showHysPlusMinusProjection,
+    showCoincidenceMinusProjection,
+    showRarefactionSlowMinusProjection,
+    showCoincidencePlusProjection,
+    showRarefactionSlowPlusProjection,
+    showHysMinusMinusProjection,
+    showHysPlusPlusProjection,
+    showHugoniotMinusPlusProjection,
+    showHysMinusPlusProjection,
     showSaturatedPlus,
     showHysteresisSelfIntersection,
     setShowSaturated,
+    setShowDoubleSonicMinusProjection,
+    setShowDoubleSonicPlusProjection,
+    setShowExtensionMinusMinusProjection,
+    setShowExtensionPlusMinusProjection,
+    setShowExtensionMinusPlusProjection,
+    setShowExtensionPlusPlusProjection,
+    setShowInflectionMinusProjection,
+    setShowInflectionPlusProjection,
+    setShowHysPlusMinusProjection,
+    setShowCoincidenceMinusProjection,
+    setShowRarefactionSlowMinusProjection,
+    setShowCoincidencePlusProjection,
+    setShowRarefactionSlowPlusProjection,
+    setShowHysMinusMinusProjection,
+    setShowHysPlusPlusProjection,
+    setShowHugoniotMinusPlusProjection,
+    setShowHysMinusPlusProjection,
     setShowSaturatedPlus,
     setShowHysteresisSelfIntersection,
     showSaturatedCoincidence,
@@ -139,7 +173,6 @@ export default function useOverlayPanelController(props) {
   const [selectedSchaefferShearerCase, setSelectedSchaefferShearerCase] = useState('iv')
   const [schaefferShearerCasePresets, setSchaefferShearerCasePresets] = useState(initialSchaefferShearerCasePresets)
   const activeParameterCase = hoveredParameterCase ?? selectedSchaefferShearerCase
-  const canOpenStateView = Boolean(slowEntry && fastEntry)
   const { activeViewLabel, activeModeLabel, activeModeClass } = buildModeLabels({
     activeView,
     solutionModeEnabled,
@@ -274,7 +307,26 @@ export default function useOverlayPanelController(props) {
     }))
   }
 
-  const visualizationSetters = [
+  const projectionSetters = [
+    setShowDoubleSonicMinusProjection,
+    setShowDoubleSonicPlusProjection,
+    setShowExtensionMinusMinusProjection,
+    setShowExtensionPlusMinusProjection,
+    setShowExtensionMinusPlusProjection,
+    setShowExtensionPlusPlusProjection,
+    setShowInflectionMinusProjection,
+    setShowInflectionPlusProjection,
+    setShowHysPlusMinusProjection,
+    setShowCoincidenceMinusProjection,
+    setShowRarefactionSlowMinusProjection,
+    setShowCoincidencePlusProjection,
+    setShowRarefactionSlowPlusProjection,
+    setShowHysMinusMinusProjection,
+    setShowHysPlusPlusProjection,
+    setShowHugoniotMinusPlusProjection,
+    setShowHysMinusPlusProjection,
+  ]
+  const sceneSetters = [
     setShowAxes,
     setShowCharacteristic,
     setShowSonicRight,
@@ -304,6 +356,7 @@ export default function useOverlayPanelController(props) {
   ]
 
   const setAllVisualizationControls = (value) => {
+    const visualizationSetters = activeView === 'state' ? projectionSetters : sceneSetters
     visualizationSetters.filter((setter) => typeof setter === 'function').forEach((setter) => setter(Boolean(value)))
   }
 
@@ -340,6 +393,7 @@ export default function useOverlayPanelController(props) {
   }
 
   const visualizationPanelProps = {
+    activeView,
     activeEntry,
     clearSelectedState,
     clearVisualizationControls,
@@ -369,6 +423,23 @@ export default function useOverlayPanelController(props) {
     setShowRarefactionFast,
     setShowRarefactionSlow,
     setShowSaturated,
+    setShowDoubleSonicMinusProjection,
+    setShowDoubleSonicPlusProjection,
+    setShowExtensionMinusMinusProjection,
+    setShowExtensionPlusMinusProjection,
+    setShowExtensionMinusPlusProjection,
+    setShowExtensionPlusPlusProjection,
+    setShowInflectionMinusProjection,
+    setShowInflectionPlusProjection,
+    setShowHysPlusMinusProjection,
+    setShowCoincidenceMinusProjection,
+    setShowRarefactionSlowMinusProjection,
+    setShowCoincidencePlusProjection,
+    setShowRarefactionSlowPlusProjection,
+    setShowHysMinusMinusProjection,
+    setShowHysPlusPlusProjection,
+    setShowHugoniotMinusPlusProjection,
+    setShowHysMinusPlusProjection,
     setShowSaturatedPlus,
     setShowHysteresisSelfIntersection,
     setShowSaturatedCoincidence,
@@ -396,6 +467,23 @@ export default function useOverlayPanelController(props) {
     showRarefactionFast,
     showRarefactionSlow,
     showSaturated,
+    showDoubleSonicMinusProjection,
+    showDoubleSonicPlusProjection,
+    showExtensionMinusMinusProjection,
+    showExtensionPlusMinusProjection,
+    showExtensionMinusPlusProjection,
+    showExtensionPlusPlusProjection,
+    showInflectionMinusProjection,
+    showInflectionPlusProjection,
+    showHysPlusMinusProjection,
+    showCoincidenceMinusProjection,
+    showRarefactionSlowMinusProjection,
+    showCoincidencePlusProjection,
+    showRarefactionSlowPlusProjection,
+    showHysMinusMinusProjection,
+    showHysPlusPlusProjection,
+    showHugoniotMinusPlusProjection,
+    showHysMinusPlusProjection,
     showSaturatedPlus,
     showHysteresisSelfIntersection,
     showSaturatedCoincidence,
@@ -423,7 +511,6 @@ export default function useOverlayPanelController(props) {
     activeViewLabel,
     activeModeLabel,
     activeModeClass,
-    canOpenStateView,
     currentParameterPoint,
     displayCoordinateTex,
     formatNumber,
@@ -457,6 +544,11 @@ export default function useOverlayPanelController(props) {
     applySchaefferShearerCase,
   }
 }
+
+
+
+
+
 
 
 

@@ -12,12 +12,25 @@ export default function OverlayStage({
   probeView,
   selectedEntries,
   onSelectCharacteristicPoint,
-  showInflectionSlow,
-  showInflectionFast,
+  showInflectionMinusProjection,
+  showInflectionPlusProjection,
   showCoincidence,
-  showHysteresis,
+  showHysPlusMinusProjection,
+  showCoincidenceMinusProjection,
+  showRarefactionSlowMinusProjection,
+  showCoincidencePlusProjection,
+  showRarefactionSlowPlusProjection,
+  showHysMinusMinusProjection,
+  showHysPlusPlusProjection,
+  showHugoniotMinusPlusProjection,
+  showHysMinusPlusProjection,
   showHugoniotMinus,
-  showExtensionCoincidenceMinus,
+  showDoubleSonicMinusProjection,
+  showDoubleSonicPlusProjection,
+  showExtensionMinusMinusProjection,
+  showExtensionPlusMinusProjection,
+  showExtensionMinusPlusProjection,
+  showExtensionPlusPlusProjection,
   showExtensionCoincidencePlus,
   inspectionModeEnabled,
   inspectionProbesByBranch,
@@ -31,13 +44,9 @@ export default function OverlayStage({
   return (
     <main className="wm-stage-shell">
       <div className="wm-stage-frame">
-        {activeView === '3d' ? (
-          <div className="wm-stage-title">Variedade de ondas <MathLabel tex={"\\mathcal{W}"} /></div>
-        ) : null}
 
         {activeView === 'state' ? (
           <div className="wm-stage-content state-view">
-            <div className="wm-stage-title inline">Espaço de estados <MathLabel tex={"(u,v)"} /></div>
             <div className="stage-state-plot">
               <StateSpaceCanvas
                 params={params}
@@ -45,12 +54,25 @@ export default function OverlayStage({
                 probeView={probeView}
                 selectedEntries={selectedEntries}
                 onSelectCharacteristicPoint={onSelectCharacteristicPoint}
-                showInflectionSlow={showInflectionSlow}
-                showInflectionFast={showInflectionFast}
+                showInflectionMinusProjection={showInflectionMinusProjection}
+                showInflectionPlusProjection={showInflectionPlusProjection}
                 showCoincidence={showCoincidence}
-                showHysteresis={showHysteresis}
+                showHysPlusMinusProjection={showHysPlusMinusProjection}
+                showCoincidenceMinusProjection={showCoincidenceMinusProjection}
+                showRarefactionSlowMinusProjection={showRarefactionSlowMinusProjection}
+                showCoincidencePlusProjection={showCoincidencePlusProjection}
+                showRarefactionSlowPlusProjection={showRarefactionSlowPlusProjection}
+                showHysMinusMinusProjection={showHysMinusMinusProjection}
+                showHysPlusPlusProjection={showHysPlusPlusProjection}
+                showHugoniotMinusPlusProjection={showHugoniotMinusPlusProjection}
+                showHysMinusPlusProjection={showHysMinusPlusProjection}
                 showHugoniotMinus={showHugoniotMinus}
-                showExtensionCoincidenceMinus={showExtensionCoincidenceMinus}
+                showDoubleSonicMinusProjection={showDoubleSonicMinusProjection}
+                showDoubleSonicPlusProjection={showDoubleSonicPlusProjection}
+                showExtensionMinusMinusProjection={showExtensionMinusMinusProjection}
+                showExtensionPlusMinusProjection={showExtensionPlusMinusProjection}
+                showExtensionMinusPlusProjection={showExtensionMinusPlusProjection}
+                showExtensionPlusPlusProjection={showExtensionPlusPlusProjection}
                 showExtensionCoincidencePlus={showExtensionCoincidencePlus}
                 inspectionModeEnabled={inspectionModeEnabled}
                 inspectionProbesByBranch={inspectionProbesByBranch}
@@ -82,3 +104,8 @@ export default function OverlayStage({
     </main>
   )
 }
+
+
+
+
+

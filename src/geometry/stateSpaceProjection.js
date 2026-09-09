@@ -167,8 +167,16 @@ export function buildSonicRightSeparatorMinusProjection(bounds, params, samples 
   return buildSonicSeparatorStateProjection(bounds, params, 'right', 'minus', samples)
 }
 
+export function buildSonicRightSeparatorPlusProjection(bounds, params, samples = 3200) {
+  return buildSonicSeparatorStateProjection(bounds, params, 'right', 'plus', samples)
+}
+
 export function buildSonicLeftSeparatorPlusProjection(bounds, params, samples = 3200) {
   return buildSonicSeparatorStateProjection(bounds, params, 'left', 'plus', samples)
+}
+
+export function buildSonicLeftSeparatorMinusProjection(bounds, params, samples = 3200) {
+  return buildSonicSeparatorStateProjection(bounds, params, 'left', 'minus', samples)
 }
 
 export function buildCharacteristicProjectionSamples(view, params, branch, samplesT = 181, samplesZ = 181) {

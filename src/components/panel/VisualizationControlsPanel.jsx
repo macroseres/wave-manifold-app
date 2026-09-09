@@ -3,6 +3,7 @@ import MathLabel from './MathLabel'
 import { Section, Toggle } from './PanelPrimitives'
 
 export default function VisualizationControlsPanel({
+  activeView = '3d',
   clearVisualizationControls,
   clearSelectedState,
   markVisualizationControls,
@@ -25,6 +26,23 @@ export default function VisualizationControlsPanel({
   setShowRarefactionFast,
   setShowRarefactionSlow,
   setShowSaturated,
+  setShowDoubleSonicMinusProjection,
+  setShowDoubleSonicPlusProjection,
+  setShowExtensionMinusMinusProjection,
+  setShowExtensionPlusMinusProjection,
+  setShowExtensionMinusPlusProjection,
+  setShowExtensionPlusPlusProjection,
+  setShowInflectionMinusProjection,
+  setShowInflectionPlusProjection,
+  setShowHysPlusMinusProjection,
+  setShowCoincidenceMinusProjection,
+  setShowRarefactionSlowMinusProjection,
+  setShowCoincidencePlusProjection,
+  setShowRarefactionSlowPlusProjection,
+  setShowHysMinusMinusProjection,
+  setShowHysPlusPlusProjection,
+  setShowHugoniotMinusPlusProjection,
+  setShowHysMinusPlusProjection,
   setShowSaturatedPlus,
   setShowHysteresisSelfIntersection,
   setShowSaturatedCoincidence,
@@ -52,6 +70,23 @@ export default function VisualizationControlsPanel({
   showRarefactionFast,
   showRarefactionSlow,
   showSaturated,
+  showDoubleSonicMinusProjection,
+  showDoubleSonicPlusProjection,
+  showExtensionMinusMinusProjection,
+  showExtensionPlusMinusProjection,
+  showExtensionMinusPlusProjection,
+  showExtensionPlusPlusProjection,
+  showInflectionMinusProjection,
+  showInflectionPlusProjection,
+  showHysPlusMinusProjection,
+  showCoincidenceMinusProjection,
+  showRarefactionSlowMinusProjection,
+  showCoincidencePlusProjection,
+  showRarefactionSlowPlusProjection,
+  showHysMinusMinusProjection,
+  showHysPlusPlusProjection,
+  showHugoniotMinusPlusProjection,
+  showHysMinusPlusProjection,
   showSaturatedPlus,
   showHysteresisSelfIntersection,
   showSaturatedCoincidence,
@@ -65,8 +100,38 @@ export default function VisualizationControlsPanel({
   return (
       <aside className="wm-left wm-panel">
 
-      <div className="wm-panel-kicker">Camadas da cena</div>
-      <div className="wm-panel-intro">Escolha as superfícies e curvas que ajudam a responder sua pergunta atual.</div>
+      <div className="wm-panel-kicker">{activeView === 'state' ? 'Projeções' : 'Camadas da cena'}</div>
+      <div className="wm-panel-intro">{activeView === 'state' ? 'Escolha as projeções para visualizar no espaço de estados.' : 'Escolha as superfícies e curvas da variedade de ondas.'}</div>
+      {activeView === 'state' && (
+      <>
+      <Section title={<>Projeções <MathLabel tex="\pi_-" /></>} defaultOpen={true} accent="#fde047">
+        <div className="toggle-grid">
+          <Toggle checked={showCoincidenceMinusProjection} onChange={setShowCoincidenceMinusProjection} label={<MathLabel tex="\pi_-(E)" />} color={waveColors.coincidence} />
+          <Toggle checked={showRarefactionSlowMinusProjection} onChange={setShowRarefactionSlowMinusProjection} label={<MathLabel tex="\pi_-(R_-(U_L))" />} color={waveColors.rarefactionSlow} />
+          <Toggle checked={showDoubleSonicMinusProjection} onChange={setShowDoubleSonicMinusProjection} label={<><MathLabel tex={"\\pi_-(\\mathcal{DS})"} /><span> : Dupla sônica</span></>} color={waveColors.doubleSonic} />
+          <Toggle checked={showExtensionMinusMinusProjection} onChange={setShowExtensionMinusMinusProjection} label={<><MathLabel tex={"\\pi_-(\\operatorname{ext}_-(\\mathcal{E}))"} /><span> : Inclusão na coincidência</span></>} color={waveColors.extensionCoincidenceMinus} />
+          <Toggle checked={showExtensionPlusMinusProjection} onChange={setShowExtensionPlusMinusProjection} label={<><MathLabel tex={"\\pi_-(\\operatorname{ext}_+(\\mathcal{E}))"} /><span> : Projeção da extensão</span></>} color={waveColors.extensionCoincidencePlus} />
+          <Toggle checked={showInflectionMinusProjection} onChange={setShowInflectionMinusProjection} label={<MathLabel tex={"\\pi_-(\\mathcal{J})"} />} color={waveColors.inflection} />
+          <Toggle checked={showHysPlusMinusProjection} onChange={setShowHysPlusMinusProjection} label={<><MathLabel tex={"\\pi_-(\\operatorname{Hys}^+)"} /><span> : Projeção no espaço de estados</span></>} color={waveColors.hysPlusMinusProjection} />
+          <Toggle checked={showHysMinusMinusProjection} onChange={setShowHysMinusMinusProjection} label={<><MathLabel tex={"\\pi_-(\\operatorname{Hys}^-)"} /><span> : Projeção no espaço de estados</span></>} color={waveColors.hysMinusMinusProjection} />
+        </div>
+      </Section>
+      <Section title={<>Projeções <MathLabel tex="\pi_+" /></>} defaultOpen={true} accent="#f472b6">
+        <div className="toggle-grid">
+          <Toggle checked={showHugoniotMinusPlusProjection} onChange={setShowHugoniotMinusPlusProjection} label={<MathLabel tex="\pi_+(H_-(U_L))" />} color={waveColors.hugoniotMinus} />
+          <Toggle checked={showCoincidencePlusProjection} onChange={setShowCoincidencePlusProjection} label={<MathLabel tex="\pi_+(E)" />} color={waveColors.coincidence} />
+          <Toggle checked={showRarefactionSlowPlusProjection} onChange={setShowRarefactionSlowPlusProjection} label={<MathLabel tex="\pi_+(R_-(U_L))" />} color={waveColors.rarefactionSlow} />
+          <Toggle checked={showDoubleSonicPlusProjection} onChange={setShowDoubleSonicPlusProjection} label={<><MathLabel tex={"\\pi_+(\\mathcal{DS})"} /><span> : Dupla sônica (tracejada)</span></>} color={waveColors.doubleSonic} />
+          <Toggle checked={showExtensionMinusPlusProjection} onChange={setShowExtensionMinusPlusProjection} label={<><MathLabel tex={"\\pi_+(\\operatorname{ext}_-(\\mathcal{E}))"} /><span> : Projeção da extensão</span></>} color={waveColors.extensionCoincidenceMinus} />
+          <Toggle checked={showExtensionPlusPlusProjection} onChange={setShowExtensionPlusPlusProjection} label={<><MathLabel tex={"\\pi_+(\\operatorname{ext}_+(\\mathcal{E}))"} /><span> : Inclusão na coincidência</span></>} color={waveColors.extensionCoincidencePlus} />
+          <Toggle checked={showInflectionPlusProjection} onChange={setShowInflectionPlusProjection} label={<MathLabel tex={"\\pi_+(\\mathcal{J})"} />} color={waveColors.inflection} />
+          <Toggle checked={showHysPlusPlusProjection} onChange={setShowHysPlusPlusProjection} label={<><MathLabel tex={"\\pi_+(\\operatorname{Hys}^+)"} /><span> : Projeção no espaço de estados</span></>} color={waveColors.hysPlusPlusProjection} />
+          <Toggle checked={showHysMinusPlusProjection} onChange={setShowHysMinusPlusProjection} label={<><MathLabel tex={"\\pi_+(\\operatorname{Hys}^-)"} /><span> : Projeção no espaço de estados</span></>} color={waveColors.hysMinusPlusProjection} />
+        </div>
+      </Section>
+      </>
+      )}
+      {activeView !== 'state' && (<>
       <Section title="Referências geométricas" defaultOpen={true} accent="#38bdf8">
         <div className="toggle-grid">
           <Toggle checked={showAxes} onChange={setShowAxes} label="Eixos" />
@@ -76,8 +141,8 @@ export default function VisualizationControlsPanel({
       </Section>
       <Section title="Superfícies e fronteiras" defaultOpen={true} accent="#f97316">
         <div className="toggle-grid">
-          <Toggle checked={showSonicLeft} onChange={setShowSonicLeft} label={<><MathLabel tex={"\\mathcal{S}^-_s"} /><span> / </span><MathLabel tex={"\\mathcal{S}^-_f"} /><span> : Sônica Esquerda</span></>} color={waveColors.sonicLeftSlow} />
-          <Toggle checked={showSonicRight} onChange={setShowSonicRight} label={<><MathLabel tex={"\\mathcal{S}^+_s"} /><span> / </span><MathLabel tex={"\\mathcal{S}^+_f"} /><span> : Sônica Direita</span></>} color={waveColors.sonicRightFast} />
+          <Toggle checked={showSonicLeft} onChange={setShowSonicLeft} label={<><MathLabel tex={"\\mathcal{S}^- = \\mathcal{S}^-_s \\cup\\mathcal{S}^-_f"} /><span> : Sônica Esquerda</span></>} color={waveColors.sonicLeftSlow} />
+          <Toggle checked={showSonicRight} onChange={setShowSonicRight} label={<><MathLabel tex={"\\mathcal{S}^+ = \\mathcal{S}^+_s\\cup\\mathcal{S}^+_f"} /><span> : Sônica Direita</span></>} color={waveColors.sonicRightFast} />
           <Toggle checked={showDoubleSonic} onChange={setShowDoubleSonic} label={<><MathLabel tex={"\\mathcal{DS}"} /><span> : Dupla Sônica </span></>} color={waveColors.doubleSonic} />
           <Toggle checked={showInflectionSlow || showInflectionFast} onChange={(checked) => { setShowInflectionSlow(checked); setShowInflectionFast(checked) }} label={<><MathLabel tex={"\\mathcal{J}"} /><span> : Inflexões </span></>} color={waveColors.inflection ?? waveColors.inflectionSlow} />
           <Toggle checked={showHysteresisLeft ?? showHysteresis} onChange={setShowHysteresisLeft ?? setShowHysteresis} label={<><MathLabel tex={"\\operatorname{Hys}^-"} /><span> : Histerese Esquerda</span></>} color={waveColors.hysteresisLeft ?? '#64748b'} />
@@ -95,15 +160,15 @@ export default function VisualizationControlsPanel({
       <Section title="Família lenta" defaultOpen={true} accent="#22c55e">
         <div className="toggle-grid">
           <Toggle checked={showHugoniotMinus} onChange={setShowHugoniotMinus} label={<><MathLabel tex={"H_-(U_L)"} /><span> : Hugoniot Forward</span></>} color={waveColors.hugoniotMinus ?? '#0f172a'} />
-          <Toggle checked={showRarefactionSlow} onChange={setShowRarefactionSlow} label={<><MathLabel tex={"\\mathcal{R}^-(U_L)"} /><span> : Rarefação Lenta </span></>} color={waveColors.rarefactionSlow} />
+          <Toggle checked={showRarefactionSlow} onChange={setShowRarefactionSlow} label={<><MathLabel tex={"\\mathcal{R}_-(U_L)"} /><span> : Rarefação Lenta </span></>} color={waveColors.rarefactionSlow} />
           <Toggle checked={showCompositeSlow} onChange={setShowCompositeSlow} label={<><MathLabel tex={"\\mathcal{K}_-(U_L)"} /><span> : Composta Lenta </span></>} color={waveColors.compositeSlow ?? waveColors.composite} />
           <Toggle checked={showCompositeSaturatedSlow} onChange={setShowCompositeSaturatedSlow} label={<><MathLabel tex={"\\operatorname{sat}_{H_-}(\\mathcal{R}^-)"} /><span> : Superfície saturada lenta </span></>} color={waveColors.compositeSaturatedSlow ?? '#60a5fa'} />
         </div>
       </Section>
-      <Section title="Família rápida" defaultOpen={false} accent="#a78bfa">
+      <Section title="Família rápida" defaultOpen={true} accent="#a78bfa">
         <div className="toggle-grid">
           <Toggle checked={showHugoniotPlus} onChange={setShowHugoniotPlus} label={<><MathLabel tex={"H_+(U_R)"} /><span> : Hugoniot Backward</span></>} color={waveColors.hugoniotPlus ?? '#0f172a'} />
-          <Toggle checked={showRarefactionFast} onChange={setShowRarefactionFast} label={<><MathLabel tex={"\\mathcal{R}^+(U_R)"} /><span> : Rarefação Rápida</span></>} color={waveColors.rarefactionFast} />
+          <Toggle checked={showRarefactionFast} onChange={setShowRarefactionFast} label={<><MathLabel tex={"\\mathcal{R}_+(U_R)"} /><span> : Rarefação Rápida</span></>} color={waveColors.rarefactionFast} />
           <Toggle checked={showCompositeFast} onChange={setShowCompositeFast} label={<><MathLabel tex={"\\mathcal{K}_+(U_R)"} /><span> : Composta Rápida</span></>} color={waveColors.compositeFast ?? waveColors.composite} />
           <Toggle checked={showCompositeSaturatedFast} onChange={setShowCompositeSaturatedFast} label={<><MathLabel tex={"\\operatorname{sat}_{H_+}(\\mathcal{R}^+)"} /><span> : Superfície saturada rápida</span></>} color={waveColors.compositeSaturatedFast ?? '#f472b6'} />
           
@@ -111,6 +176,7 @@ export default function VisualizationControlsPanel({
         </div>
       </Section>
 
+      </>)}
       <div className="visualization-bulk-actions">
         <button type="button" className="secondary-button visualization-clear-button" onClick={clearVisualizationControls}>Ocultar tudo</button>
         <button type="button" className="secondary-button visualization-clear-button" onClick={markVisualizationControls}>Mostrar tudo</button>
@@ -124,6 +190,17 @@ export default function VisualizationControlsPanel({
     </aside>
   )
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

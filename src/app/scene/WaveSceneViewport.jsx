@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from 'react'
+import React, { memo, useMemo, useState } from 'react'
 import * as THREE from 'three'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
@@ -174,6 +174,20 @@ function WaveSceneViewport({
   finishOrbiting3D,
 }) {
   const markerScale = useMemo(() => [1 / tScale, 1 / yScale, 1 / zScale], [tScale, yScale, zScale])
+  const [navigationMode, setNavigationMode] = useState('rotate')
+  const setCameraView = (direction) => {
+    const controls = orbitControlsRef.current
+    if (!controls) return
+    const camera = controls.object
+    const distance = direction === 'reset' ? Math.sqrt(75) : camera.position.distanceTo(controls.target)
+    controls.target.set(0, 0, 0)
+    camera.up.set(0, 1, 0)
+    const vector = direction === 'front' ? [0, 0, 1] : direction === 'side' ? [1, 0, 0] : direction === 'top' ? [0, 1, 0] : [1, 1, 1]
+    if (direction === 'top') camera.up.set(0, 0, -1)
+    camera.position.set(...vector).normalize().multiplyScalar(distance)
+    camera.lookAt(controls.target)
+    controls.update()
+  }
   const sceneScale = useMemo(() => [tScale, yScale, zScale], [tScale, yScale, zScale])
   const selectedCharacteristicPoints = useMemo(
     () => Object.values(displayedSelectedByBranch).filter(Boolean),
@@ -182,9 +196,15 @@ function WaveSceneViewport({
 
   return (
     <div className={`scene-viewport ${activeView === '3d' ? 'active' : 'inactive'}`} onPointerMove={onScenePointerMove} onPointerLeave={onScenePointerLeave}>
-      <div className="scene-zoom-controls" aria-label="Controles de zoom da visualização 3D">
+      <div className="scene-navigation-controls" role="toolbar" aria-label="Navegação da variedade de ondas">
+        <button type="button" aria-pressed={navigationMode === 'rotate'} onClick={() => setNavigationMode('rotate')} title="Arraste para girar; clique para selecionar pontos">Girar / selecionar</button>
+        <button type="button" aria-pressed={navigationMode === 'pan'} onClick={() => setNavigationMode('pan')} title="Arraste para deslocar a vista">Mover vista</button>
         <button type="button" aria-label="Afastar visualização 3D" title="Afastar" onClick={zoomOut}>−</button>
         <button type="button" aria-label="Aproximar visualização 3D" title="Aproximar" onClick={zoomIn}>+</button>
+        <button type="button" onClick={() => setCameraView('front')}>Frente</button>
+        <button type="button" onClick={() => setCameraView('side')}>Lado</button>
+        <button type="button" onClick={() => setCameraView('top')}>Topo</button>
+        <button type="button" onClick={() => setCameraView('reset')}>Restaurar vista</button>
       </div>
 
       <Canvas
@@ -195,7 +215,7 @@ function WaveSceneViewport({
         performance={{ min: 0.5 }}
         gl={WEBGL_PERFORMANCE_OPTIONS}
       >
-        <CameraZoomController zoomSignal={zoomSignal} />
+        <CameraZoomController zoomSignal={zoomSignal} controlsRef={orbitControlsRef} />
         <color attach="background" args={['#010B15']} />
         <ambientLight intensity={0.9} />
         <directionalLight position={[5, 6, 8]} intensity={1.0} />
@@ -216,9 +236,9 @@ function WaveSceneViewport({
               onMarkerHoverChange={onMarkerHoverChange}
               selectedPoints={selectedCharacteristicPoints}
               markerScale={markerScale}
-              interactive={!solutionModeEnabled || inspectionModeEnabled}
+              interactive={navigationMode !== 'pan' && (!solutionModeEnabled || inspectionModeEnabled)}
               inspectionMode={inspectionModeEnabled}
-              markerInteractive={!inspectionModeEnabled && !solutionModeEnabled}
+              markerInteractive={navigationMode !== 'pan' && !inspectionModeEnabled && !solutionModeEnabled}
             />
           )}
 
@@ -356,8 +376,8 @@ function WaveSceneViewport({
           target={[0, 0, 0]}
           enableDamping={true}
           dampingFactor={0.16}
-          enablePan={false}
-          mouseButtons={{ LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: null }}
+          enablePan={true}
+          mouseButtons={{ LEFT: navigationMode === 'pan' ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: null }}
           onStart={() => {
             if (draggingCharacteristicPoint) {
               setOrbitControlsEnabled(false)

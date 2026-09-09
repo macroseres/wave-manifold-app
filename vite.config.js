@@ -12,6 +12,10 @@ function manualChunks(id) {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    // File notifications can be missed when edits come from the Windows sandbox.
+    watch: { usePolling: true, interval: 1000 },
+  },
   build: {
     rollupOptions: {
       output: { manualChunks },

@@ -47,6 +47,40 @@ export default function WaveOverlayPanel({
       setShowHysteresisSelfIntersection={actions.setShowHysteresisSelfIntersection}
       showSaturatedPlus={visibility.showSaturatedPlus}
       setShowSaturatedPlus={actions.setShowSaturatedPlus}
+      showDoubleSonicMinusProjection={state.showDoubleSonicMinusProjection}
+      setShowDoubleSonicMinusProjection={actions.setShowDoubleSonicMinusProjection}
+      showDoubleSonicPlusProjection={state.showDoubleSonicPlusProjection}
+      setShowDoubleSonicPlusProjection={actions.setShowDoubleSonicPlusProjection}
+      showExtensionMinusMinusProjection={state.showExtensionMinusMinusProjection}
+      showExtensionPlusMinusProjection={state.showExtensionPlusMinusProjection}
+      setShowExtensionMinusMinusProjection={actions.setShowExtensionMinusMinusProjection}
+      setShowExtensionPlusMinusProjection={actions.setShowExtensionPlusMinusProjection}
+      showExtensionMinusPlusProjection={state.showExtensionMinusPlusProjection}
+      showExtensionPlusPlusProjection={state.showExtensionPlusPlusProjection}
+      setShowExtensionMinusPlusProjection={actions.setShowExtensionMinusPlusProjection}
+      setShowExtensionPlusPlusProjection={actions.setShowExtensionPlusPlusProjection}
+      showInflectionMinusProjection={state.showInflectionMinusProjection}
+      setShowInflectionMinusProjection={actions.setShowInflectionMinusProjection}
+      showInflectionPlusProjection={state.showInflectionPlusProjection}
+      setShowInflectionPlusProjection={actions.setShowInflectionPlusProjection}
+      showHysPlusMinusProjection={state.showHysPlusMinusProjection}
+      showCoincidenceMinusProjection={state.showCoincidenceMinusProjection}
+      showRarefactionSlowMinusProjection={state.showRarefactionSlowMinusProjection}
+      showCoincidencePlusProjection={state.showCoincidencePlusProjection}
+      showRarefactionSlowPlusProjection={state.showRarefactionSlowPlusProjection}
+      showHysMinusMinusProjection={state.showHysMinusMinusProjection}
+      setShowHysPlusMinusProjection={actions.setShowHysPlusMinusProjection}
+      setShowCoincidenceMinusProjection={actions.setShowCoincidenceMinusProjection}
+      setShowRarefactionSlowMinusProjection={actions.setShowRarefactionSlowMinusProjection}
+      setShowCoincidencePlusProjection={actions.setShowCoincidencePlusProjection}
+      setShowRarefactionSlowPlusProjection={actions.setShowRarefactionSlowPlusProjection}
+      setShowHysMinusMinusProjection={actions.setShowHysMinusMinusProjection}
+      showHysPlusPlusProjection={state.showHysPlusPlusProjection}
+      showHugoniotMinusPlusProjection={state.showHugoniotMinusPlusProjection}
+      showHysMinusPlusProjection={state.showHysMinusPlusProjection}
+      setShowHysPlusPlusProjection={actions.setShowHysPlusPlusProjection}
+      setShowHugoniotMinusPlusProjection={actions.setShowHugoniotMinusPlusProjection}
+      setShowHysMinusPlusProjection={actions.setShowHysMinusPlusProjection}
       showSaturated={visibility.showSaturated}
       setShowSaturated={actions.setShowSaturated}
       showSaturatedCoincidence={visibility.showSaturatedCoincidence}
@@ -120,5 +154,10 @@ export default function WaveOverlayPanel({
     />
   )
 }
+
+
+
+
+
 
 

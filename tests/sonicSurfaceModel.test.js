@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
+  buildSonicBranchGeometries,
   buildSonicSeparatorSegments,
   classifySonicPoint,
   sonicLeftBranchIndicator,
@@ -13,6 +14,28 @@ import { projectPointMinus, projectPointPlus } from '../src/entities/geometry/st
 
 const params = { a: 0, b1: 8, b2: 0.2, c: 1 }
 const view = { tMin: -2, tMax: 2, yMin: -2, yMax: 2, zMin: -2, zMax: 2 }
+
+test('both sonic surfaces extend to both compactified z ends beyond the finite view', () => {
+  for (const side of ['left', 'right']) {
+    const branches = buildSonicBranchGeometries(side, params, view, 1)
+    try {
+      for (const geometry of Object.values(branches)) {
+        const positions = geometry.getAttribute('position')
+        let min = Infinity, max = -Infinity
+        for (let i = 0; i < positions.count; i++) {
+          const zHat = 2 / Math.PI * Math.atan(positions.getZ(i))
+          assert.ok(Number.isFinite(zHat))
+          min = Math.min(min, zHat)
+          max = Math.max(max, zHat)
+        }
+        assert.ok(min < -0.99, `${side}: missing negative tail`)
+        assert.ok(max > 0.99, `${side}: missing positive tail`)
+      }
+    } finally {
+      Object.values(branches).forEach(geometry => geometry.dispose())
+    }
+  }
+})
 
 test('sonic branch indicators classify opposite signs for mirrored left/right points', () => {
   const left = sonicLeftBranchIndicator(0.4, 0.1, 0.3, params)
@@ -40,6 +63,10 @@ test('pi-plus of D-minus matches pi-minus of D-plus', () => {
     const minusState = projectPointMinus(rightSeparator, params)
     assert.ok(Math.abs(plusState.u - minusState.u) < 1e-12)
     assert.ok(Math.abs(plusState.v - minusState.v) < 1e-12)
+    const rightPlus = projectPointPlus(rightSeparator, params)
+    const leftMinus = projectPointMinus(leftSeparator, params)
+    assert.ok(Math.abs(rightPlus.u - leftMinus.u) < 1e-12)
+    assert.ok(Math.abs(rightPlus.v - leftMinus.v) < 1e-12)
   }
 })
 

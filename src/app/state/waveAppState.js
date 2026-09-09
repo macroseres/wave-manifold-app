@@ -88,6 +88,23 @@ export const initialWaveAppState = {
   showHugoniotPlus: false,
   showHysteresisLeft: false,
   showHysteresisRight: false,
+  showDoubleSonicMinusProjection: false,
+  showDoubleSonicPlusProjection: false,
+  showExtensionMinusMinusProjection: false,
+  showExtensionPlusMinusProjection: false,
+  showExtensionMinusPlusProjection: false,
+  showExtensionPlusPlusProjection: false,
+  showInflectionMinusProjection: false,
+  showInflectionPlusProjection: false,
+  showHysPlusMinusProjection: false,
+  showCoincidenceMinusProjection: false,
+  showRarefactionSlowMinusProjection: false,
+  showCoincidencePlusProjection: false,
+  showRarefactionSlowPlusProjection: false,
+  showHysMinusMinusProjection: false,
+  showHysPlusPlusProjection: false,
+  showHugoniotMinusPlusProjection: false,
+  showHysMinusPlusProjection: false,
   showCoincidence: false,
   showBifurcationRight: false,
   showInflectionSlow: false,
@@ -191,5 +208,10 @@ export function useWaveAppState() {
 
   return [state, actions]
 }
+
+
+
+
+
 
 

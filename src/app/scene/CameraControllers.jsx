@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 
-export function CameraZoomController({ zoomSignal }) {
+export function CameraZoomController({ zoomSignal, controlsRef }) {
   const { camera } = useThree()
   const lastSignalRef = useRef(zoomSignal)
   const targetPositionRef = useRef(camera.position.clone())
@@ -13,9 +13,13 @@ export function CameraZoomController({ zoomSignal }) {
     if (!delta) return
 
     const factor = delta > 0 ? 0.82 : 1.22
-    targetPositionRef.current.copy(camera.position).multiplyScalar(factor)
+    const target = controlsRef?.current?.target
+    targetPositionRef.current.copy(camera.position)
+    if (target) targetPositionRef.current.sub(target)
+    targetPositionRef.current.multiplyScalar(factor)
+    if (target) targetPositionRef.current.add(target)
     isAnimatingRef.current = true
-  }, [camera, zoomSignal])
+  }, [camera, zoomSignal, controlsRef])
 
   useFrame((_, delta) => {
     if (!isAnimatingRef.current) return

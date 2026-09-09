@@ -27,8 +27,6 @@ export default function OverlayPanel(props) {
     selectedEntries = [],
     activeView = '3d',
     setActiveView,
-    autoRotate3D = false,
-    setAutoRotate3D,
     inspectionModeEnabled = false,
     inspectionProbesByBranch = { slow: null, fast: null },
     inspectionCurveVisibility = null,
@@ -38,12 +36,25 @@ export default function OverlayPanel(props) {
     solutionModeEnabled = false,
     setSolutionModeEnabled,
     canEnableSolutionMode = false,
-    showInflectionSlow,
-    showInflectionFast,
+    showInflectionMinusProjection,
+    showInflectionPlusProjection,
     showCoincidence,
-    showHysteresis,
+    showHysPlusMinusProjection,
+    showCoincidenceMinusProjection,
+    showRarefactionSlowMinusProjection,
+    showCoincidencePlusProjection,
+    showRarefactionSlowPlusProjection,
+    showHysMinusMinusProjection,
+    showHysPlusPlusProjection,
+    showHugoniotMinusPlusProjection,
+    showHysMinusPlusProjection,
     showHugoniotMinus,
-    showExtensionCoincidenceMinus,
+    showDoubleSonicMinusProjection,
+    showDoubleSonicPlusProjection,
+    showExtensionMinusMinusProjection,
+    showExtensionPlusMinusProjection,
+    showExtensionMinusPlusProjection,
+    showExtensionPlusPlusProjection,
     showExtensionCoincidencePlus,
     solutionDiagnostics = [],
     onSelectCharacteristicPoint,
@@ -57,12 +68,9 @@ export default function OverlayPanel(props) {
       <OverlayTopBar
         activeView={activeView}
         setActiveView={setActiveView}
-        canOpenStateView={controller.canOpenStateView}
         activeViewLabel={controller.activeViewLabel}
         activeModeLabel={controller.activeModeLabel}
         activeModeClass={controller.activeModeClass}
-        autoRotate3D={autoRotate3D}
-        setAutoRotate3D={setAutoRotate3D}
         canEnableInspectionMode={canEnableInspectionMode}
         inspectionModeEnabled={inspectionModeEnabled}
         setInspectionModeEnabled={setInspectionModeEnabled}
@@ -121,12 +129,25 @@ export default function OverlayPanel(props) {
         probeView={calculationView ?? view}
         selectedEntries={selectedEntries}
         onSelectCharacteristicPoint={onSelectCharacteristicPoint}
-        showInflectionSlow={showInflectionSlow}
-        showInflectionFast={showInflectionFast}
+        showInflectionMinusProjection={showInflectionMinusProjection}
+        showInflectionPlusProjection={showInflectionPlusProjection}
         showCoincidence={showCoincidence}
-        showHysteresis={showHysteresis}
+        showHysPlusMinusProjection={showHysPlusMinusProjection}
+        showCoincidenceMinusProjection={showCoincidenceMinusProjection}
+        showRarefactionSlowMinusProjection={showRarefactionSlowMinusProjection}
+        showCoincidencePlusProjection={showCoincidencePlusProjection}
+        showRarefactionSlowPlusProjection={showRarefactionSlowPlusProjection}
+        showHysMinusMinusProjection={showHysMinusMinusProjection}
+        showHysPlusPlusProjection={showHysPlusPlusProjection}
+        showHugoniotMinusPlusProjection={showHugoniotMinusPlusProjection}
+        showHysMinusPlusProjection={showHysMinusPlusProjection}
         showHugoniotMinus={showHugoniotMinus}
-        showExtensionCoincidenceMinus={showExtensionCoincidenceMinus}
+        showDoubleSonicMinusProjection={showDoubleSonicMinusProjection}
+        showDoubleSonicPlusProjection={showDoubleSonicPlusProjection}
+        showExtensionMinusMinusProjection={showExtensionMinusMinusProjection}
+        showExtensionPlusMinusProjection={showExtensionPlusMinusProjection}
+        showExtensionMinusPlusProjection={showExtensionMinusPlusProjection}
+        showExtensionPlusPlusProjection={showExtensionPlusPlusProjection}
         showExtensionCoincidencePlus={showExtensionCoincidencePlus}
         inspectionModeEnabled={inspectionModeEnabled}
         inspectionProbesByBranch={inspectionProbesByBranch}
@@ -160,3 +181,8 @@ export default function OverlayPanel(props) {
     </div>
   )
 }
+
+
+
+
+

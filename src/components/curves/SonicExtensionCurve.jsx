@@ -21,7 +21,7 @@ function SonicExtensionCurve({ side, params, view, visible = true }) {
           key={`extension-${side}-${index}`}
           points={points}
           color={color}
-          lineWidth={1.7}
+          lineWidth={1.35}
           transparent
           opacity={0.96}
           depthTest

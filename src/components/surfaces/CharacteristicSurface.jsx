@@ -36,12 +36,13 @@ function CharacteristicSurface({
   markerInteractive = true,
 }) {
   const zeroTauGap = Math.max(1e-5, ZERO_TAU_GAP_FACTOR * Math.max(1, view.tMax - view.tMin))
+  // The rendered branches meet at t = 0; the gap is only a drag constraint.
   const fastGeometry = useMemo(() => (
-    makeCharacteristicPlane(view.tMin, Math.min(-zeroTauGap, view.tMax), VISUAL_Z_MIN, VISUAL_Z_MAX)
-  ), [view.tMin, view.tMax, zeroTauGap])
+    makeCharacteristicPlane(view.tMin, Math.min(0, view.tMax), VISUAL_Z_MIN, VISUAL_Z_MAX)
+  ), [view.tMin, view.tMax])
   const slowGeometry = useMemo(() => (
-    makeCharacteristicPlane(Math.max(zeroTauGap, view.tMin), view.tMax, VISUAL_Z_MIN, VISUAL_Z_MAX)
-  ), [view.tMin, view.tMax, zeroTauGap])
+    makeCharacteristicPlane(Math.max(0, view.tMin), view.tMax, VISUAL_Z_MIN, VISUAL_Z_MAX)
+  ), [view.tMin, view.tMax])
 
   const rootRef = useRef(null)
   const pointerDownRef = useRef(null)

@@ -1,14 +1,12 @@
 import React from 'react'
+import MathLabel from './MathLabel'
 
 export default function OverlayTopBar({
   activeView,
   setActiveView,
-  canOpenStateView,
   activeViewLabel,
   activeModeLabel,
   activeModeClass,
-  autoRotate3D,
-  setAutoRotate3D,
   canEnableInspectionMode,
   inspectionModeEnabled,
   setInspectionModeEnabled,
@@ -34,21 +32,17 @@ export default function OverlayTopBar({
       </div>
 
       <nav className="wm-tabs" aria-label="Navegação principal">
-        <button type="button" className={`wm-tab ${activeView === '3d' ? 'active' : ''}`} onClick={() => setActiveView?.('3d')}>
-          <span className="wm-tab-icon">⟐</span>
-          <span>Exploração</span>
+        <button type="button" className={`wm-tab ${activeView === '3d' ? 'active' : ''}`} title="Abrir variedade de ondas" onClick={() => setActiveView?.('3d')}>
+          <span className="wm-math-tab-label">Variedade <MathLabel tex="\mathcal{W}" /></span>
         </button>
-        <button type="button" className={`wm-tab ${activeView === 'state' ? 'active' : ''}`} disabled={!canOpenStateView} title={canOpenStateView ? 'Abrir espaço de estados' : 'Selecione C_s e C_f primeiro'} onClick={() => setActiveView?.('state')}>
-          <span className="wm-tab-icon">uv</span>
-          <span>Estados</span>
+        <button type="button" className={`wm-tab ${activeView === 'state' ? 'active' : ''}`} title="Abrir espaço de estados" onClick={() => setActiveView?.('state')}>
+          <span className="wm-math-tab-label">Estados <MathLabel tex="(u,v)" /></span>
         </button>
-        <button type="button" className={`wm-tab ${activeView === 'solution' ? 'active' : ''}`} onClick={() => setActiveView?.('solution')}>
-          <span className="wm-tab-icon">Σ</span>
-          <span>Perfil</span>
+        <button type="button" className={`wm-tab ${activeView === 'solution' ? 'active' : ''}`} title="Abrir perfil da solução" onClick={() => setActiveView?.('solution')}>
+          <span className="wm-math-tab-label">Perfil <MathLabel tex="(x,t=t_0)" /></span>
         </button>
-        <button type="button" className={`wm-tab ${activeView === 'params' ? 'active' : ''}`} onClick={() => setActiveView?.('params')}>
-          <span className="wm-tab-icon">β</span>
-          <span>Parâmetros</span>
+        <button type="button" className={`wm-tab ${activeView === 'params' ? 'active' : ''}`} title="Abrir parâmetros" onClick={() => setActiveView?.('params')}>
+          <span className="wm-params-tab-label">Parâmetros <MathLabel tex="(b_1,b_2)" /></span>
         </button>
       </nav>
 
@@ -58,17 +52,8 @@ export default function OverlayTopBar({
       </div>
 
       <div className="wm-actions">
-        {activeView === '3d' ? (
+        {(activeView === '3d' || activeView === 'state') ? (
           <>
-            <button
-              type="button"
-              title={autoRotate3D ? 'Parar rotação automática em torno de Y' : 'Rotação automática em torno de Y'}
-              aria-label={autoRotate3D ? 'Parar rotação automática em torno de Y' : 'Ativar rotação automática em torno de Y'}
-              className={`wm-action-button ${autoRotate3D ? 'active' : ''}`}
-              onClick={() => setAutoRotate3D?.((value) => !value)}
-            >
-              <span>⟳</span><strong>Rotação</strong>
-            </button>
             <button
               type="button"
               title={canEnableInspectionMode

@@ -39,7 +39,7 @@ function buildSonicBaseGeometry(implicitFn, params, view, resolution, compactifi
 export function buildSonicBranchGeometries(side, params, view, resolution) {
   const indicatorFn = side === 'left' ? sonicLeftBranchIndicator : sonicRightBranchIndicator
   const implicitFn = side === 'left' ? sonicLeftImplicitF : sonicImplicitF
-  const baseGeometry = buildSonicBaseGeometry(implicitFn, params, view, resolution, side === 'left')
+  const baseGeometry = buildSonicBaseGeometry(implicitFn, params, view, resolution, true)
   const geometries = {
     slow: buildClippedBranchGeometry(
       baseGeometry,

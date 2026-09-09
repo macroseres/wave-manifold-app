@@ -14,15 +14,15 @@ export default function Axes({ view }) {
       <Line points={[[0, yMin, 0], [0, yMax, 0]]} color={axisColor} lineWidth={1.35} />
       <VisualLine points={[[0, 0, VISUAL_Z_MIN], [0, 0, VISUAL_Z_MAX]]} color={axisColor} lineWidth={1.35} />
 
-      <Html position={[tMax + 0.25, 0, 0]} center>
+      <Html position={[tMax + 0.04, 0, 0]} center>
         <div style={{ color: axisColor, fontWeight: 'bold', fontSize: 16 }}>{displayCoordinates.tau}</div>
       </Html>
 
-      <Html position={[0, yMax + 0.25, 0]} center>
+      <Html position={[0, yMax + 0.10, 0]} center>
         <div style={{ color: axisColor, fontWeight: 'bold', fontSize: 16 }}>Y</div>
       </Html>
 
-      <Html position={[0, 0, VISUAL_Z_MAX + 0.12]} center>
+      <Html position={[0, 0, VISUAL_Z_MAX + 0.05]} center>
         <div style={{ color: axisColor, fontWeight: 'bold', fontSize: 16 }}>ẑ</div>
       </Html>
 

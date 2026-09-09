@@ -232,7 +232,7 @@ export function BranchAdmissibleArcs({
             key={`${prefix}-R-env-${index}`}
             points={points}
             color={rarefactionNonlocalColor}
-            lineWidth={1.15}
+            lineWidth={1.35}
             renderOrder={12}
             visible={involvedRarefactionVisible}
           />
@@ -245,7 +245,7 @@ export function BranchAdmissibleArcs({
             key={`${prefix}-K-env-${index}`}
             points={points}
             color={compositeColor}
-            lineWidth={1.15}
+            lineWidth={1.35}
             renderOrder={13}
             visible={involvedCompositeVisible}
           />

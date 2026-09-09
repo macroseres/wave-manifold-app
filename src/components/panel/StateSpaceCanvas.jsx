@@ -1,5 +1,9 @@
+import { buildDoubleSonicStateProjection } from '../../geometry/doubleSonicStateProjection.js'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import MathLabel from './MathLabel'
+import RarefactionSegmentsWorker from '../../workers/rarefactionSegments.worker?worker'
+import { useWorkerTask } from '../hooks/useWorkerTask'
+import { useStateViewport } from './useStateViewport'
 import { formatNumber } from '../../ui/display'
 import { buildImplicitHysPlusMinusStateSegments, buildImplicitHysPlusPlusStateSegments } from '../../entities/stateSpace/hysteresisSegments'
 import {
@@ -8,7 +12,9 @@ import {
   buildImplicitHugoniotMinusStateSegments,
   buildImplicitCoincidenceStateSegments,
   buildSonicRightSeparatorMinusProjection,
+  buildSonicRightSeparatorPlusProjection,
   buildSonicLeftSeparatorPlusProjection,
+  buildSonicLeftSeparatorMinusProjection,
   stateFromScreenPoint,
   refineCharacteristicProjectionFromState,
   projectionBounds,
@@ -16,6 +22,8 @@ import {
 import { drawSolutionCanvas, drawStateSpaceCanvas } from '../../entities/stateSpace/canvasDrawing'
 import { coordsOf, PROBE_Z_EXTENSION_MARGIN, sampleHugoniot, sampleRarefaction, withStates } from '../../entities/inspection/probeHelpers.jsx'
 import { FORWARD_HUGONIOT, BACKWARD_HUGONIOT } from '../../entities/hugoniot/directions.js'
+
+const createRarefactionWorker = () => new RarefactionSegmentsWorker()
 
 function projectProbeSegments(segments, side, params) {
   return (segments ?? []).map((segment) => (segment ?? []).map((point) => {
@@ -38,13 +46,23 @@ function StateSpaceCanvas({
   probeView = view,
   selectedEntries = [],
   onSelectCharacteristicPoint,
-  showInflectionSlow = false,
-  showInflectionFast = false,
-  showCoincidence = false,
-  showHysteresis = false,
-  showHugoniotMinus = false,
-  showExtensionCoincidenceMinus = false,
-  showExtensionCoincidencePlus = false,
+  showInflectionMinusProjection = false,
+  showInflectionPlusProjection = false,
+  showCoincidenceMinusProjection = false,
+  showCoincidencePlusProjection = false,
+  showRarefactionSlowMinusProjection = false,
+  showRarefactionSlowPlusProjection = false,
+  showHysPlusMinusProjection = false,
+  showHysPlusPlusProjection = false,
+  showHysMinusMinusProjection = false,
+  showHysMinusPlusProjection = false,
+  showHugoniotMinusPlusProjection = false,
+  showExtensionMinusPlusProjection = false,
+  showExtensionPlusMinusProjection = false,
+  showExtensionPlusPlusProjection = false,
+  showDoubleSonicMinusProjection = false,
+  showDoubleSonicPlusProjection = false,
+  showExtensionMinusMinusProjection = false,
   inspectionModeEnabled = false,
   inspectionProbesByBranch = { slow: null, fast: null },
   inspectionCurveVisibility = null,
@@ -52,6 +70,7 @@ function StateSpaceCanvas({
   resolution = 40,
 }) {
   const canvasRef = useRef(null)
+  const showCoincidence = showCoincidenceMinusProjection || showCoincidencePlusProjection
   const draggingBranchRef = useRef(null)
   const draggingProbeBranchRef = useRef(null)
   const pendingDragSampleRef = useRef(null)
@@ -66,6 +85,16 @@ function StateSpaceCanvas({
     return { slow, fast, all: [...slow, ...fast] }
   }, [view, params])
   const selectedMap = useMemo(() => Object.fromEntries(selectedEntries.map((entry) => [entry.branch, entry])), [selectedEntries])
+  const rarefactionPayload = useMemo(() => ({
+    fixedState: selectedMap.slow?.seed,
+    params, view: probeView, resolution, constrainZ: true,
+    direction: FORWARD_HUGONIOT, compactifiedZ: true,
+  }), [selectedMap, params, probeView, resolution])
+  const showRarefaction = showRarefactionSlowMinusProjection || showRarefactionSlowPlusProjection
+  const { data: rarefactionData } = useWorkerTask(createRarefactionWorker, rarefactionPayload, showRarefaction && Boolean(selectedMap.slow?.seed))
+  const rarefactionSlowSegments = useMemo(() => (
+    showRarefaction && selectedMap.slow?.seed ? projectProbeSegments(rarefactionData, 'minus', params) : []
+  ), [showRarefaction, selectedMap, rarefactionData, params])
 
   const probeProjection = useMemo(() => {
     const result = {}
@@ -96,7 +125,7 @@ function StateSpaceCanvas({
     return result
   }, [inspectionProbesByBranch, inspectionCurveVisibility, params, probeView, resolution])
 
-  const bounds = useMemo(() => {
+  const baseBounds = useMemo(() => {
     const probeSamples = Object.values(probeProjection).flatMap((projection) => [
       ...(projection.minusSegments ?? []).flat(),
       ...(projection.plusSegments ?? []).flat(),
@@ -106,33 +135,56 @@ function StateSpaceCanvas({
     ])
     return projectionBounds([...samples.all, ...probeSamples])
   }, [samples, probeProjection])
+  const navigation = useStateViewport(baseBounds)
+  const bounds = navigation.bounds
 
+  const hysMinusSegments = useMemo(() => (
+    (showHysPlusMinusProjection || showHysMinusPlusProjection) ? buildImplicitHysPlusMinusStateSegments(bounds, params, 420) : []
+  ), [bounds, params, showHysPlusMinusProjection, showHysMinusPlusProjection])
+  const hysPlusSegments = useMemo(() => (
+    (showHysPlusPlusProjection || showHysMinusMinusProjection) ? buildImplicitHysPlusPlusStateSegments(bounds, params, 420) : []
+  ), [bounds, params, showHysPlusPlusProjection, showHysMinusMinusProjection])
   const hysPlusProjectionSegments = useMemo(() => ({
-    minus: showHysteresis ? buildImplicitHysPlusMinusStateSegments(bounds, params, 420) : [],
-    plus: showHysteresis ? buildImplicitHysPlusPlusStateSegments(bounds, params, 420) : [],
-  }), [bounds, params, showHysteresis])
+    minus: showHysPlusMinusProjection ? hysMinusSegments : [],
+    plus: showHysPlusPlusProjection ? hysPlusSegments : [],
+    // Reflection Y -> -Y exchanges the two state projections of Hys.
+    leftMinus: showHysMinusMinusProjection ? hysPlusSegments : [],
+    leftPlus: showHysMinusPlusProjection ? hysMinusSegments : [],
+  }), [hysMinusSegments, hysPlusSegments, showHysPlusMinusProjection, showHysPlusPlusProjection, showHysMinusMinusProjection, showHysMinusPlusProjection])
 
   const implicitInflectionSegments = useMemo(() => (
-    (showInflectionSlow || showInflectionFast)
+    (showInflectionMinusProjection || showInflectionPlusProjection)
       ? buildImplicitInflectionStateSegments(bounds, params, 220)
       : []
-  ), [bounds, params, showInflectionSlow, showInflectionFast])
+  ), [bounds, params, showInflectionMinusProjection, showInflectionPlusProjection])
   // A coincidência é sempre necessária aqui: além de poder ser exibida
   // como curva, ela é a fronteira tau=0 compartilhada pelas características.
   const implicitCoincidenceSegments = useMemo(() => (
     buildImplicitCoincidenceStateSegments(bounds, params, 260)
   ), [bounds, params])
   const implicitHugoniotMinusSegments = useMemo(() => (
-    showHugoniotMinus
+    showHugoniotMinusPlusProjection
       ? buildImplicitHugoniotMinusStateSegments(bounds, selectedMap.slow?.selectedState, params, 260)
       : []
-  ), [bounds, selectedMap, params, showHugoniotMinus])
+  ), [bounds, selectedMap, params, showHugoniotMinusPlusProjection])
   const sonicRightSeparatorMinusSegments = useMemo(() => (
-    showExtensionCoincidencePlus ? buildSonicRightSeparatorMinusProjection(bounds, params) : []
-  ), [bounds, params, showExtensionCoincidencePlus])
+    showExtensionPlusMinusProjection ? buildSonicRightSeparatorMinusProjection(bounds, params) : []
+  ), [bounds, params, showExtensionPlusMinusProjection])
+  const sonicRightSeparatorPlusSegments = useMemo(() => (
+    showExtensionPlusPlusProjection ? buildSonicRightSeparatorPlusProjection(bounds, params) : []
+  ), [bounds, params, showExtensionPlusPlusProjection])
   const sonicLeftSeparatorPlusSegments = useMemo(() => (
-    showExtensionCoincidenceMinus ? buildSonicLeftSeparatorPlusProjection(bounds, params) : []
-  ), [bounds, params, showExtensionCoincidenceMinus])
+    showExtensionMinusPlusProjection ? buildSonicLeftSeparatorPlusProjection(bounds, params) : []
+  ), [bounds, params, showExtensionMinusPlusProjection])
+  const doubleSonicMinusSegments = useMemo(() => (
+    showDoubleSonicMinusProjection ? buildDoubleSonicStateProjection(bounds, params, 'minus') : []
+  ), [bounds, params, showDoubleSonicMinusProjection])
+  const doubleSonicPlusSegments = useMemo(() => (
+    showDoubleSonicPlusProjection ? buildDoubleSonicStateProjection(bounds, params, 'plus') : []
+  ), [bounds, params, showDoubleSonicPlusProjection])
+  const sonicLeftSeparatorMinusSegments = useMemo(() => (
+    showExtensionMinusMinusProjection ? buildSonicLeftSeparatorMinusProjection(bounds, params) : []
+  ), [bounds, params, showExtensionMinusMinusProjection])
 
   const statePercent = (state) => {
     if (!state || !Number.isFinite(state.uMinus) || !Number.isFinite(state.vMinus)) return null
@@ -270,6 +322,7 @@ function StateSpaceCanvas({
   }
 
   const handlePointerDown = (event) => {
+    if (navigation.down(event)) return
     if (inspectionModeEnabled) {
       const candidates = ['slow', 'fast']
         .map((branch) => ({ branch, distance: probeScreenDistance(branch, event) }))
@@ -294,6 +347,8 @@ function StateSpaceCanvas({
   }
 
   const handlePointerMove = (event) => {
+    if (navigation.move(event)) return
+    if (navigation.mode !== 'select') return
     if (inspectionModeEnabled) {
       const branch = draggingProbeBranchRef.current
       if (branch) {
@@ -320,6 +375,7 @@ function StateSpaceCanvas({
   }
 
   const handlePointerUp = (event) => {
+    if (navigation.up(event)) return
     if (inspectionModeEnabled) {
       const branch = draggingProbeBranchRef.current
       if (probeFrameRef.current) cancelAnimationFrame(probeFrameRef.current)
@@ -362,7 +418,12 @@ function StateSpaceCanvas({
       implicitHugoniotMinusSegments,
       sonicRightSeparatorMinusSegments,
       sonicLeftSeparatorPlusSegments,
+      doubleSonicMinusSegments,
+      doubleSonicPlusSegments,
+      sonicLeftSeparatorMinusSegments,
       hysPlusProjectionSegments,
+      rarefactionSlowSegments,
+      sonicRightSeparatorPlusSegments,
       probeProjection,
     })
 
@@ -370,7 +431,7 @@ function StateSpaceCanvas({
     const observer = new ResizeObserver(draw)
     observer.observe(canvas)
     return () => observer.disconnect()
-  }, [bounds, selectedMap, hoverBranch, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, sonicRightSeparatorMinusSegments, sonicLeftSeparatorPlusSegments, hysPlusProjectionSegments, probeProjection])
+  }, [bounds, selectedMap, hoverBranch, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, sonicRightSeparatorMinusSegments, sonicRightSeparatorPlusSegments, sonicLeftSeparatorPlusSegments, sonicLeftSeparatorMinusSegments, doubleSonicMinusSegments, doubleSonicPlusSegments, hysPlusProjectionSegments, rarefactionSlowSegments, probeProjection])
 
   const cursor = draggingBranchRef.current || draggingProbeBranchRef.current ? 'grabbing' : hoverBranch ? 'grab' : 'default'
   const slowLabelPosition = selectedLabelPosition('slow')
@@ -379,20 +440,6 @@ function StateSpaceCanvas({
     const point = probeProjection?.[branch]?.point
     return [branch, projectedStatePercent({ u: point?.uMinus, v: point?.vMinus })]
   }))
-  const implicitInflectionLabelPosition = (() => {
-    const firstSegment = implicitInflectionSegments?.find((segment) => segment?.length)
-    if (!firstSegment) return null
-    const sample = firstSegment[Math.floor(firstSegment.length / 2)]
-    return projectedStatePercent(sample?.state)
-  })()
-  const hysLabelPosition = (side) => {
-    const segments = hysPlusProjectionSegments?.[side]
-    const firstSegment = segments?.find((segment) => segment?.length)
-    if (!firstSegment) return null
-    const sample = firstSegment[Math.floor(firstSegment.length / 2)]
-    return projectedStatePercent(sample?.state)
-  }
-
   const renderStateLatexLabel = (branch, tex, position) => {
     if (!position) return null
     const highlighted = hoverBranch === branch || draggingBranchRef.current === branch
@@ -406,18 +453,6 @@ function StateSpaceCanvas({
         <span className="state-space-coordinate-label">
           ({formatNumber(state.uMinus)}, {formatNumber(state.vMinus)})
         </span>
-      </div>
-    )
-  }
-
-  const renderInflectionLatexLabel = (tex, position) => {
-    if (!position) return null
-    return (
-      <div
-        className="state-space-latex-label state-space-inflection-label"
-        style={{ left: `${position.left}%`, top: `${position.top}%` }}
-      >
-        <MathLabel tex={tex} />
       </div>
     )
   }
@@ -441,18 +476,36 @@ function StateSpaceCanvas({
   }
 
   return (
-    <div className="state-space-canvas-wrap">
+    <div className="state-space-canvas-wrap" tabIndex={0} onKeyDown={event => {
+      if (event.key === 'Escape') navigation.cancel()
+    }}>
+      <div className="state-viewport-controls" role="toolbar" aria-label="Navegação do espaço de estados">
+        <button type="button" aria-pressed={navigation.mode === 'select'} onClick={() => navigation.setMode('select')}>Selecionar</button>
+        <button type="button" aria-pressed={navigation.mode === 'box'} onClick={() => navigation.setMode('box')} title="Arraste um retângulo sobre a região desejada">Zoom por retângulo</button>
+        <button type="button" aria-pressed={navigation.mode === 'pan'} onClick={() => navigation.setMode('pan')}>Mover vista</button>
+        <button type="button" onClick={() => navigation.zoom(.75)} aria-label="Ampliar espaço de estados">+</button>
+        <button type="button" onClick={() => navigation.zoom(1 / .75)} aria-label="Reduzir espaço de estados">−</button>
+        <button type="button" disabled={!navigation.canUndo} onClick={navigation.undo}>Voltar zoom</button>
+        <button type="button" onClick={navigation.reset}>Restaurar vista</button>
+        <button type="button" aria-pressed={navigation.showLabels} onClick={() => navigation.setShowLabels(value => !value)}>Rótulos</button>
+      </div>
       <canvas
         className="stage-2d-canvas"
         ref={canvasRef}
-        style={{ cursor, pointerEvents: 'auto', touchAction: 'none' }}
+        style={{ cursor: navigation.mode === 'box' ? 'crosshair' : navigation.mode === 'pan' ? 'grab' : cursor, pointerEvents: 'auto', touchAction: 'none', transform: navigation.transform }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
         onPointerLeave={() => { if (!draggingBranchRef.current && !draggingProbeBranchRef.current) setHoverBranch(null) }}
       />
-      <div className="state-space-latex-overlay" aria-hidden="true">
+      {navigation.preview?.mode === 'box' && <div className="state-zoom-rectangle" style={{
+        left: Math.min(navigation.preview.start.x, navigation.preview.end.x),
+        top: Math.min(navigation.preview.start.y, navigation.preview.end.y),
+        width: Math.abs(navigation.preview.start.x - navigation.preview.end.x),
+        height: Math.abs(navigation.preview.start.y - navigation.preview.end.y),
+      }} />}
+      <div className="state-space-latex-overlay" aria-hidden="true" style={{ visibility: navigation.showLabels ? 'visible' : 'hidden', transform: navigation.transform }}>
         <span
           className="state-space-axis-label state-space-axis-label--u"
           style={{ left: 'calc(100% - 18px)', top: `calc(${axisLabelPositions.axisVPercent}% - 18px)` }}
@@ -465,9 +518,6 @@ function StateSpaceCanvas({
         >
           <MathLabel tex="v" />
         </span>
-        {(showInflectionSlow || showInflectionFast) ? renderInflectionLatexLabel('\\mathcal{J}', implicitInflectionLabelPosition) : null}
-        {showHysteresis ? renderInflectionLatexLabel('\\mathcal{Hys}^{+}_{-}', hysLabelPosition('minus')) : null}
-        {showHysteresis ? renderInflectionLatexLabel('\\mathcal{Hys}^{+}_{+}', hysLabelPosition('plus')) : null}
         {renderStateLatexLabel('slow', 'U_L', slowLabelPosition)}
         {renderStateLatexLabel('fast', 'U_R', fastLabelPosition)}
         {renderProbeLabel('slow')}
@@ -501,3 +551,7 @@ function SolutionCanvas() {
 
 export { SolutionCanvas }
 export default StateSpaceCanvas
+
+
+
+

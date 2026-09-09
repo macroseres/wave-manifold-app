@@ -36,9 +36,6 @@ export default function ParameterMapView({
 }) {
   return (
     <div className="wm-stage-content params-view">
-      <div className="wm-stage-title inline">
-        Mapa de parâmetros <MathLabel tex={"(b_1,b_2)"} />
-      </div>
       <div className="stage-param-plot">
         <div className="stage-param-plane" style={{ '--axis-x': `${parameterAxisX}%`, '--axis-y': `${parameterAxisY}%` }}>
           <ParameterCanvas

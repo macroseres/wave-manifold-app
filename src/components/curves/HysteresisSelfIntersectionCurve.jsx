@@ -5,7 +5,7 @@ import { buildHysteresisSelfIntersectionSegments } from '../../geometry/hysteres
 export default function HysteresisSelfIntersectionCurve({ params, view, visible = true }) {
   const segments = useMemo(() => visible ? buildHysteresisSelfIntersectionSegments(params, view) : [], [params, view, visible])
   return <group>{segments.map((points, index) => (
-    <ZCompactifiedLine key={index} points={points} color="#fef08a" lineWidth={2.5}
+    <ZCompactifiedLine key={index} points={points} color="#fef08a" lineWidth={1.35}
       transparent opacity={1} depthWrite={false} renderOrder={20} />
   ))}</group>
 }
