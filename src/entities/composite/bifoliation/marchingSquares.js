@@ -137,7 +137,7 @@ function buildPolylinesFromUvEdges(uvEdges, level) {
 }
 
 export function extractGlobalCompositeLevelSet(level, renderView, params) {
-  const bounds = compositeBounds()
+  const bounds = { ...compositeBounds(), ...(level.compactifiedZ ? { wMin: 0, wMax: 1 } : {}) }
   const baseUSamples = Math.max(20, Math.floor(COMPOSITE.GLOBAL_LEVELSET_U_SAMPLES ?? 150))
   const baseWSamples = Math.max(20, Math.floor(COMPOSITE.GLOBAL_LEVELSET_W_SAMPLES ?? 220))
   const valueCap = Math.max(1, COMPOSITE.GLOBAL_LEVELSET_VALUE_CAP ?? 1e8)
@@ -200,6 +200,5 @@ export function extractGlobalCompositeLevelSet(level, renderView, params) {
   const segments = buildPolylinesFromUvEdges(uvEdges, level)
   // Mantem todos os componentes encontrados, mas recorta cada polilinha
   // ao intervalo computacional em z (view ja vem com margem de 20%).
-  return splitSegmentsByZWindow(segments, renderView)
+  return level.compactifiedZ ? segments : splitSegmentsByZWindow(segments, renderView)
 }
-

@@ -3,6 +3,7 @@ import { solveRightHysteresisPoint } from '../entities/hysteresis/index.js'
 import { projectPointMinus, projectPointPlus } from '../entities/geometry/stateProjections.js'
 import { solveSonicBranchSeparatorPoint } from '../entities/surfaceImplicit/sonic.js'
 import { hugoniotMinusImplicit } from './hugoniotStateImplicit.js'
+import { buildParametricHugoniot } from './hugoniotStateParametric.js'
 import { coincidenceStateImplicit } from './coincidenceStateImplicit.js'
 import { visualZToPhysical } from './zCompactification.js'
 
@@ -109,6 +110,8 @@ export function buildImplicitCoincidenceStateSegments(bounds, params, resolution
 
 export function buildImplicitHugoniotMinusStateSegments(bounds, fixedLeftState, params, resolution = 220) {
   if (!fixedLeftState || !params) return []
+  const parametric = buildParametricHugoniot(bounds, fixedLeftState, params, resolution)
+  if (parametric) return parametric
   return buildImplicitStateSegments(
     bounds,
     resolution,

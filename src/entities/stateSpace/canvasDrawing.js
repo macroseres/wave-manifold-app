@@ -116,8 +116,8 @@ function drawProjectedSegments(ctx, {
   segments,
   color,
   lineWidth = 1.35,
-  dashed = false,
-  dotted = false,
+
+
   alpha = 0.98,
   toScreen,
   rect,
@@ -127,9 +127,9 @@ function drawProjectedSegments(ctx, {
   ctx.strokeStyle = color
   ctx.globalAlpha = alpha
   ctx.lineWidth = lineWidth
-  ctx.setLineDash(dotted ? [2, 5] : dashed ? [7, 5] : [])
+  ctx.setLineDash([])
+  ctx.beginPath()
   for (const segment of segments) {
-    ctx.beginPath()
     let started = false
     for (const sample of segment) {
       const state = sample?.state
@@ -141,8 +141,8 @@ function drawProjectedSegments(ctx, {
       if (!started) { ctx.moveTo(x, y); started = true }
       else ctx.lineTo(x, y)
     }
-    if (started) ctx.stroke()
   }
+  ctx.stroke()
   ctx.restore()
 }
 
@@ -150,13 +150,13 @@ function drawProbeProjection(ctx, { probeProjection, toScreen, rect }) {
   for (const branch of ['slow', 'fast']) {
     const projection = probeProjection?.[branch]
     if (!projection) continue
-    drawProjectedSegments(ctx, { segments: projection.minusSegments, color: waveColors.hugoniotMinus, lineWidth: 1.35, dashed: true, toScreen, rect })
-    drawProjectedSegments(ctx, { segments: projection.plusSegments, color: waveColors.hugoniotPlus, lineWidth: 1.35, dashed: true, toScreen, rect })
+    drawProjectedSegments(ctx, { segments: projection.minusSegments, color: waveColors.hugoniotMinus, lineWidth: 1.35, toScreen, rect })
+    drawProjectedSegments(ctx, { segments: projection.plusSegments, color: waveColors.hugoniotPlus, lineWidth: 1.35, toScreen, rect })
     drawProjectedSegments(ctx, {
       segments: projection.rarefactionSegments,
       color: branch === 'slow' ? waveColors.rarefactionSlow : waveColors.rarefactionFast,
       lineWidth: 1.35,
-      dashed: true,
+     
       toScreen,
       rect,
     })
@@ -216,7 +216,7 @@ export function drawStateSpaceCanvas(canvas, options) {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
   const { rect, dpr } = resizeCanvasForDpr(canvas)
-  const { bounds, selectedMap, hoverBranch, draggingBranch, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, sonicRightSeparatorMinusSegments, sonicRightSeparatorPlusSegments, sonicLeftSeparatorPlusSegments, sonicLeftSeparatorMinusSegments, doubleSonicMinusSegments, doubleSonicPlusSegments, hysPlusProjectionSegments, rarefactionSlowSegments, probeProjection } = options
+  const { rarefactionFastSegments, fastCompositeProjectionSegments, implicitHugoniotPlusSegments, showHugoniotPlusPlusProjection, showHugoniotMinusMinusProjection, selfIntersectionProjection, bounds, selectedMap, hoverBranch, draggingBranch, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, sonicRightSeparatorMinusSegments, sonicRightSeparatorPlusSegments, sonicLeftSeparatorPlusSegments, sonicLeftSeparatorMinusSegments, doubleSonicMinusSegments, doubleSonicPlusSegments, hysPlusProjectionSegments, rarefactionSlowSegments, compositeProjectionSegments, probeProjection } = options
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
   ctx.clearRect(0, 0, rect.width, rect.height)
 
@@ -236,7 +236,7 @@ export function drawStateSpaceCanvas(canvas, options) {
     segments: implicitCoincidenceSegments,
     color: waveColors.coincidenceState,
     lineWidth: 1.35,
-    dotted: true,
+
     alpha: 0.46,
     toScreen,
     rect,
@@ -254,20 +254,66 @@ export function drawStateSpaceCanvas(canvas, options) {
   }
   drawProjectedSegments(ctx, { segments: implicitInflectionSegments, color: waveColors.inflection ?? '#facc15', lineWidth: 1.35, toScreen, rect })
   drawProjectedSegments(ctx, { segments: sonicRightSeparatorMinusSegments, color: waveColors.extensionCoincidencePlus, lineWidth: 1.35, toScreen, rect })
-  drawProjectedSegments(ctx, { segments: sonicRightSeparatorPlusSegments, color: waveColors.extensionCoincidencePlus, lineWidth: 1.35, dashed: true, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: sonicRightSeparatorPlusSegments, color: waveColors.extensionCoincidencePlus, lineWidth: 1.35, toScreen, rect })
   drawProjectedSegments(ctx, { segments: sonicLeftSeparatorPlusSegments, color: waveColors.extensionCoincidenceMinus, lineWidth: 1.35, toScreen, rect })
-  drawProjectedSegments(ctx, { segments: sonicLeftSeparatorMinusSegments, color: waveColors.extensionCoincidenceMinus, lineWidth: 1.35, dashed: true, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: sonicLeftSeparatorMinusSegments, color: waveColors.extensionCoincidenceMinus, lineWidth: 1.35, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: selfIntersectionProjection?.plus, color: waveColors.hysteresisSelfIntersection, lineWidth: 1.35, toScreen, rect })
+  ctx.save()
+  ctx.fillStyle = waveColors.hysteresisSelfIntersection
+  for (const point of selfIntersectionProjection?.points ?? []) {
+    const { x, y } = toScreen(point, rect)
+    ctx.beginPath()
+    ctx.arc(x, y, 4, 0, 2 * Math.PI)
+    ctx.fill()
+  }
+  ctx.restore()
   drawProjectedSegments(ctx, { segments: doubleSonicMinusSegments, color: waveColors.doubleSonic, lineWidth: 1.35, toScreen, rect })
-  drawProjectedSegments(ctx, { segments: doubleSonicPlusSegments, color: waveColors.doubleSonic, lineWidth: 1.35, dashed: true, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: doubleSonicPlusSegments, color: waveColors.doubleSonic, lineWidth: 1.35, toScreen, rect })
   drawProjectedSegments(ctx, { segments: implicitHugoniotMinusSegments, color: waveColors.hugoniotMinus, lineWidth: 1.35, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: rarefactionFastSegments, color: waveColors.rarefactionFast, lineWidth: 1.35, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: implicitHugoniotPlusSegments, color: waveColors.hugoniotPlus, lineWidth: 1.35, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: fastCompositeProjectionSegments?.minus, color: waveColors.compositeFast, lineWidth: 1.35, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: fastCompositeProjectionSegments?.plus, color: waveColors.compositeFast, lineWidth: 1.35, toScreen, rect })
   drawProjectedSegments(ctx, { segments: rarefactionSlowSegments, color: waveColors.rarefactionSlow, lineWidth: 1.35, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: compositeProjectionSegments?.minus, color: waveColors.compositeSlow, lineWidth: 1.35, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: compositeProjectionSegments?.plus, color: waveColors.compositeSlow, lineWidth: 1.35, toScreen, rect })
   drawProjectedSegments(ctx, { segments: hysPlusProjectionSegments.minus, color: waveColors.hysPlusMinusProjection, lineWidth: 1.35, toScreen, rect })
   drawProjectedSegments(ctx, { segments: hysPlusProjectionSegments.plus, color: waveColors.hysPlusPlusProjection, lineWidth: 1.35, toScreen, rect })
-  drawProjectedSegments(ctx, { segments: hysPlusProjectionSegments.leftMinus, color: waveColors.hysMinusMinusProjection, lineWidth: 1.35, dashed: true, toScreen, rect })
-  drawProjectedSegments(ctx, { segments: hysPlusProjectionSegments.leftPlus, color: waveColors.hysMinusPlusProjection, lineWidth: 1.35, dashed: true, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: hysPlusProjectionSegments.leftMinus, color: waveColors.hysMinusMinusProjection, lineWidth: 1.35, toScreen, rect })
+  drawProjectedSegments(ctx, { segments: hysPlusProjectionSegments.leftPlus, color: waveColors.hysMinusPlusProjection, lineWidth: 1.35, toScreen, rect })
   drawProbeProjection(ctx, { probeProjection, toScreen, rect })
   drawSelectedPoint(ctx, { branch: 'slow', color: waveColors.characteristicSlow, selectedMap, hoverBranch, draggingBranch, toScreen, rect })
   drawSelectedPoint(ctx, { branch: 'fast', color: waveColors.characteristicFast, selectedMap, hoverBranch, draggingBranch, toScreen, rect })
+  if (showHugoniotMinusMinusProjection) {
+    const selected = selectedMap.slow?.selectedState
+    const state = selected && { u: selected.uMinus, v: selected.vMinus }
+    if (state && Number.isFinite(state.u) && Number.isFinite(state.v)) {
+      const { x, y } = toScreen(state, rect)
+      ctx.save()
+      ctx.strokeStyle = waveColors.hugoniotMinus
+      ctx.lineWidth = 1.35
+      ctx.setLineDash([])
+      ctx.beginPath()
+      ctx.arc(x, y, 11, 0, 2 * Math.PI)
+      ctx.stroke()
+      ctx.restore()
+    }
+  }
+  if (showHugoniotPlusPlusProjection) {
+    const selected = selectedMap.fast?.selectedState
+    const state = selected && { u: selected.uMinus, v: selected.vMinus }
+    if (state && Number.isFinite(state.u) && Number.isFinite(state.v)) {
+      const { x, y } = toScreen(state, rect)
+      ctx.save()
+      ctx.strokeStyle = waveColors.hugoniotPlus
+      ctx.lineWidth = 1.35
+      ctx.setLineDash([])
+      ctx.beginPath()
+      ctx.arc(x, y, 11, 0, 2 * Math.PI)
+      ctx.stroke()
+      ctx.restore()
+    }
+  }
   drawProbeMarkers(ctx, { probeProjection, toScreen, rect })
 }
 
@@ -295,6 +341,11 @@ export function drawSolutionCanvas(canvas) {
   ctx.beginPath(); ctx.moveTo(left, bottom); ctx.lineTo(right, bottom); ctx.stroke()
   ctx.beginPath(); ctx.moveTo(left, top); ctx.lineTo(left, bottom); ctx.stroke()
 }
+
+
+
+
+
 
 
 

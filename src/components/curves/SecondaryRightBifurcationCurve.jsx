@@ -5,7 +5,7 @@ import { waveColors } from '../../config/waveColors'
 
 export default function SecondaryRightBifurcationCurve({ params, view, resolution = 40, visible = true }) {
   const segments = useMemo(
-    () => visible ? buildSecondaryRightBifurcationSegments(params, view, Math.max(220, Math.min(520, resolution * 6))) : [],
+    () => visible ? buildSecondaryRightBifurcationSegments(params, view, Math.max(220, Math.min(520, resolution * 6)), { compactifiedZ: true }) : [],
     [params, view, resolution, visible],
   )
 
@@ -25,3 +25,4 @@ export default function SecondaryRightBifurcationCurve({ params, view, resolutio
     </group>
   )
 }
+

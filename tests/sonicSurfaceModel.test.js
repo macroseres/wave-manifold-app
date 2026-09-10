@@ -11,6 +11,19 @@ import {
 import { SONIC_SURFACE } from '../src/config/numerics.js'
 import { sonicImplicitF, solveSonicBranchSeparatorPoint } from '../src/entities/surfaceImplicit/sonic.js'
 import { projectPointMinus, projectPointPlus } from '../src/entities/geometry/stateProjections.js'
+import { solveDoubleSonicSegments } from '../src/entities/surfaceImplicit/specialSegments.js'
+
+test('compactified DS includes finite roots outside the physical z window', () => {
+  const params = { b1: 8, b2: 3, c: 1 }
+  const view = { tMin: -2, tMax: 2, yMin: -2, yMax: 2, zMin: -1, zMax: 1 }
+  assert.equal(solveDoubleSonicSegments(params, view).length, 1)
+  const segments = solveDoubleSonicSegments(params, view, { compactifiedZ: true })
+  assert.equal(segments.length, 2)
+  for (const segment of segments) for (const [t, Y, z] of segment) {
+    assert.ok(Math.abs(sonicImplicitF(Y, t, z, params)) < 1e-8)
+    assert.ok(Math.abs(sonicImplicitF(-Y, t, z, params)) < 1e-8)
+  }
+})
 
 const params = { a: 0, b1: 8, b2: 0.2, c: 1 }
 const view = { tMin: -2, tMax: 2, yMin: -2, yMax: 2, zMin: -2, zMax: 2 }

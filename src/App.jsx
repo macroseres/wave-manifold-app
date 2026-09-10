@@ -289,6 +289,7 @@ export default function App() {
         controlsEnabled={controlsEnabled}
         orbitControlsRef={orbitControlsRef}
         autoRotate3D={autoRotate3D}
+        setAutoRotate3D={waveActions.setAutoRotate3D}
         showAxes={showAxes}
         showCharacteristic={showCharacteristic}
         displayedSelectedByBranch={selection.displayedSelectedByBranch}

@@ -10,15 +10,15 @@ export default function SaturatedSurface({ params, view, resolution, opacity, wi
 
   return (
     <ZCompactifiedMesh geometry={geometry} renderOrder={1}>
-      <meshStandardMaterial
+      {/* Folded parameter sheets can have vanishing averaged normals.
+          Use unlit color so lighting does not introduce false dark curves. */}
+      <meshBasicMaterial
         color={direction === 'plus' ? '#34d399' : '#f59e0b'}
         side={THREE.DoubleSide}
         transparent
         depthWrite={false}
         opacity={Math.min(0.5, opacity * 0.65)}
         wireframe={wireframe}
-        roughness={0.45}
-        metalness={0.0}
       />
     </ZCompactifiedMesh>
   )

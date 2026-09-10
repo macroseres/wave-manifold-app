@@ -21,9 +21,9 @@ function buildCompositeFromRarefactionSegment(segment, params, calcView, renderV
   // mas ficar fora do dominio parametrico testado.
   const etaMarginFactor = COMPOSITE.HUGONIOT_SATURATION_ETA_MARGIN_FACTOR ?? COMPOSITE.ETA_MARGIN_FACTOR ?? 0
   const etaMargin = Math.max(0, etaMarginFactor) * etaSpan
-  const etaMin = calcView.zMin - etaMargin
-  const etaMax = calcView.zMax + etaMargin
-  const level = makeCompositeLevelFunction(rareParam, params, direction, sonicTarget, etaMin, etaMax, desiredSonicBranch, mathcalR, mathcalH)
+  const etaMin = Math.min(calcView.zMin - etaMargin, renderView.zMin)
+  const etaMax = Math.max(calcView.zMax + etaMargin, renderView.zMax)
+  const level = makeCompositeLevelFunction(rareParam, params, direction, sonicTarget, etaMin, etaMax, desiredSonicBranch, mathcalR, mathcalH, renderView.compactifiedZ)
 
   const anchorPoints = anchors
     .map((anchor) => {
@@ -87,7 +87,7 @@ export function buildCompositeSegmentsFromRarefaction(rare, params, calcView, vi
   return result ?? { segments: [], inflectionPoint: null }
 }
 
-export function buildCompositeSegments(fixedState, params, view, samples, resolution, _inflectionBranch = 'all', direction = FORWARD_HUGONIOT, sonicTarget = 'left') {
+export function buildCompositeSegments(fixedState, params, view, samples, resolution, _inflectionBranch = 'all', direction = FORWARD_HUGONIOT, sonicTarget = 'left', renderView = view) {
   if (!fixedState) return { segments: [], inflectionPoint: null, endpoint: null }
   const calcView = compositeContinuationView(fixedState, view)
   const compositeSamples = compositeBaseRarefactionSampleCount(samples, resolution)
@@ -104,7 +104,7 @@ export function buildCompositeSegments(fixedState, params, view, samples, resolu
   })
 
   const results = rareSegments
-    .map((segment) => buildCompositeFromRarefactionSegment(segment, params, calcView, view, direction, sonicTarget, fixedState, _inflectionBranch, mathcalR, mathcalH))
+    .map((segment) => buildCompositeFromRarefactionSegment(segment, params, calcView, renderView, direction, sonicTarget, fixedState, _inflectionBranch, mathcalR, mathcalH))
     .filter((result) => result?.segments?.length)
 
   if (!results.length) return { segments: [], inflectionPoint: null, endpoint: null }

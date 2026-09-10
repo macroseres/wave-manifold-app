@@ -59,7 +59,7 @@ export function makeRarefactionParam(segment, view) {
   return { points: clean, s, total, interpolate, uAtIndex }
 }
 
-export function makeCompositeLevelFunction(rareParam, params, direction, sonicTarget, etaMin, etaMax, desiredSonicBranch = 'all', mathcalR = null, mathcalH = null) {
+export function makeCompositeLevelFunction(rareParam, params, direction, sonicTarget, etaMin, etaMax, desiredSonicBranch = 'all', mathcalR = null, mathcalH = null, compactifiedZ = false) {
   const saturation = makeSaturatedHugoniotBifoliation({
     rarefactionParam: rareParam,
     params,
@@ -69,17 +69,21 @@ export function makeCompositeLevelFunction(rareParam, params, direction, sonicTa
     sourceBifoliations: { mathcalR, mathcalH },
   })
 
+  const etaFromW = compactifiedZ ? w => Math.tan((w - 0.5) * Math.PI * 0.9998) : saturation.etaFromW
+  const wFromEta = compactifiedZ ? eta => 0.5 + Math.atan(eta) / (Math.PI * 0.9998) : saturation.wFromEta
   const evalAt = (u, w) => {
-    const obj = saturation.evaluate(u, w)
+    if (compactifiedZ && (w < 0 || w > 1)) return null
+    const obj = saturation.evaluate(u, compactifiedZ ? saturation.wFromEta(etaFromW(w)) : w)
     if (!obj?.point) return null
     if (!sonicBranchMatches(obj.point, params, sonicTarget, desiredSonicBranch)) return null
-    const value = sonicValue(obj.point, params, sonicTarget)
+    const rawValue = sonicValue(obj.point, params, sonicTarget)
+    const value = compactifiedZ ? rawValue / (1 + obj.point.z * obj.point.z) ** 2.5 : rawValue
     if (!finite(value)) return null
     const branchIndicator = sonicBranchIndicator(obj.point, params, sonicTarget)
     return { value, point: obj.point, generator: obj.generator, state: obj.state, eta: obj.eta, u, w, saturation, sonicBranch: desiredSonicBranch, sonicBranchIndicator: branchIndicator }
   }
 
-  return { evalAt, etaFromW: saturation.etaFromW, wFromEta: saturation.wFromEta, saturation }
+  return { evalAt, etaFromW, wFromEta, saturation, compactifiedZ }
 }
 
 export function findRarefactionSonicAnchors(rareParam, params, sonicTarget, fixedState, view, desiredSonicBranch = 'all') {
@@ -150,4 +154,3 @@ export function findRarefactionSonicAnchors(rareParam, params, sonicTarget, fixe
     }))
     .sort((a, b) => a.score - b.score)
 }
-

@@ -61,7 +61,8 @@ function CompositeCurveBase({
     inflectionBranch,
     direction,
     sonicTarget,
-  }), [fixedState, params, view, resolution, inflectionBranch, direction, sonicTarget])
+    renderView: !admissibleOrientation ? { ...view, compactifiedZ: true } : view,
+  }), [fixedState, params, view, resolution, inflectionBranch, direction, sonicTarget, admissibleOrientation])
 
   const hasSegmentsOverride = Array.isArray(segmentsOverride) && segmentsOverride.some((segment) => normalizeSegment(segment).length >= 2)
 
@@ -90,7 +91,7 @@ function CompositeCurveBase({
     const rawSegments = (data?.segments ?? []).map(normalizeSegment).filter((segment) => segment.length >= 2)
     const branchPoint = inflectionBranch === 'slow'
       ? computeCompositeSlowInflectionPoint(fixedState, params, view, resolution)
-      : null
+      : data?.sonicAnchorPoint
     const branchSegments = filterCompositeBranchesThroughPoint(
       rawSegments,
       branchPoint,
@@ -156,6 +157,9 @@ function CompositeCurveBase({
             points={points}
             color={color}
             lineWidth={lineWidth}
+            dashed={false}
+            depthWrite={false}
+            depthTest={true}
             renderOrder={showOrientationMarkers ? 16 : 8}
             onClick={handleLineClick}
           />
@@ -213,3 +217,5 @@ export function CompositeSlowArcCurve(props) { return <CompositeSlowCurve {...pr
 export function CompositeFastArcCurve(props) { return <CompositeFastCurve {...props} /> }
 
 export default React.memo(CompositeCurveBase)
+
+

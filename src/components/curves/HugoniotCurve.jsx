@@ -1,3 +1,4 @@
+import { waveColors } from '../../config/waveColors.js'
 import React, { useMemo } from 'react'
 import * as THREE from 'three'
 import { FORWARD_HUGONIOT, BACKWARD_HUGONIOT, normalizeHugoniotDirection } from '../../entities/hugoniot/directions'
@@ -92,7 +93,7 @@ function HugoniotCurve({
 
   if (!visible || !fixedState || (segments.length === 0 && visibleIntersections.length === 0)) return null
 
-  const curveColor = color ?? (normalizeHugoniotDirection(direction) === BACKWARD_HUGONIOT ? '#be123c' : '#1d4ed8')
+  const curveColor = color ?? (normalizeHugoniotDirection(direction) === BACKWARD_HUGONIOT ? waveColors.hugoniotPlus : waveColors.hugoniotMinus)
 
   return (
     <group>
@@ -139,3 +140,4 @@ function HugoniotCurve({
 }
 
 export default React.memo(HugoniotCurve)
+

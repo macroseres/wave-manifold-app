@@ -75,11 +75,12 @@ export function buildSaturatedGeometry(params, view, resolution = 40, direction 
       }),
     }
   }
-  let previous = sampleRow(-1 + margin)
-  for (let i = 1; i <= seedCount; i++) {
-    const current = sampleRow(-1 + margin + (2 - 2 * margin) * i / seedCount)
+  const first = sampleRow(-1 + margin)
+  let previous = first
+  const connectRows = (previous, current, acrossInfinity = false) => {
+
     // Never join across a pole of the rational parametrization.
-    if (previous && current && previous.determinant * current.determinant > 0) {
+    if (previous && current && (acrossInfinity || previous.determinant * current.determinant > 0)) {
       for (let j = 0; j < leafCount; j++) {
         const corners = [previous.points[j], current.points[j], current.points[j + 1], previous.points[j + 1]]
         if (!corners.every(Boolean)) continue
@@ -89,10 +90,29 @@ export function buildSaturatedGeometry(params, view, resolution = 40, direction 
         appendTriangle([a, c, d])
       }
     }
+  }
+  for (let i = 1; i <= seedCount; i++) {
+    const current = sampleRow(-1 + margin + (2 - 2 * margin) * i / seedCount)
+    connectRows(previous, current)
     previous = current
   }
+  // The seed parameter is projective: its two infinite ends can represent
+  // the same generator state. Leaving these rows apart opens a whole leaf.
+  if (hysteresisSeedHasFiniteSeam(params, direction)) connectRows(previous, first, true)
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
   geometry.setIndex(indices)
   geometry.computeVertexNormals()
   return geometry
+}
+
+export function hysteresisSeedHasFiniteSeam(params, direction = 'minus') {
+  const project = direction === 'plus' ? computeRightStateFromWavePoint : computeLeftStateFromWavePoint
+  const values = [-1e7, 1e7, -1e8, 1e8].map(z => {
+    const p = solveRightHysteresisPoint(z, params)
+    const s = p && project(p.t, p.Y, p.z, params)
+    return s && [s.u, s.v]
+  })
+  if (!values.every(p => p?.every(Number.isFinite))) return false
+  const scale = Math.max(1, ...values.flat().map(Math.abs))
+  return values.every(p => Math.hypot(p[0] - values[3][0], p[1] - values[3][1]) < 1e-5 * scale)
 }

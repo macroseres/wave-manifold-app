@@ -1,6 +1,12 @@
+import { findHysteresisDoubleStates } from '../../geometry/hysteresisSelfIntersection.js'
 import { buildDoubleSonicStateProjection } from '../../geometry/doubleSonicStateProjection.js'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import MathLabel from './MathLabel'
+import CompositeSegmentsWorker from '../../workers/compositeSegments.worker?worker'
+import { RAREFACTION, clampResolutionSamples } from '../../config/numerics'
+import { computeCompositeSlowInflectionPoint } from '../curves/compositeInflectionUtils'
+import { filterCompositeBranchesThroughPoint, normalizeSegment, keepDrawableSegment } from '../../entities/composite/admissibleGeometry'
+import { buildDrawableCompositeSegments } from '../../geometry/compositeCurveGeometry'
 import RarefactionSegmentsWorker from '../../workers/rarefactionSegments.worker?worker'
 import { useWorkerTask } from '../hooks/useWorkerTask'
 import { useStateViewport } from './useStateViewport'
@@ -24,6 +30,7 @@ import { coordsOf, PROBE_Z_EXTENSION_MARGIN, sampleHugoniot, sampleRarefaction, 
 import { FORWARD_HUGONIOT, BACKWARD_HUGONIOT } from '../../entities/hugoniot/directions.js'
 
 const createRarefactionWorker = () => new RarefactionSegmentsWorker()
+const createCompositeSegmentsWorker = () => new CompositeSegmentsWorker()
 
 function projectProbeSegments(segments, side, params) {
   return (segments ?? []).map((segment) => (segment ?? []).map((point) => {
@@ -51,16 +58,27 @@ function StateSpaceCanvas({
   showCoincidenceMinusProjection = false,
   showCoincidencePlusProjection = false,
   showRarefactionSlowMinusProjection = false,
+  showRarefactionFastMinusProjection = false,
   showRarefactionSlowPlusProjection = false,
+  showRarefactionFastPlusProjection = false,
+  showCompositeSlowMinusProjection = false,
+  showCompositeFastMinusProjection = false,
+  showCompositeSlowPlusProjection = false,
+  showCompositeFastPlusProjection = false,
   showHysPlusMinusProjection = false,
   showHysPlusPlusProjection = false,
   showHysMinusMinusProjection = false,
   showHysMinusPlusProjection = false,
   showHugoniotMinusPlusProjection = false,
+  showHugoniotPlusPlusProjection = false,
+  showHugoniotMinusMinusProjection = false,
+  showHugoniotPlusMinusProjection = false,
   showExtensionMinusPlusProjection = false,
   showExtensionPlusMinusProjection = false,
   showExtensionPlusPlusProjection = false,
   showDoubleSonicMinusProjection = false,
+  showHysteresisSelfIntersectionMinusProjection = false,
+  showHysteresisSelfIntersectionPlusProjection = false,
   showDoubleSonicPlusProjection = false,
   showExtensionMinusMinusProjection = false,
   inspectionModeEnabled = false,
@@ -78,6 +96,7 @@ function StateSpaceCanvas({
   const dragFrameRef = useRef(null)
   const probeFrameRef = useRef(null)
   const [hoverBranch, setHoverBranch] = useState(null)
+  const [dragPreview, setDragPreview] = useState(null)
 
   const samples = useMemo(() => {
     const slow = buildCharacteristicProjectionSamples(view, params, 'slow')
@@ -85,16 +104,77 @@ function StateSpaceCanvas({
     return { slow, fast, all: [...slow, ...fast] }
   }, [view, params])
   const selectedMap = useMemo(() => Object.fromEntries(selectedEntries.map((entry) => [entry.branch, entry])), [selectedEntries])
+  const slowSeedKey = JSON.stringify(selectedMap.slow?.seed ?? null)
+  const slowSeed = useMemo(() => JSON.parse(slowSeedKey), [slowSeedKey])
+  const slowStateKey = JSON.stringify(selectedMap.slow?.selectedState ?? null)
+  const slowState = useMemo(() => JSON.parse(slowStateKey), [slowStateKey])
+  const fastSeedKey = JSON.stringify(selectedMap.fast?.seed ?? null)
+  const fastSeed = useMemo(() => JSON.parse(fastSeedKey), [fastSeedKey])
+  const fastStateKey = JSON.stringify(selectedMap.fast?.selectedState ?? null)
+  const fastState = useMemo(() => JSON.parse(fastStateKey), [fastStateKey])
+  const displayMap = useMemo(() => dragPreview ? {
+    ...selectedMap,
+    [dragPreview.branch]: { ...selectedMap[dragPreview.branch], selectedState: withStates(dragPreview.sample.manifold, params) },
+  } : selectedMap, [selectedMap, dragPreview, params])
+  const showComposite = showCompositeSlowMinusProjection || showCompositeSlowPlusProjection
+  const compositePayload = useMemo(() => ({
+    fixedState: slowSeed, params, view: probeView, resolution,
+    samples: clampResolutionSamples(resolution * RAREFACTION.SAMPLES_PER_RESOLUTION, RAREFACTION.MIN_SAMPLES, RAREFACTION.MAX_SAMPLES),
+    inflectionBranch: 'slow', direction: FORWARD_HUGONIOT, sonicTarget: 'left',
+    renderView: { ...probeView, compactifiedZ: true },
+  }), [slowSeed, params, probeView, resolution])
+  const { data: compositeData, loading: compositeLoading, error: compositeError } = useWorkerTask(createCompositeSegmentsWorker, compositePayload, showComposite && Boolean(slowSeed))
+  const compositeProjectionSegments = useMemo(() => {
+    if (!showComposite || !slowSeed || !compositeData) return { minus: [], plus: [] }
+    const raw = (compositeData.segments ?? []).map(normalizeSegment).filter(segment => segment.length >= 2)
+    const anchor = computeCompositeSlowInflectionPoint(slowSeed, params, probeView, resolution)
+    const branches = filterCompositeBranchesThroughPoint(raw, anchor, probeView, { tolerance: Math.max(0.025, 0.10 / Math.max(1, resolution)) })
+    const segments = buildDrawableCompositeSegments(branches).filter(segment => keepDrawableSegment(segment, probeView))
+    return {
+      minus: showCompositeSlowMinusProjection ? projectProbeSegments(segments, 'minus', params) : [],
+      plus: showCompositeSlowPlusProjection ? projectProbeSegments(segments, 'plus', params) : [],
+    }
+  }, [showComposite, slowSeed, compositeData, params, probeView, resolution, showCompositeSlowMinusProjection, showCompositeSlowPlusProjection])
   const rarefactionPayload = useMemo(() => ({
-    fixedState: selectedMap.slow?.seed,
+    fixedState: slowSeed,
     params, view: probeView, resolution, constrainZ: true,
     direction: FORWARD_HUGONIOT, compactifiedZ: true,
-  }), [selectedMap, params, probeView, resolution])
+  }), [slowSeed, params, probeView, resolution])
   const showRarefaction = showRarefactionSlowMinusProjection || showRarefactionSlowPlusProjection
-  const { data: rarefactionData } = useWorkerTask(createRarefactionWorker, rarefactionPayload, showRarefaction && Boolean(selectedMap.slow?.seed))
+  const { data: rarefactionData, loading: rarefactionLoading, error: rarefactionError } = useWorkerTask(createRarefactionWorker, rarefactionPayload, showRarefaction && Boolean(slowSeed))
   const rarefactionSlowSegments = useMemo(() => (
-    showRarefaction && selectedMap.slow?.seed ? projectProbeSegments(rarefactionData, 'minus', params) : []
-  ), [showRarefaction, selectedMap, rarefactionData, params])
+    showRarefaction && slowSeed ? projectProbeSegments(rarefactionData, 'minus', params) : []
+  ), [showRarefaction, slowSeed, rarefactionData, params])
+
+  const showFastComposite = showCompositeFastMinusProjection || showCompositeFastPlusProjection
+  const fastCompositePayload = useMemo(() => ({
+    fixedState: fastSeed, params, view: probeView, resolution,
+    samples: clampResolutionSamples(resolution * RAREFACTION.SAMPLES_PER_RESOLUTION, RAREFACTION.MIN_SAMPLES, RAREFACTION.MAX_SAMPLES),
+    inflectionBranch: 'fast', direction: BACKWARD_HUGONIOT, sonicTarget: 'right',
+    renderView: { ...probeView, compactifiedZ: true },
+  }), [fastSeed, params, probeView, resolution])
+  const { data: fastCompositeData, loading: fastCompositeLoading, error: fastCompositeError } = useWorkerTask(createCompositeSegmentsWorker, fastCompositePayload, showFastComposite && Boolean(fastSeed))
+  const fastCompositeProjectionSegments = useMemo(() => {
+    if (!showFastComposite || !fastSeed || !fastCompositeData) return { minus: [], plus: [] }
+    const raw = (fastCompositeData.segments ?? []).map(normalizeSegment).filter(segment => segment.length >= 2)
+    const anchor = fastCompositeData.sonicAnchorPoint
+    const branches = filterCompositeBranchesThroughPoint(raw, anchor, probeView, { tolerance: Math.max(0.025, 0.10 / Math.max(1, resolution)) })
+    const segments = buildDrawableCompositeSegments(branches).filter(segment => keepDrawableSegment(segment, probeView))
+    return {
+      minus: showCompositeFastMinusProjection ? projectProbeSegments(segments, 'minus', params) : [],
+      plus: showCompositeFastPlusProjection ? projectProbeSegments(segments, 'plus', params) : [],
+    }
+  }, [showFastComposite, fastSeed, fastCompositeData, params, probeView, resolution, showCompositeFastMinusProjection, showCompositeFastPlusProjection])
+  const fastRarefactionPayload = useMemo(() => ({
+    fixedState: fastSeed,
+    params, view: probeView, resolution, constrainZ: true,
+    direction: BACKWARD_HUGONIOT, compactifiedZ: true,
+  }), [fastSeed, params, probeView, resolution])
+  const showFastRarefaction = showRarefactionFastMinusProjection || showRarefactionFastPlusProjection
+  const { data: fastRarefactionData, loading: fastRarefactionLoading, error: fastRarefactionError } = useWorkerTask(createRarefactionWorker, fastRarefactionPayload, showFastRarefaction && Boolean(fastSeed))
+  const rarefactionFastSegments = useMemo(() => (
+    showFastRarefaction && fastSeed ? projectProbeSegments(fastRarefactionData, 'minus', params) : []
+  ), [showFastRarefaction, fastSeed, fastRarefactionData, params])
 
   const probeProjection = useMemo(() => {
     const result = {}
@@ -164,9 +244,14 @@ function StateSpaceCanvas({
   ), [bounds, params])
   const implicitHugoniotMinusSegments = useMemo(() => (
     showHugoniotMinusPlusProjection
-      ? buildImplicitHugoniotMinusStateSegments(bounds, selectedMap.slow?.selectedState, params, 260)
+      ? buildImplicitHugoniotMinusStateSegments(bounds, slowState, params, 260)
       : []
-  ), [bounds, selectedMap, params, showHugoniotMinusPlusProjection])
+  ), [bounds, slowState, params, showHugoniotMinusPlusProjection])
+  const implicitHugoniotPlusSegments = useMemo(() => (
+    showHugoniotPlusMinusProjection
+      ? buildImplicitHugoniotMinusStateSegments(bounds, fastState, params, 260)
+      : []
+  ), [bounds, fastState, params, showHugoniotPlusMinusProjection])
   const sonicRightSeparatorMinusSegments = useMemo(() => (
     showExtensionPlusMinusProjection ? buildSonicRightSeparatorMinusProjection(bounds, params) : []
   ), [bounds, params, showExtensionPlusMinusProjection])
@@ -176,6 +261,17 @@ function StateSpaceCanvas({
   const sonicLeftSeparatorPlusSegments = useMemo(() => (
     showExtensionMinusPlusProjection ? buildSonicLeftSeparatorPlusProjection(bounds, params) : []
   ), [bounds, params, showExtensionMinusPlusProjection])
+  const selfIntersectionStates = useMemo(() => (
+    showHysteresisSelfIntersectionMinusProjection || showHysteresisSelfIntersectionPlusProjection
+      ? findHysteresisDoubleStates(params) : []
+  ), [params, showHysteresisSelfIntersectionMinusProjection, showHysteresisSelfIntersectionPlusProjection])
+  const selfIntersectionProjection = useMemo(() => ({
+    points: showHysteresisSelfIntersectionMinusProjection
+      ? selfIntersectionStates.map(p => ({ u: p.uMinus, v: p.vMinus })) : [],
+    plus: showHysteresisSelfIntersectionPlusProjection
+      ? selfIntersectionStates.flatMap(p => buildImplicitHugoniotMinusStateSegments(
+        bounds, { u: p.uMinus, v: p.vMinus }, params, 260)) : [],
+  }), [bounds, params, selfIntersectionStates, showHysteresisSelfIntersectionMinusProjection, showHysteresisSelfIntersectionPlusProjection])
   const doubleSonicMinusSegments = useMemo(() => (
     showDoubleSonicMinusProjection ? buildDoubleSonicStateProjection(bounds, params, 'minus') : []
   ), [bounds, params, showDoubleSonicMinusProjection])
@@ -193,7 +289,7 @@ function StateSpaceCanvas({
     return { left, top }
   }
 
-  const selectedLabelPosition = (branch) => statePercent(selectedMap[branch]?.selectedState)
+  const selectedLabelPosition = (branch) => statePercent(displayMap[branch]?.selectedState)
 
   const projectedStatePercent = (state) => {
     if (!state || !Number.isFinite(state.u) || !Number.isFinite(state.v)) return null
@@ -302,10 +398,7 @@ function StateSpaceCanvas({
     const pending = pendingDragSampleRef.current
     pendingDragSampleRef.current = null
     if (!pending) return
-    onSelectCharacteristicPoint?.(
-      { ...pending.sample.manifold, branch: pending.branch },
-      { dragging: true },
-    )
+    setDragPreview(pending)
   }
 
   const scheduleBranchUpdate = (branch, sample) => {
@@ -395,7 +488,8 @@ function StateSpaceCanvas({
       pendingDragSampleRef.current = null
     }
     const sample = pointOnCharacteristicFromEvent(branch, event)
-    if (sample) onSelectCharacteristicPoint?.({ ...sample.manifold, branch }, { dragging: false, final: true })
+    setDragPreview(null)
+    if (sample && event.type !== 'pointercancel') onSelectCharacteristicPoint?.({ ...sample.manifold, branch }, { dragging: false, final: true })
     draggingBranchRef.current = null
     event.currentTarget.releasePointerCapture?.(event.pointerId)
   }
@@ -406,7 +500,7 @@ function StateSpaceCanvas({
 
     const draw = () => drawStateSpaceCanvas(canvas, {
       bounds,
-      selectedMap,
+      selectedMap: displayMap,
       hoverBranch,
       draggingBranch: draggingBranchRef.current,
       view,
@@ -415,14 +509,21 @@ function StateSpaceCanvas({
       implicitInflectionSegments,
       implicitCoincidenceSegments,
       showCoincidence,
+      showHugoniotMinusMinusProjection,
       implicitHugoniotMinusSegments,
       sonicRightSeparatorMinusSegments,
       sonicLeftSeparatorPlusSegments,
+      selfIntersectionProjection,
       doubleSonicMinusSegments,
       doubleSonicPlusSegments,
       sonicLeftSeparatorMinusSegments,
       hysPlusProjectionSegments,
+      rarefactionFastSegments,
+      fastCompositeProjectionSegments,
+      implicitHugoniotPlusSegments,
+      showHugoniotPlusPlusProjection,
       rarefactionSlowSegments,
+      compositeProjectionSegments,
       sonicRightSeparatorPlusSegments,
       probeProjection,
     })
@@ -431,7 +532,7 @@ function StateSpaceCanvas({
     const observer = new ResizeObserver(draw)
     observer.observe(canvas)
     return () => observer.disconnect()
-  }, [bounds, selectedMap, hoverBranch, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, sonicRightSeparatorMinusSegments, sonicRightSeparatorPlusSegments, sonicLeftSeparatorPlusSegments, sonicLeftSeparatorMinusSegments, doubleSonicMinusSegments, doubleSonicPlusSegments, hysPlusProjectionSegments, rarefactionSlowSegments, probeProjection])
+  }, [rarefactionFastSegments, fastCompositeProjectionSegments, implicitHugoniotPlusSegments, showHugoniotPlusPlusProjection, displayMap, showHugoniotMinusMinusProjection, selfIntersectionProjection, bounds, selectedMap, hoverBranch, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, sonicRightSeparatorMinusSegments, sonicRightSeparatorPlusSegments, sonicLeftSeparatorPlusSegments, sonicLeftSeparatorMinusSegments, doubleSonicMinusSegments, doubleSonicPlusSegments, hysPlusProjectionSegments, rarefactionSlowSegments, compositeProjectionSegments, probeProjection])
 
   const cursor = draggingBranchRef.current || draggingProbeBranchRef.current ? 'grabbing' : hoverBranch ? 'grab' : 'default'
   const slowLabelPosition = selectedLabelPosition('slow')
@@ -443,7 +544,7 @@ function StateSpaceCanvas({
   const renderStateLatexLabel = (branch, tex, position) => {
     if (!position) return null
     const highlighted = hoverBranch === branch || draggingBranchRef.current === branch
-    const state = selectedMap[branch]?.selectedState
+    const state = displayMap[branch]?.selectedState
     return (
       <div
         className={`state-space-latex-label ${highlighted ? 'state-space-latex-label--hover' : ''}`}
@@ -489,6 +590,13 @@ function StateSpaceCanvas({
         <button type="button" onClick={navigation.reset}>Restaurar vista</button>
         <button type="button" aria-pressed={navigation.showLabels} onClick={() => navigation.setShowLabels(value => !value)}>Rótulos</button>
       </div>
+      {(dragPreview || compositeLoading || rarefactionLoading || compositeError || rarefactionError || fastCompositeLoading || fastRarefactionLoading || fastCompositeError || fastRarefactionError) && (
+        <div role="status" aria-live="polite" style={{ position: 'absolute', right: 12, bottom: 12, zIndex: 5, padding: '7px 11px', borderRadius: 7, background: '#0f172a', color: '#e2e8f0', pointerEvents: 'none', fontSize: 12 }}>
+          {dragPreview ? 'Solte o ponto para atualizar as curvas.'
+            : compositeError || rarefactionError || fastCompositeError || fastRarefactionError ? 'Não foi possível calcular uma das curvas.'
+              : `Calculando e desenhando: ${[compositeLoading && 'composta lenta', rarefactionLoading && 'rarefação lenta', fastCompositeLoading && 'composta rápida', fastRarefactionLoading && 'rarefação rápida'].filter(Boolean).join(', ')}…`}
+        </div>
+      )}
       <canvas
         className="stage-2d-canvas"
         ref={canvasRef}
@@ -551,6 +659,12 @@ function SolutionCanvas() {
 
 export { SolutionCanvas }
 export default StateSpaceCanvas
+
+
+
+
+
+
 
 
 

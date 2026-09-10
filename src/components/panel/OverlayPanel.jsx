@@ -42,15 +42,26 @@ export default function OverlayPanel(props) {
     showHysPlusMinusProjection,
     showCoincidenceMinusProjection,
     showRarefactionSlowMinusProjection,
+    showRarefactionFastMinusProjection,
+    showCompositeSlowMinusProjection,
+    showCompositeFastMinusProjection,
     showCoincidencePlusProjection,
     showRarefactionSlowPlusProjection,
+    showRarefactionFastPlusProjection,
+    showCompositeSlowPlusProjection,
+    showCompositeFastPlusProjection,
     showHysMinusMinusProjection,
     showHysPlusPlusProjection,
     showHugoniotMinusPlusProjection,
+    showHugoniotPlusPlusProjection,
+    showHugoniotMinusMinusProjection,
+    showHugoniotPlusMinusProjection,
     showHysMinusPlusProjection,
     showHugoniotMinus,
     showDoubleSonicMinusProjection,
+    showHysteresisSelfIntersectionMinusProjection,
     showDoubleSonicPlusProjection,
+    showHysteresisSelfIntersectionPlusProjection,
     showExtensionMinusMinusProjection,
     showExtensionPlusMinusProjection,
     showExtensionMinusPlusProjection,
@@ -135,15 +146,26 @@ export default function OverlayPanel(props) {
         showHysPlusMinusProjection={showHysPlusMinusProjection}
         showCoincidenceMinusProjection={showCoincidenceMinusProjection}
         showRarefactionSlowMinusProjection={showRarefactionSlowMinusProjection}
+        showRarefactionFastMinusProjection={showRarefactionFastMinusProjection}
+        showCompositeSlowMinusProjection={showCompositeSlowMinusProjection}
+        showCompositeFastMinusProjection={showCompositeFastMinusProjection}
         showCoincidencePlusProjection={showCoincidencePlusProjection}
         showRarefactionSlowPlusProjection={showRarefactionSlowPlusProjection}
+        showRarefactionFastPlusProjection={showRarefactionFastPlusProjection}
+        showCompositeSlowPlusProjection={showCompositeSlowPlusProjection}
+        showCompositeFastPlusProjection={showCompositeFastPlusProjection}
         showHysMinusMinusProjection={showHysMinusMinusProjection}
         showHysPlusPlusProjection={showHysPlusPlusProjection}
         showHugoniotMinusPlusProjection={showHugoniotMinusPlusProjection}
+        showHugoniotPlusPlusProjection={showHugoniotPlusPlusProjection}
+        showHugoniotMinusMinusProjection={showHugoniotMinusMinusProjection}
+        showHugoniotPlusMinusProjection={showHugoniotPlusMinusProjection}
         showHysMinusPlusProjection={showHysMinusPlusProjection}
         showHugoniotMinus={showHugoniotMinus}
         showDoubleSonicMinusProjection={showDoubleSonicMinusProjection}
+        showHysteresisSelfIntersectionMinusProjection={showHysteresisSelfIntersectionMinusProjection}
         showDoubleSonicPlusProjection={showDoubleSonicPlusProjection}
+        showHysteresisSelfIntersectionPlusProjection={showHysteresisSelfIntersectionPlusProjection}
         showExtensionMinusMinusProjection={showExtensionMinusMinusProjection}
         showExtensionPlusMinusProjection={showExtensionPlusMinusProjection}
         showExtensionMinusPlusProjection={showExtensionMinusPlusProjection}

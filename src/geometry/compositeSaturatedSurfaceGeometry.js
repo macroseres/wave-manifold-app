@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { clipTriangleToBox } from './clipTriangleToBox.js'
 import { FORWARD_HUGONIOT, BACKWARD_HUGONIOT, normalizeHugoniotDirection } from '../entities/hugoniot/directions'
 import {
   sonicImplicitF,
@@ -10,6 +11,7 @@ import {
 import { buildRarefactionBifoliation, selectLeafFromBifoliation } from '../entities/waves/basicBifoliations'
 import { makeSaturatedHugoniotBifoliation } from '../entities/waves/saturatedBifoliation'
 import { COMPOSITE, RAREFACTION } from '../config/numerics'
+import { physicalZToVisual, visualZToPhysical } from './zCompactification'
 
 function finite(value) {
   return Number.isFinite(value)
@@ -75,29 +77,13 @@ function compositeBounds() {
   }
 }
 
-function inRenderWindow(point, view, marginFactor = 0.35) {
-  if (!point) return false
-  const tTol = marginFactor * Math.max(1, view.tMax - view.tMin)
-  const yTol = marginFactor * Math.max(1, view.yMax - view.yMin)
-
-  // Importante: no eixo z a superficie saturada deve ser recortada
-  // exatamente pela mesma janela das curvas compostas. O App passa aqui
-  // calcView = view visual + 20% em z. Portanto nao adicionamos mais
-  // tolerancia/margem em z; caso contrario a folha saturada aparece fora
-  // do dominio esperado e fica incoerente com a composta.
-  return (
-    point.t >= view.tMin - tTol && point.t <= view.tMax + tTol &&
-    point.Y >= view.yMin - yTol && point.Y <= view.yMax + yTol &&
-    point.z >= view.zMin && point.z <= view.zMax
-  )
-}
-
 function normalizedPointDistance(a, b, view) {
   if (!a || !b) return Number.POSITIVE_INFINITY
   const tScale = Math.max(1, view.tMax - view.tMin)
   const yScale = Math.max(1, view.yMax - view.yMin)
   const zScale = Math.max(1, view.zMax - view.zMin)
-  return Math.hypot((a.t - b.t) / tScale, (a.Y - b.Y) / yScale, (a.z - b.z) / zScale)
+  const dz = view.compactifiedZ ? (physicalZToVisual(a.z) - physicalZToVisual(b.z)) / 2 : (a.z - b.z) / zScale
+  return Math.hypot((a.t - b.t) / tScale, (a.Y - b.Y) / yScale, dz)
 }
 
 
@@ -291,13 +277,20 @@ export function buildGeometryForRarefactionSaturationSegment(segment, params, ca
   // recebida do App: view visual + 20%.
   const etaMin = renderView.zMin
   const etaMax = renderView.zMax
-  const saturation = makeSaturatedHugoniotBifoliation({
+  const physicalSaturation = makeSaturatedHugoniotBifoliation({
     rarefactionParam: rareParam,
     params,
     direction,
     etaMin,
     etaMax,
   })
+  // Sample the extended leaves uniformly in visual z, preserving the
+  // original rarefaction parameter and avoiding sparse physical-z tails.
+  const saturation = renderView.compactifiedZ ? {
+    evaluate: (u, w) => physicalSaturation.evaluate(u, physicalSaturation.wFromEta(
+      visualZToPhysical(-0.9999 + 1.9998 * w),
+    )),
+  } : physicalSaturation
 
   const bounds = compositeBounds()
   // A superfície é apenas visual; manter a malha moderada evita lag na cena.
@@ -318,7 +311,7 @@ export function buildGeometryForRarefactionSaturationSegment(segment, params, ca
   // A margem W_MARGIN continua sendo usada na extração da CURVA composta,
   // mas não na malha visual da superfície saturada.
   const wGrid = makeEtaGrid(etaMin, etaMax, wSamples, [...sonicWFocuses, ...doubleSonicWFocuses])
-  const indexGrid = Array.from({ length: uGrid.length }, () => Array(wGrid.length).fill(-1))
+
   const pointGrid = Array.from({ length: uGrid.length }, () => Array(wGrid.length).fill(null))
   const vertices = []
 
@@ -328,10 +321,10 @@ export function buildGeometryForRarefactionSaturationSegment(segment, params, ca
       const w = wGrid[j]
       const obj = saturation.evaluate(u, w)
       const point = normalizePoint(obj?.point)
-      if (!point || !inRenderWindow(point, renderView)) continue
-      const index = vertices.length / 3
-      vertices.push(point.t, point.Y, point.z)
-      indexGrid[i][j] = index
+      if (!point) continue
+
+
+
       pointGrid[i][j] = point
     }
   }
@@ -348,20 +341,44 @@ export function buildGeometryForRarefactionSaturationSegment(segment, params, ca
   }
 
   const indices = []
-  for (let i = 0; i < uGrid.length - 1; i += 1) {
-    for (let j = 0; j < wGrid.length - 1; j += 1) {
-      const a = indexGrid[i][j]
-      const b = indexGrid[i + 1][j]
-      const c = indexGrid[i][j + 1]
-      const d = indexGrid[i + 1][j + 1]
-      if (a < 0 || b < 0 || c < 0 || d < 0) continue
-      if (okEdge(i, j, i + 1, j) && okEdge(i, j, i, j + 1) && okEdge(i + 1, j, i + 1, j + 1) && okEdge(i, j + 1, i + 1, j + 1)) {
-        indices.push(a, b, c)
-        indices.push(c, b, d)
-      }
+  const tTol = 0.35 * Math.max(1, renderView.tMax - renderView.tMin)
+  const yTol = 0.35 * Math.max(1, renderView.yMax - renderView.yMin)
+  const min = [renderView.tMin - tTol, renderView.yMin - yTol, physicalZToVisual(renderView.zMin)]
+  const max = [renderView.tMax + tTol, renderView.yMax + yTol, physicalZToVisual(renderView.zMax)]
+  const vertexCache = new Map()
+  const vertexIndex = (point) => {
+    const key = point.map(value => value.toPrecision(13)).join(',')
+    if (vertexCache.has(key)) return vertexCache.get(key)
+    const index = vertices.length / 3
+    vertices.push(point[0], point[1], visualZToPhysical(point[2]))
+    vertexCache.set(key, index)
+    return index
+  }
+  const appendTriangle = (corners) => {
+    if (corners.some(([i, j]) => !pointGrid[i][j])) return
+    if (!corners.every(([i, j], k) => {
+      const [nextI, nextJ] = corners[(k + 1) % 3]
+      return okEdge(i, j, nextI, nextJ)
+    })) return
+    // Clip in display coordinates so the new boundary follows the rendered
+    // triangle, including along compactified z. Never add a closing cap.
+    const triangle = corners.map(([i, j]) => {
+      const p = pointGrid[i][j]
+      return [p.t, p.Y, physicalZToVisual(p.z)]
+    })
+    const polygon = clipTriangleToBox(triangle, min, max)
+    if (polygon.length < 3) return
+    const ids = polygon.map(vertexIndex)
+    for (let k = 1; k < ids.length - 1; k += 1) {
+      if (new Set([ids[0], ids[k], ids[k + 1]]).size === 3) indices.push(ids[0], ids[k], ids[k + 1])
     }
   }
-
+  for (let i = 0; i < uGrid.length - 1; i += 1) {
+    for (let j = 0; j < wGrid.length - 1; j += 1) {
+      appendTriangle([[i, j], [i + 1, j], [i, j + 1]])
+      appendTriangle([[i, j + 1], [i + 1, j], [i + 1, j + 1]])
+    }
+  }
   if (vertices.length === 0 || indices.length === 0) return null
   return { vertices, indices }
 }
@@ -384,8 +401,12 @@ export function buildCompositeSaturatedSurfaceGeometry({ fixedState, params, vie
 
   const vertices = []
   const indices = []
+  const renderView = {
+    ...view, compactifiedZ: true,
+    zMin: visualZToPhysical(-0.9999), zMax: visualZToPhysical(0.9999),
+  }
   for (const segment of rareSegments) {
-    const part = buildGeometryForRarefactionSaturationSegment(segment, params, view, view, normalizedDirection, resolution)
+    const part = buildGeometryForRarefactionSaturationSegment(segment, params, view, renderView, normalizedDirection, resolution)
     if (!part) continue
     const offset = vertices.length / 3
     appendValues(vertices, part.vertices)
@@ -400,3 +421,5 @@ export function buildCompositeSaturatedSurfaceGeometry({ fixedState, params, vie
   geometry.computeVertexNormals()
   return geometry
 }
+
+

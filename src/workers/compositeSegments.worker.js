@@ -12,6 +12,7 @@ self.onmessage = (event) => {
       inflectionBranch,
       direction,
       sonicTarget,
+      renderView,
     } = payload ?? {}
     const data = buildCompositeSegments(
       fixedState,
@@ -22,6 +23,7 @@ self.onmessage = (event) => {
       inflectionBranch,
       direction,
       sonicTarget,
+      renderView,
     )
     self.postMessage({ id, ok: true, data })
   } catch (error) {

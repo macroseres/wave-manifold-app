@@ -32,7 +32,7 @@ function SelectedRarefactionCurves({ curveEntries, params, calcView, resolution,
       lineWidth={entry.lineWidth}
       constrainZ={true}
       direction={entry.direction}
-      compactifiedZ={entry.branch === 'slow'}
+      compactifiedZ={true}
     />
   ))
 }
@@ -118,7 +118,7 @@ function SelectedHugoniotCurves({ curveEntries, params, calcView, resolution, ma
       onInspectPoint={onInspectPoint}
       onHoverPoint={inspectionModeEnabled ? onHoverPoint : null}
       interactive={true}
-      compactifiedZ={entry.branch === 'slow'}
+      compactifiedZ={true}
     />
   ))
 }
@@ -141,6 +141,7 @@ function WaveSceneViewport({
   controlsEnabled,
   orbitControlsRef,
   autoRotate3D,
+  setAutoRotate3D,
   showAxes,
   showCharacteristic,
   displayedSelectedByBranch,
@@ -204,6 +205,7 @@ function WaveSceneViewport({
         <button type="button" onClick={() => setCameraView('front')}>Frente</button>
         <button type="button" onClick={() => setCameraView('side')}>Lado</button>
         <button type="button" onClick={() => setCameraView('top')}>Topo</button>
+        <button type="button" aria-pressed={autoRotate3D} onClick={() => setAutoRotate3D(!autoRotate3D)}>Rotação</button>
         <button type="button" onClick={() => setCameraView('reset')}>Restaurar vista</button>
       </div>
 
@@ -395,5 +397,6 @@ function WaveSceneViewport({
 }
 
 export default memo(WaveSceneViewport)
+
 
 

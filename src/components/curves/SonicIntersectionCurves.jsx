@@ -23,8 +23,8 @@ function CurveGroup({ segments, color, lineWidth = 1.35, renderOrder = 6 }) {
   )
 }
 
-export function DoubleSonicCurve({ params, view, resolution = 40, visible = true }) {
-  const segments = useMemo(() => visible ? solveDoubleSonicSegments(params, view, Math.max(240, Math.min(560, resolution * 7))) : [], [params, view, resolution, visible])
+export function DoubleSonicCurve({ params, view, visible = true }) {
+  const segments = useMemo(() => visible ? solveDoubleSonicSegments(params, view, { compactifiedZ: true }) : [], [params, view, visible])
   if (!visible) return null
   return <CurveGroup segments={segments} color={waveColors.doubleSonic ?? '#f59e0b'} lineWidth={1.35} />
 }

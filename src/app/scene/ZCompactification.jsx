@@ -5,7 +5,7 @@ import { compactifyZPositionArray, physicalPointToVisual } from '../../geometry/
 
 export function ZCompactifiedLine({ points = [], ...props }) {
   const visualPoints = useMemo(() => points.map(physicalPointToVisual), [points])
-  return <Line points={visualPoints} {...props} />
+  return <Line points={visualPoints} {...props} dashed={false} />
 }
 
 export function useVisualZPoint(point) {
@@ -36,3 +36,4 @@ export function ZCompactifiedMesh({ geometry, children, ...props }) {
   const visualGeometry = useZCompactifiedGeometry(geometry)
   return <mesh geometry={visualGeometry} {...props}>{children}</mesh>
 }
+

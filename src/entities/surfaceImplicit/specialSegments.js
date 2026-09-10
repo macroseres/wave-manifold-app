@@ -1,6 +1,6 @@
 import { P, Q, A } from './algebra.js'
 import { sonicLineTCoeff, sonicLineConst } from './sonic.js'
-import { pushSegment, inExpandedWindow, inflectionZDomain, clipInflectionSegmentToTauWindow, uniqueFiniteLocal } from './helpers.js'
+import { pushSegment, inflectionZDomain, clipInflectionSegmentToTauWindow, uniqueFiniteLocal } from './helpers.js'
 import { VISUAL_Z_MAX, VISUAL_Z_MIN, visualZToPhysical } from '../../geometry/zCompactification.js'
 
 export function solveCoincidenceSegments(view) {
@@ -11,7 +11,7 @@ export function solveCoincidenceSegments(view) {
   return [[[0, 0, zMin], [0, 0, zMax]]]
 }
 
-export function solveSecondaryRightBifurcationSegments(params, view, samples = 260) {
+export function solveSecondaryRightBifurcationSegments(params, view, _samples = 260, { compactifiedZ = false } = {}) {
   const { b1, b2 } = params
   let roots = []
 
@@ -30,31 +30,30 @@ export function solveSecondaryRightBifurcationSegments(params, view, samples = 2
   }
 
   return uniqueFiniteLocal(roots.filter((z) => Math.abs(P(z, b1, b2)) < 1e-7))
-    .filter((z) => z >= view.zMin && z <= view.zMax)
+    .filter((z) => compactifiedZ || (z >= view.zMin && z <= view.zMax))
     .flatMap((z) => {
-      const aValue = A(z, b2)
-      const denom = aValue
-      const points = []
-      const n = Math.max(80, samples)
-      const dt = (view.tMax - view.tMin) / Math.max(n - 1, 1)
-      for (let i = 0; i < n; i += 1) {
-        const t = view.tMin + i * dt
-        let Y
-        if (Math.abs(denom) > 1e-12) {
-          // B_R deve estar em S_R. Com a convencao atual de S_R(t,Y,z),
-          // o ramo visivel de B_R satisfaz
-          //     P(z)=0,  2 b1 z(1+z^2)t - A(z)Y = 0.
-          // O sinal oposto colocava a curva no espelho S_L.
-          Y = 2 * b1 * z * (1 + z * z) * t / denom
-        } else if (Math.abs(2 * b1 * z * (1 + z * z)) < 1e-12) {
-          Y = 0
-        } else {
-          continue
+      // P(z)=0 and 2 b1 z(1+z²)t - A(z)Y=0 define a straight
+      // line at fixed z. Clip it analytically, including vertical cases.
+      const coefficient = 2 * b1 * z * (1 + z * z)
+      const denominator = A(z, b2)
+      if (Math.abs(denominator) < 1e-12) {
+        if (Math.abs(coefficient) < 1e-12) {
+          return view.yMin <= 0 && view.yMax >= 0
+            ? [[[view.tMin, 0, z], [view.tMax, 0, z]]] : []
         }
-        const point = { t, Y, z }
-        if (inExpandedWindow(point, view, 0.04)) points.push([t, Y, z])
+        return view.tMin <= 0 && view.tMax >= 0
+          ? [[[0, view.yMin, z], [0, view.yMax, z]]] : []
       }
-      return points.length >= 2 ? [points] : []
+      const slope = coefficient / denominator
+      let lo = view.tMin
+      let hi = view.tMax
+      if (Math.abs(slope) < 1e-14) {
+        if (view.yMin > 0 || view.yMax < 0) return []
+      } else {
+        lo = Math.max(lo, Math.min(view.yMin / slope, view.yMax / slope))
+        hi = Math.min(hi, Math.max(view.yMin / slope, view.yMax / slope))
+      }
+      return hi > lo ? [[[lo, slope * lo, z], [hi, slope * hi, z]]] : []
     })
 }
 
@@ -133,7 +132,7 @@ export function solveInflectionSegments(params, view, samples = 640, branch = 'a
   return segments
 }
 
-export function solveDoubleSonicSegments(params, view) {
+export function solveDoubleSonicSegments(params, view, { compactifiedZ = false } = {}) {
   const { b1, b2 } = params
   let roots = []
   if (Math.abs(b1 + 1) < 1e-12) {
@@ -151,7 +150,7 @@ export function solveDoubleSonicSegments(params, view) {
   }
 
   return uniqueFiniteLocal(roots.filter((z) => Math.abs(Q(z, b1, b2)) < 1e-7))
-    .filter((z) => z >= view.zMin && z <= view.zMax)
+    .filter((z) => compactifiedZ || (z >= view.zMin && z <= view.zMax))
     .flatMap((z) => {
       const tCoeff = sonicLineTCoeff(z, params)
       const cTerm = sonicLineConst(z, params)
@@ -165,3 +164,4 @@ export function solveDoubleSonicSegments(params, view) {
       return [[[t, view.yMin, z], [t, view.yMax, z]]]
     })
 }
+

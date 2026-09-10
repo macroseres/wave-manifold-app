@@ -1,5 +1,6 @@
-import { COMPOSITE } from '../config/numerics'
-import { smoothCurveCoords } from './curveSmoothing'
+import { COMPOSITE } from '../config/numerics.js'
+import { smoothCurveCoords } from './curveSmoothing.js'
+import { physicalPointToVisual, visualZToPhysical } from './zCompactification.js'
 
 function finite(value) {
   return Number.isFinite(value)
@@ -49,12 +50,19 @@ function splitLargeJumps(segment) {
   for (let i = 1; i < segment.length; i += 1) lengths.push(distance3(segment[i - 1], segment[i]))
   const typical = median(lengths)
   if (!finite(typical) || typical <= 1e-12) return [segment]
-  const jumpLimit = Math.max(COMPOSITE.DRAW_SPLIT_JUMP_MIN, COMPOSITE.DRAW_SPLIT_JUMP_FACTOR * typical)
 
   const out = []
   let current = [segment[0]]
   for (let i = 1; i < segment.length; i += 1) {
     const jump = distance3(segment[i - 1], segment[i])
+    // The contour grid is strongly clustered. A global median mistakes
+    // ordinary edges in its sparse regions for discontinuities. Compare
+    // against nearby edges, excluding the candidate jump itself.
+    const neighbors = lengths.slice(Math.max(0, i - 9), i - 1)
+      .concat(lengths.slice(i, i + 8))
+    const localTypical = median(neighbors)
+    const jumpLimit = Math.max(COMPOSITE.DRAW_SPLIT_JUMP_MIN,
+      COMPOSITE.DRAW_SPLIT_JUMP_FACTOR * Math.max(typical, localTypical))
     if (!finite(jump) || jump > jumpLimit) {
       if (current.length >= 2) out.push(current)
       current = [segment[i]]
@@ -114,6 +122,7 @@ function smoothCompositePiece(segment) {
     minPoints: COMPOSITE.DRAW_SMOOTH_MIN_POINTS,
     samplesPerEdge: COMPOSITE.DRAW_SMOOTH_SAMPLES_PER_EDGE,
     maxPoints: COMPOSITE.DRAW_MAX_POINTS,
+    maxRawPoints: COMPOSITE.DRAW_MAX_POINTS,
     curveType: 'centripetal',
     tension: COMPOSITE.DRAW_SMOOTH_TENSION,
   })
@@ -126,12 +135,16 @@ export function buildDrawableCompositeSegments(rawSegments) {
     const normalized = normalizeSegment(raw)
     if (normalized.length < 2) continue
 
-    const pieces = splitLargeJumps(normalized)
+    // Physical z grows without bound near the compactified ends. Splitting
+    // and resampling there must use screen-space geometry, not physical z.
+    const pieces = splitLargeJumps(normalized.map(physicalPointToVisual))
     for (const piece of pieces) {
       const densified = densifySegment(piece)
-      const smoothed = smoothCompositePiece(densified)
+      // Resample the entire piece before smoothing. The generic smoother
+      // otherwise truncates long input and silently drops the end of it.
+      const smoothed = smoothCompositePiece(resampleSegment(densified, COMPOSITE.DRAW_MAX_POINTS))
       const drawable = resampleSegment(smoothed, COMPOSITE.DRAW_MAX_POINTS)
-      if (drawable.length >= 2) output.push(drawable)
+      if (drawable.length >= 2) output.push(drawable.map(([t, Y, zHat]) => [t, Y, visualZToPhysical(zHat)]))
     }
   }
   return output
