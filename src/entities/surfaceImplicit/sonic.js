@@ -50,10 +50,14 @@ export function solveSonicBranchSeparatorPoint(side, z, params) {
 export function hysteresisRightImplicitF(Y, t, z, { b1, b2, c }) {
   const q = Q(z, b1, b2)
 
-  // Equação equivalente a H_R = 0, multiplicada por 2z(1+z^2):
-  // -4b1(1+z^2)Q(z)t
-  // +(b1+1)(1+z^2)[b2 - 4z - b2(b1+1)z^2]Y
-  // -4czQ(z) = 0.
+// Condição de tangência da folha de Hugoniot à sônica direita.
+// Hys+ é definida conjuntamente por S_R = 0 e H_R = 0.
+// A expressão abaixo é uma forma equivalente de H_R = 0,
+// multiplicada por 2z(1+z^2):
+//
+// -4b1(1+z^2)Q(z)t
+// +(b1+1)(1+z^2)[b2 - 4z - b2(b1+1)z^2]Y
+// -4czQ(z) = 0.
   const tCoeff = -4 * b1 * (1 + z * z) * q
   const yCoeff = (b1 + 1) * (1 + z * z) * (b2 - 4 * z - b2 * (b1 + 1) * z * z)
   const constTerm = -4 * c * z * q
