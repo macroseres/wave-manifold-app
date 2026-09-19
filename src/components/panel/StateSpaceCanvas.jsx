@@ -84,6 +84,7 @@ function StateSpaceCanvas({
   inspectionModeEnabled = false,
   inspectionProbesByBranch = { slow: null, fast: null },
   inspectionCurveVisibility = null,
+  onCreateInspectionProbe = null,
   onMoveInspectionProbe = null,
   resolution = 40,
 }) {
@@ -177,6 +178,7 @@ function StateSpaceCanvas({
   ), [showFastRarefaction, fastSeed, fastRarefactionData, params])
 
   const probeProjection = useMemo(() => {
+    if (!inspectionModeEnabled) return {}
     const result = {}
     const hugoniotSamples = Math.max(220, Math.min(520, resolution * 7))
     const rarefactionSamples = Math.max(260, Math.min(720, resolution * 8))
@@ -203,18 +205,14 @@ function StateSpaceCanvas({
       }
     }
     return result
-  }, [inspectionProbesByBranch, inspectionCurveVisibility, params, probeView, resolution])
+  }, [inspectionModeEnabled, inspectionProbesByBranch, inspectionCurveVisibility, params, probeView, resolution])
 
   const baseBounds = useMemo(() => {
-    const probeSamples = Object.values(probeProjection).flatMap((projection) => [
-      ...(projection.minusSegments ?? []).flat(),
-      ...(projection.plusSegments ?? []).flat(),
-      ...(projection.rarefactionSegments ?? []).flat(),
-      { state: { u: projection.point?.uMinus, v: projection.point?.vMinus } },
-      { state: { u: projection.point?.uPlus, v: projection.point?.vPlus } },
-    ])
-    return projectionBounds([...samples.all, ...probeSamples])
-  }, [samples, probeProjection])
+    // O enquadramento pertence ao espaço de estados, não às camadas temporárias
+    // de inspeção. Mantê-lo independente das sondas evita saltos de escala ao
+    // ativar ou desativar o modo de inspeção.
+    return projectionBounds(samples.all)
+  }, [samples])
   const navigation = useStateViewport(baseBounds)
   const bounds = navigation.bounds
 
@@ -382,6 +380,15 @@ function StateSpaceCanvas({
     if (probeFrameRef.current) cancelAnimationFrame(probeFrameRef.current)
   }, [])
 
+  useEffect(() => {
+    if (inspectionModeEnabled) return
+    draggingProbeBranchRef.current = null
+    pendingProbeSampleRef.current = null
+    if (probeFrameRef.current) cancelAnimationFrame(probeFrameRef.current)
+    probeFrameRef.current = null
+    setHoverBranch(null)
+  }, [inspectionModeEnabled])
+
   const scheduleProbeUpdate = (branch, point) => {
     pendingProbeSampleRef.current = { branch, point }
     if (probeFrameRef.current) return
@@ -420,11 +427,34 @@ function StateSpaceCanvas({
       const candidates = ['slow', 'fast']
         .map((branch) => ({ branch, distance: probeScreenDistance(branch, event) }))
         .sort((a, b) => a.distance - b.distance)
-      if (candidates[0]?.distance > 20) return
+      if (candidates[0]?.distance <= 20) {
+        event.preventDefault()
+        event.stopPropagation()
+        draggingProbeBranchRef.current = candidates[0].branch
+        setHoverBranch(candidates[0].branch)
+        event.currentTarget.setPointerCapture?.(event.pointerId)
+        return
+      }
+
+      const characteristicCandidates = ['slow', 'fast']
+        .map((branch) => ({ branch, sample: pointOnCharacteristicFromEvent(branch, event) }))
+        .filter((candidate) => candidate.sample)
+        .sort((a, b) => a.sample.screenDistance - b.sample.screenDistance)
+      const nearest = characteristicCandidates[0]
+      if (!nearest || nearest.sample.screenDistance > 20) return
+
       event.preventDefault()
       event.stopPropagation()
-      draggingProbeBranchRef.current = candidates[0].branch
-      setHoverBranch(candidates[0].branch)
+      const point = {
+        ...nearest.sample.manifold,
+        branch: nearest.branch,
+        Y: 0,
+        mode: 'characteristic',
+        attachedCurve: null,
+      }
+      onCreateInspectionProbe?.(point)
+      draggingProbeBranchRef.current = nearest.branch
+      setHoverBranch(nearest.branch)
       event.currentTarget.setPointerCapture?.(event.pointerId)
       return
     }
@@ -453,7 +483,16 @@ function StateSpaceCanvas({
       const candidates = ['slow', 'fast']
         .map((candidateBranch) => ({ branch: candidateBranch, distance: probeScreenDistance(candidateBranch, event) }))
         .sort((a, b) => a.distance - b.distance)
-      setHoverBranch(candidates[0]?.distance <= 20 ? candidates[0].branch : null)
+      if (candidates[0]?.distance <= 20) {
+        setHoverBranch(candidates[0].branch)
+        return
+      }
+      const characteristicCandidates = ['slow', 'fast']
+        .map((candidateBranch) => ({ branch: candidateBranch, sample: pointOnCharacteristicFromEvent(candidateBranch, event) }))
+        .filter((candidate) => candidate.sample)
+        .sort((a, b) => a.sample.screenDistance - b.sample.screenDistance)
+      const nearest = characteristicCandidates[0]
+      setHoverBranch(nearest?.sample.screenDistance <= 20 ? nearest.branch : null)
       return
     }
     if (draggingBranchRef.current) {
@@ -501,7 +540,7 @@ function StateSpaceCanvas({
     const draw = () => drawStateSpaceCanvas(canvas, {
       bounds,
       selectedMap: displayMap,
-      hoverBranch,
+      hoverBranch: inspectionModeEnabled ? null : hoverBranch,
       draggingBranch: draggingBranchRef.current,
       view,
       params,
@@ -532,7 +571,7 @@ function StateSpaceCanvas({
     const observer = new ResizeObserver(draw)
     observer.observe(canvas)
     return () => observer.disconnect()
-  }, [rarefactionFastSegments, fastCompositeProjectionSegments, implicitHugoniotPlusSegments, showHugoniotPlusPlusProjection, displayMap, showHugoniotMinusMinusProjection, selfIntersectionProjection, bounds, selectedMap, hoverBranch, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, sonicRightSeparatorMinusSegments, sonicRightSeparatorPlusSegments, sonicLeftSeparatorPlusSegments, sonicLeftSeparatorMinusSegments, doubleSonicMinusSegments, doubleSonicPlusSegments, hysPlusProjectionSegments, rarefactionSlowSegments, compositeProjectionSegments, probeProjection])
+  }, [rarefactionFastSegments, fastCompositeProjectionSegments, implicitHugoniotPlusSegments, showHugoniotPlusPlusProjection, displayMap, showHugoniotMinusMinusProjection, selfIntersectionProjection, bounds, selectedMap, hoverBranch, inspectionModeEnabled, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, sonicRightSeparatorMinusSegments, sonicRightSeparatorPlusSegments, sonicLeftSeparatorPlusSegments, sonicLeftSeparatorMinusSegments, doubleSonicMinusSegments, doubleSonicPlusSegments, hysPlusProjectionSegments, rarefactionSlowSegments, compositeProjectionSegments, probeProjection])
 
   const cursor = draggingBranchRef.current || draggingProbeBranchRef.current ? 'grabbing' : hoverBranch ? 'grab' : 'default'
   const slowLabelPosition = selectedLabelPosition('slow')
@@ -543,7 +582,7 @@ function StateSpaceCanvas({
   }))
   const renderStateLatexLabel = (branch, tex, position) => {
     if (!position) return null
-    const highlighted = hoverBranch === branch || draggingBranchRef.current === branch
+    const highlighted = !inspectionModeEnabled && (hoverBranch === branch || draggingBranchRef.current === branch)
     const state = displayMap[branch]?.selectedState
     return (
       <div

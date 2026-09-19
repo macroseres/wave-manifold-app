@@ -268,6 +268,7 @@ export default function App() {
         canEnableSolutionMode={canEnableSolutionMode}
         setSolutionModeEnabled={setSolutionModeEnabled}
         onExportSnapshot={handleExportSnapshot}
+        onCreateInspectionProbe={inspection.createInspectionProbe}
         onMoveInspectionProbe={inspection.moveInspectionProbe}
       />
 

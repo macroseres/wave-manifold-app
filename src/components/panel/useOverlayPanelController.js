@@ -186,9 +186,7 @@ export default function useOverlayPanelController(props) {
   const fastEntry = selectedEntries.find((entry) => entry.branch === 'fast') ?? null
   const activeEntry = activeBranch === 'slow' ? slowEntry : activeBranch === 'fast' ? fastEntry : null
   const [showSettingsPanel, setShowSettingsPanel] = useState(false)
-  const [showHelpPanel, setShowHelpPanel] = useState(false)
   const [showDocumentation, setShowDocumentation] = useState(false)
-  const [showAboutPanel, setShowAboutPanel] = useState(false)
   const [parameterWindow, setParameterWindow] = useState(initialParameterWindow)
   const [visibleParameterCurves, setVisibleParameterCurves] = useState({ c1: true, c2: true, c3: true })
   const [hoveredParameterCase, setHoveredParameterCase] = useState(null)
@@ -406,6 +404,7 @@ export default function useOverlayPanelController(props) {
   }
 
   const rightInfoPanelProps = {
+    activeView,
     activeEntry,
     formatNumber,
     hugoniotIntersections,
@@ -577,12 +576,8 @@ export default function useOverlayPanelController(props) {
     schaefferShearerCases,
     selectedSchaefferShearerCase,
     setHoveredParameterCase,
-    setShowAboutPanel,
-    setShowHelpPanel,
     setShowDocumentation,
     setShowSettingsPanel,
-    showAboutPanel,
-    showHelpPanel,
     showDocumentation,
     showSettingsPanel,
     updateParam,

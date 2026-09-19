@@ -2,8 +2,8 @@
 
 ## Visualizações principais
 
-- **Exploração:** variedade de ondas \(\mathcal W\) em três dimensões.
-- **Estados:** projeção das construções no plano \((u,v)\); fica disponível após a seleção das duas famílias.
+- **Variedade:** variedade de ondas \(\mathcal W\) em três dimensões.
+- **Estados:** projeções \(\pi_-\) e \(\pi_+\) das construções no plano \((u,v)\).
 - **Perfil:** perfil da solução em \((x,t=t_0)\) e seus diagnósticos.
 - **Parâmetros:** mapa dos casos no plano \((b_1,b_2)\).
 
@@ -11,8 +11,8 @@
 
 1. Escolha um caso de Schaeffer–Shearer ou ajuste os parâmetros.
 2. Ative no painel esquerdo as superfícies e curvas de interesse.
-3. Na superfície característica, clique para selecionar \(C_s\) e use `Shift` + clique para selecionar \(C_f\).
-4. Ative **Inspeção** para examinar curvas ligadas a um estado.
+3. Na superfície característica, clique para selecionar \(C_s\) e use `Shift` + clique para selecionar \(C_f\). Os pontos determinam \(U_L\) e \(U_R\).
+4. Ative **Inspeção** para examinar curvas ligadas a um estado, tanto na variedade quanto no espaço de estados.
 5. Com os dois estados selecionados, ative **Solução** para construir os arcos admissíveis.
 6. Compare a variedade 3D, o espaço de estados e o perfil resultante.
 
@@ -25,3 +25,9 @@ Em **Ajustes**, podem ser alteradas as escalas dos eixos, a resolução numéric
 ## Camadas da cena
 
 O painel esquerdo agrupa as camadas em referências geométricas, superfícies e fronteiras, família lenta e família rápida. **Ocultar tudo** e **Mostrar tudo** ajudam a isolar construções; **Limpar seleções** remove os estados escolhidos.
+
+## Inspeção no espaço de estados
+
+Com **Inspeção** ativa, clique próximo da projeção de \(C_s\) ou \(C_f\) no plano \((u,v)\) para criar a sonda da família correspondente. Arraste o marcador da sonda para percorrer a característica. A mesma sonda e suas curvas associadas permanecem sincronizadas entre as vistas **Variedade** e **Estados**.
+
+Ao desativar **Inspeção**, as curvas, os marcadores e os rótulos das sondas são ocultados, mas suas posições ficam preservadas. O enquadramento e os estados \(U_L\) e \(U_R\) não são alterados.

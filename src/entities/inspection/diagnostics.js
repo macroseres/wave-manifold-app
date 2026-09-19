@@ -1,3 +1,4 @@
+import { legacyHysteresisRightImplicitF } from '../surfaceImplicit/sonic.js'
 import {
   computeLeftStateFromWavePoint,
   computeRightStateFromWavePoint,
@@ -103,7 +104,7 @@ export function inspectionResiduals(point, params, visibleSets = {}) {
   const sMinus = sonicLeftImplicitF(Y, t, z, params)
   const sPlus = sonicImplicitF(Y, t, z, params)
   const hysPlus = hysteresisRightImplicitF(Y, t, z, params)
-  const hysMinus = hysteresisRightImplicitF(-Y, t, z, params)
+  const hysMinus = legacyHysteresisRightImplicitF(-Y, t, z, params)
 
   const entries = [
     { key: 'S-', label: 'S^-', residual: scaledResidual(sMinus, scale), raw: sMinus, visible: visibleSets.sonicLeft !== false },
@@ -135,3 +136,4 @@ export function compareInspectionPoints(a, b, params) {
     dvPlus: pb.vPlus - pa.vPlus,
   }
 }
+

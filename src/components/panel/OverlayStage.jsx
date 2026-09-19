@@ -46,6 +46,7 @@ export default function OverlayStage({
   inspectionModeEnabled,
   inspectionProbesByBranch,
   inspectionCurveVisibility,
+  onCreateInspectionProbe,
   onMoveInspectionProbe,
   resolution,
   solutionDiagnostics,
@@ -99,6 +100,7 @@ export default function OverlayStage({
                 inspectionModeEnabled={inspectionModeEnabled}
                 inspectionProbesByBranch={inspectionProbesByBranch}
                 inspectionCurveVisibility={inspectionCurveVisibility}
+                onCreateInspectionProbe={onCreateInspectionProbe}
                 onMoveInspectionProbe={onMoveInspectionProbe}
                 resolution={resolution}
               />

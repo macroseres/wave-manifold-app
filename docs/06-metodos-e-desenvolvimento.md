@@ -15,6 +15,10 @@ O princípio arquitetural é manter o cálculo independente de React e Three.js 
 
 O aplicativo combina solução de equações implícitas, amostragem paramétrica adaptativa, continuação, marching squares, extração de isosuperfícies, interseção de malhas, suavização e recorte de polilinhas. Tolerâncias e resolução ficam centralizadas nas configurações numéricas.
 
+As curvas implícitas no espaço de estados são extraídas por contorno em grade. Quando uma curva possui ponto duplo, como \(\pi_-(\operatorname{Hys}^+)\), o app prefere traçar sua normalização parametrizada; isso preserva os dois ramos que passam pelo nó e evita conexões espúrias entre arestas da grade.
+
+As curvas de rarefação e composta mais custosas são calculadas em Web Workers. A interface recebe segmentos serializáveis e mantém a renderização separada do cálculo.
+
 ## Execução local
 
 ```text
@@ -29,6 +33,8 @@ npm test
 npm run lint
 npm run build
 ```
+
+Os testes cobrem equações implícitas, compactificação, projeções, interseções, orientação de curvas e pipelines lento e rápido. Mudanças matemáticas devem incluir um teste numérico ou algébrico correspondente.
 
 ## Manutenção da documentação
 

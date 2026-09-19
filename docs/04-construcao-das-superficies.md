@@ -8,6 +8,23 @@ A superfície característica \(\mathcal C\) contém os pontos em que os estados
 
 As superfícies sônicas são definidas implicitamente pela igualdade entre a velocidade da onda e uma velocidade característica. O app distingue a sônica esquerda \(\mathcal S^-\) e a direita \(\mathcal S^+\), separando em cada uma os ramos lento e rápido por meio de um indicador de ramo.
 
+Com
+
+\[
+P(z)=1+b_2z+(b_1-1)z^2,
+\qquad
+Q(z)=1+b_2(b_1+1)z-(b_1+1)z^2,
+\]
+
+a sônica direita é o nível zero de
+
+\[
+-2b_1(1+z^2)[(b_1+1)z^3-b_2+3z]\tau
+ +(1+z^2)Q(z)Y+2cP(z).
+\]
+
+A sônica esquerda é obtida pela simetria \(Y\mapsto-Y\).
+
 ## Superfícies saturadas
 
 Saturar uma curva significa reunir folhas de Hugoniot que partem dos seus pontos. O aplicativo inclui:
@@ -25,3 +42,11 @@ As superfícies implícitas são avaliadas numa grade limitada pela janela de de
 ## Compactificação de \(z\)
 
 Algumas construções usam uma representação compactificada da coordenada \(z\) para tratar ramos que se prolongam além de uma janela finita. A conversão é aplicada na geometria e desfeita quando um estado físico precisa ser recuperado.
+
+A coordenada visual usada pelo app é
+
+\[
+\widehat z=\frac{2}{\pi}\arctan z,
+\]
+
+de modo que \(z\in\mathbb R\) é representado por \(\widehat z\in(-1,1)\). A compactificação altera apenas a visualização; as equações continuam sendo avaliadas na coordenada física \(z\).

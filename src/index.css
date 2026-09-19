@@ -2022,7 +2022,7 @@ body {
 .inspection-mode-card {
   display: grid;
   gap: 8px;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid rgba(250, 204, 21, 0.26);
   border-radius: 8px;
   background:
@@ -2107,10 +2107,40 @@ body {
 .inspection-probe-card {
   display: grid;
   gap: 6px;
-  padding: 7px;
+  padding: 9px;
   border: 1px solid rgba(107, 134, 163, 0.32);
   border-radius: 8px;
   background: rgba(6, 18, 32, 0.72);
+  position: relative;
+  overflow: hidden;
+}
+
+.inspection-probe-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--probe-accent);
+}
+
+.inspection-probe-card.slow { --probe-accent: #fb7185; }
+.inspection-probe-card.fast { --probe-accent: #38bdf8; }
+
+.inspection-probe-title > span,
+.inspection-options-card > strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inspection-probe-title i,
+.inspection-options-card > strong i {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--probe-accent);
+  box-shadow: 0 0 9px color-mix(in srgb, var(--probe-accent) 72%, transparent);
 }
 
 .inspection-probe-card.empty {
@@ -2170,6 +2200,38 @@ body {
   font-weight: 700;
 }
 
+.inspection-probe-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.inspection-probe-metrics > div {
+  min-width: 0;
+  padding: 5px 4px;
+  border: 1px solid rgba(107, 134, 163, 0.16);
+  border-radius: 6px;
+  background: rgba(2, 9, 18, 0.56);
+  text-align: center;
+}
+
+.inspection-probe-metrics span {
+  display: block;
+  min-height: 14px;
+  color: #94a9bf;
+  font-size: 9px;
+}
+
+.inspection-probe-metrics strong {
+  display: block;
+  overflow: hidden;
+  color: #fff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+}
+
 .inspection-state-grid {
   display: grid;
   grid-template-columns: auto 1fr auto 1fr;
@@ -2186,6 +2248,32 @@ body {
 .inspection-state-grid strong {
   color: #ffffff;
   font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.inspection-options-card {
+  --probe-accent: #facc15;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(6, 18, 32, 0.58);
+}
+
+.inspection-options-card + .inspection-options-card {
+  margin-top: 6px;
+}
+
+.inspection-options-card.slow { --probe-accent: #fb7185; }
+.inspection-options-card.fast { --probe-accent: #38bdf8; }
+
+.inspection-options-card > strong {
+  margin-bottom: 6px;
+  color: #f8fafc;
+  font-size: 10px;
+}
+
+.inspection-options-card .toggle-grid {
+  gap: 3px;
 }
 
 .wm-left::-webkit-scrollbar,
@@ -2437,7 +2525,6 @@ body {
 .state-space-latex-label--hover {
   color: #facc15;
   background: rgba(15, 23, 42, 0.78);
-  transform: translate(11px, -24px) scale(1.05);
 }
 
 .state-space-coordinate-label {
@@ -2669,17 +2756,9 @@ body {
   font-size: 11px;
 }
 
-.wm-action-button.help span,
-.wm-action-button.about span {
+.wm-action-button.help span {
   font-weight: 900;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-.wm-open-documentation {
-  width: 100%;
-  margin-top: 2px;
-  color: #f8fafc;
-  cursor: pointer;
 }
 
 .wm-docs-backdrop {
@@ -2818,6 +2897,22 @@ body {
 .wm-docs-content p,
 .wm-docs-content ul {
   margin: 0 0 14px;
+}
+
+.wm-docs-content ol {
+  margin: 0 0 14px;
+  padding-left: 22px;
+}
+
+.wm-docs-content li + li {
+  margin-top: 5px;
+}
+
+.wm-docs-math {
+  margin: 12px 0 18px;
+  overflow-x: auto;
+  color: #f8fafc;
+  text-align: center;
 }
 
 .wm-docs-content code {
@@ -2975,8 +3070,8 @@ body {
 
 /* v30: painel de inspeção com altura fixa e tooltip junto ao cursor */
 .inspection-hover-card {
-  min-height: 142px;
-  height: 142px;
+  min-height: 122px;
+  height: 122px;
   overflow: hidden;
   align-content: start;
 }

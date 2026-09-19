@@ -3,7 +3,6 @@ import VisualizationControlsPanel from './VisualizationControlsPanel'
 import RightInfoPanel from './RightInfoPanel'
 import OverlayTopBar from './OverlayTopBar'
 import OverlaySettingsPanel from './OverlaySettingsPanel'
-import { AboutCard, HelpCard } from './FloatingInfoCards'
 import OverlayStage from './OverlayStage'
 import DocumentationViewer from './DocumentationViewer'
 import useOverlayPanelController from './useOverlayPanelController'
@@ -30,6 +29,7 @@ export default function OverlayPanel(props) {
     inspectionModeEnabled = false,
     inspectionProbesByBranch = { slow: null, fast: null },
     inspectionCurveVisibility = null,
+    onCreateInspectionProbe,
     onMoveInspectionProbe,
     setInspectionModeEnabled,
     canEnableInspectionMode = false,
@@ -89,23 +89,12 @@ export default function OverlayPanel(props) {
         solutionModeEnabled={solutionModeEnabled}
         setSolutionModeEnabled={setSolutionModeEnabled}
         onExportSnapshot={onExportSnapshot}
-        showHelpPanel={controller.showHelpPanel}
-        setShowHelpPanel={controller.setShowHelpPanel}
-        showAboutPanel={controller.showAboutPanel}
-        setShowAboutPanel={controller.setShowAboutPanel}
+        showDocumentation={controller.showDocumentation}
+        setShowDocumentation={controller.setShowDocumentation}
         showSettingsPanel={controller.showSettingsPanel}
         setShowSettingsPanel={controller.setShowSettingsPanel}
       />
 
-      <HelpCard
-        open={controller.showHelpPanel}
-        onClose={() => controller.setShowHelpPanel(false)}
-        onOpenDocumentation={() => {
-          controller.setShowHelpPanel(false)
-          controller.setShowDocumentation(true)
-        }}
-      />
-      <AboutCard open={controller.showAboutPanel} onClose={() => controller.setShowAboutPanel(false)} />
       <DocumentationViewer open={controller.showDocumentation} onClose={() => controller.setShowDocumentation(false)} />
 
       {controller.showSettingsPanel ? (
@@ -174,6 +163,7 @@ export default function OverlayPanel(props) {
         inspectionModeEnabled={inspectionModeEnabled}
         inspectionProbesByBranch={inspectionProbesByBranch}
         inspectionCurveVisibility={inspectionCurveVisibility}
+        onCreateInspectionProbe={onCreateInspectionProbe}
         onMoveInspectionProbe={onMoveInspectionProbe}
         resolution={resolution}
         solutionDiagnostics={solutionDiagnostics}

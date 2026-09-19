@@ -16,36 +16,34 @@ function shockSpeedForPoint(point, params) {
 }
 
 function curveLabel(point) {
-  if (point?.mode === 'curve') return point.attachedCurve ?? 'curva'
-  return 'caracteristica'
+  if (point?.attachedCurve) return point.attachedCurve
+  return 'característica'
 }
 
-export function ProbeRow({ label, point, params }) {
+export function ProbeRow({ branch, label, point, params }) {
   if (!point) {
     return (
-      <div className="inspection-probe-card empty">
+      <div className={`inspection-probe-card ${branch} empty`}>
         <div className="inspection-probe-title">
-          <span>{label}</span>
-          <strong>aguardando</strong>
+          <span><i aria-hidden="true" />{label}</span>
+          <strong>sem sonda</strong>
         </div>
-        <p>Clique em uma curva para criar esta sonda.</p>
+        <p>Clique próximo da característica desta família para criar a sonda.</p>
       </div>
     )
   }
 
   return (
-    <div className="inspection-probe-card">
+    <div className={`inspection-probe-card ${branch}`}>
       <div className="inspection-probe-title">
-        <span>{label}</span>
+        <span><i aria-hidden="true" />{label}</span>
         <strong>{curveLabel(point)}</strong>
       </div>
-      <div className="inspection-coordinate-line">
-        <MathLabel tex={"(\\tau,Y,z)"} />
-        <strong>({fmt(point.t)}, {fmt(point.Y ?? 0)}, {fmt(point.z)})</strong>
-      </div>
-      <div className="inspection-coordinate-line">
-        <MathLabel tex={"s"} />
-        <strong>{fmt(shockSpeedForPoint(point, params))}</strong>
+      <div className="inspection-probe-metrics">
+        <div><span><MathLabel tex={"\\tau"} /></span><strong>{fmt(point.t)}</strong></div>
+        <div><span><MathLabel tex={"Y"} /></span><strong>{fmt(point.Y ?? 0)}</strong></div>
+        <div><span><MathLabel tex={"z"} /></span><strong>{fmt(point.z)}</strong></div>
+        <div><span><MathLabel tex={"s"} /></span><strong>{fmt(shockSpeedForPoint(point, params))}</strong></div>
       </div>
       <div className="inspection-state-grid">
         <span><MathLabel tex={"u^-"} /></span><strong>{fmt(point.uMinus)}</strong>
@@ -98,20 +96,31 @@ export function HoverPointCard({ point, params }) {
   )
 }
 
-export function InspectionModeSummary() {
+export function InspectionModeSummary({ activeView = '3d', probeCount = 0 }) {
+  const inStateSpace = activeView === 'state'
   return (
     <div className="inspection-mode-card">
       <div className="inspection-mode-header">
         <span className="inspection-mode-dot" />
         <div>
           <strong>Inspeção ativa</strong>
-          <span>Hugoniot, rarefacao e marcadores locais</span>
+          <span>{probeCount}/2 sondas posicionadas</span>
         </div>
       </div>
       <div className="inspection-mode-actions">
-        <div><span>Criar</span><strong><MathLabel tex={"\\mathcal C_s"} /> ou <MathLabel tex={"\\mathcal C_f"} /></strong></div>
-        <div><span>Prender</span><strong>Ctrl + arrastar em H, R, K ou J</strong></div>
-        <div><span>Soltar</span><strong>arrastar sem Ctrl</strong></div>
+        {inStateSpace ? (
+          <>
+            <div><span>Criar</span><strong>clique próximo de <MathLabel tex={"C_s"} /> ou <MathLabel tex={"C_f"} /></strong></div>
+            <div><span>Mover</span><strong>arraste o marcador da sonda</strong></div>
+            <div><span>Sincroniza</span><strong>Variedade e Estados</strong></div>
+          </>
+        ) : (
+          <>
+            <div><span>Criar</span><strong>clique em <MathLabel tex={"\\mathcal C_s"} /> ou <MathLabel tex={"\\mathcal C_f"} /></strong></div>
+            <div><span>Prender</span><strong>Ctrl + arrastar em H, R, K ou J</strong></div>
+            <div><span>Soltar</span><strong>arrastar sem Ctrl</strong></div>
+          </>
+        )}
       </div>
     </div>
   )

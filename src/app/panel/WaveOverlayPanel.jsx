@@ -14,6 +14,7 @@ export default function WaveOverlayPanel({
   canEnableSolutionMode,
   setSolutionModeEnabled,
   onExportSnapshot,
+  onCreateInspectionProbe,
   onMoveInspectionProbe,
 }) {
   return (
@@ -165,6 +166,7 @@ export default function WaveOverlayPanel({
       setSolutionModeEnabled={setSolutionModeEnabled}
       canEnableSolutionMode={canEnableSolutionMode}
       inspectionProbesByBranch={state.inspectionProbesByBranch}
+      onCreateInspectionProbe={onCreateInspectionProbe}
       onMoveInspectionProbe={onMoveInspectionProbe}
       inspectionCurveVisibility={state.inspectionCurveVisibility}
       setInspectionCurveVisibility={actions.setInspectionCurveVisibility}

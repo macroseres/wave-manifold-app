@@ -208,7 +208,9 @@ function drawSelectedPoint(ctx, { branch, color, selectedMap, hoverBranch, dragg
   ctx.fillStyle = color
   ctx.strokeStyle = highlighted ? '#facc15' : '#ffffff'
   ctx.lineWidth = highlighted ? 3.5 : 2
-  ctx.beginPath(); ctx.arc(x, y, highlighted ? 9 : 7, 0, 2 * Math.PI); ctx.fill(); ctx.stroke()
+  // O hover altera somente o halo e a borda. Manter o raio constante evita
+  // que U_L e U_R pareçam saltar quando o ponteiro cruza a área de captura.
+  ctx.beginPath(); ctx.arc(x, y, 7, 0, 2 * Math.PI); ctx.fill(); ctx.stroke()
   ctx.restore()
 }
 

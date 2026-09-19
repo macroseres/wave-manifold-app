@@ -14,10 +14,8 @@ export default function OverlayTopBar({
   solutionModeEnabled,
   setSolutionModeEnabled,
   onExportSnapshot,
-  showHelpPanel,
-  setShowHelpPanel,
-  showAboutPanel,
-  setShowAboutPanel,
+  showDocumentation,
+  setShowDocumentation,
   showSettingsPanel,
   setShowSettingsPanel,
 }) {
@@ -89,25 +87,11 @@ export default function OverlayTopBar({
         </button>
         <button
           type="button"
-          title="Ajuda"
-          className={`wm-action-button help ${showHelpPanel ? 'active' : ''}`}
-          onClick={() => {
-            setShowHelpPanel((open) => !open)
-            setShowAboutPanel(false)
-          }}
+          title="Ajuda e documentação"
+          className={`wm-action-button help ${showDocumentation ? 'active' : ''}`}
+          onClick={() => setShowDocumentation((open) => !open)}
         >
           <span>?</span><strong>Ajuda</strong>
-        </button>
-        <button
-          type="button"
-          title="Sobre"
-          className={`wm-action-button about ${showAboutPanel ? 'active' : ''}`}
-          onClick={() => {
-            setShowAboutPanel((open) => !open)
-            setShowHelpPanel(false)
-          }}
-        >
-          <span>i</span><strong>Sobre</strong>
         </button>
         <button type="button" title="Configurações" className={`wm-action-button settings ${showSettingsPanel ? 'active' : ''}`} onClick={() => setShowSettingsPanel((open) => !open)}>
           <span>⚙</span><strong>Ajustes</strong>

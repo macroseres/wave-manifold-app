@@ -1,6 +1,6 @@
 # Documentação do Wave Manifold Explorer
 
-O Wave Manifold Explorer é um ambiente interativo para construir e visualizar a variedade de ondas associada a sistemas quadráticos de leis de conservação (2\times2).
+O Wave Manifold Explorer é um ambiente interativo para construir e visualizar soluções do problema de Riemann para o modelo quadrático de Schaeffer–Shearer. A variedade de ondas organiza choques, rarefações e ondas compostas de um sistema de leis de conservação \(2\times2\).
 
 ## Capítulos
 
@@ -11,4 +11,8 @@ O Wave Manifold Explorer é um ambiente interativo para construir e visualizar a
 5. [Inspeção e construção da solução](05-inspecao-e-solucao.md)
 6. [Métodos computacionais e desenvolvimento](06-metodos-e-desenvolvimento.md)
 
-Estes arquivos são a fonte única da documentação: o GitHub os apresenta diretamente e o aplicativo os incorpora durante o build.
+## Como ler
+
+Os capítulos 1 e 2 apresentam a notação e o uso do aplicativo. Os capítulos 3 e 4 descrevem os objetos matemáticos. O capítulo 5 acompanha o fluxo da inspeção até a solução, e o capítulo 6 documenta a implementação.
+
+Estes arquivos são a fonte única da documentação: o GitHub os apresenta diretamente e o aplicativo os incorpora durante o build. As fórmulas usam a mesma notação exibida na interface.

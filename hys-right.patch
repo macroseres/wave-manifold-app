@@ -1,0 +1,190 @@
+diff --git a/src/entities/inspection/diagnostics.js b/src/entities/inspection/diagnostics.js
+index 143ed7f..648295d 100644
+--- a/src/entities/inspection/diagnostics.js
++++ b/src/entities/inspection/diagnostics.js
+@@ -1,3 +1,4 @@
++import { legacyHysteresisRightImplicitF } from '../surfaceImplicit/sonic.js'
+ import {
+   computeLeftStateFromWavePoint,
+   computeRightStateFromWavePoint,
+@@ -103,7 +104,7 @@ export function inspectionResiduals(point, params, visibleSets = {}) {
+   const sMinus = sonicLeftImplicitF(Y, t, z, params)
+   const sPlus = sonicImplicitF(Y, t, z, params)
+   const hysPlus = hysteresisRightImplicitF(Y, t, z, params)
+-  const hysMinus = hysteresisRightImplicitF(-Y, t, z, params)
++  const hysMinus = legacyHysteresisRightImplicitF(-Y, t, z, params)
+ 
+   const entries = [
+     { key: 'S-', label: 'S^-', residual: scaledResidual(sMinus, scale), raw: sMinus, visible: visibleSets.sonicLeft !== false },
+@@ -135,3 +136,4 @@ export function compareInspectionPoints(a, b, params) {
+     dvPlus: pb.vPlus - pa.vPlus,
+   }
+ }
++
+diff --git a/src/entities/surfaceImplicit/sonic.js b/src/entities/surfaceImplicit/sonic.js
+index de25261..40f4ec2 100644
+--- a/src/entities/surfaceImplicit/sonic.js
++++ b/src/entities/surfaceImplicit/sonic.js
+@@ -47,17 +47,25 @@ export function solveSonicBranchSeparatorPoint(side, z, params) {
+   return { t, Y, z }
+ }
+ 
+-export function hysteresisRightImplicitF(Y, t, z, { b1, b2, c }) {
++export function rightHysteresisCoefficients(z, { b1, b2, c }) {
++  const k = b1 + 1
++  const hY = (1 + z * z) * (1 + 3 * k * z * z + b2 * k * k * z ** 3)
++  const hT = 2 * b1 * (1 + z * z) * (b2 - z + 2 * b2 * k * z * z - 3 * k * z ** 3)
++  const hC = 2 * c * (1 + b2 * z + k * z * z + 2 * b2 * k * z ** 3 - 2 * k * z ** 4)
++  return { hT, hY, hC }
++}
++
++export function hysteresisRightImplicitF(Y, t, z, params) {
++  // H_R = (det B_+)dot is the tangency condition of the Hugoniot locus
++  // to the right sonic surface. This is the literal H_R, not H_R + f S_R.
++  const { hT, hY, hC } = rightHysteresisCoefficients(z, params)
++  return hT * t + hY * Y + hC
++}
++
++export function legacyHysteresisRightImplicitF(Y, t, z, { b1, b2, c }) {
+   const q = Q(z, b1, b2)
+ 
+-// Condição de tangência da folha de Hugoniot à sônica direita.
+-// Hys+ é definida conjuntamente por S_R = 0 e H_R = 0.
+-// A expressão abaixo é uma forma equivalente de H_R = 0,
+-// multiplicada por 2z(1+z^2):
+-//
+-// -4b1(1+z^2)Q(z)t
+-// +(b1+1)(1+z^2)[b2 - 4z - b2(b1+1)z^2]Y
+-// -4czQ(z) = 0.
++  // Retained exclusively for the unchanged Hys- inspection diagnostic.
+   const tCoeff = -4 * b1 * (1 + z * z) * q
+   const yCoeff = (b1 + 1) * (1 + z * z) * (b2 - 4 * z - b2 * (b1 + 1) * z * z)
+   const constTerm = -4 * c * z * q
+@@ -66,6 +74,38 @@ export function hysteresisRightImplicitF(Y, t, z, { b1, b2, c }) {
+ }
+ 
+ export function solveRightHysteresisPoint(z, params) {
++  // At z=0 the two literal equations coincide. Preserve the finite limit
++  // of the parametrized branch (not a unique solution of that section).
++  if (z === 0) {
++    const point = solveLegacyRightHysteresisPoint(z, params)
++    return point && { ...point, systemDet: 0, degenerateSection: true }
++  }
++  const { b1, b2, c } = params
++  const p = P(z, b1, b2)
++  const q = Q(z, b1, b2)
++
++  // Resolve simultaneamente S_R=0 e H_R=0. Assim H_R e' renderizada
++  // como curva contida em S_R, e nao como superficie independente.
++  const sT = -2 * b1 * (1 + z * z) * ((b1 + 1) * z ** 3 - b2 + 3 * z)
++  const sY = (1 + z * z) * q
++  const sC = 2 * c * p
++
++  const { hT, hY, hC } = rightHysteresisCoefficients(z, params)
++
++  const det = sT * hY - sY * hT
++  if (!Number.isFinite(det) || Math.abs(det / z) < 1e-10) return null
++
++  const t = (-sC * hY + sY * hC) / det
++  const Y = (-sT * hC + sC * hT) / det
++
++  if (!Number.isFinite(Y) || !Number.isFinite(t)) return null
++
++  // det(system) = -z * det(previous parametrization). Consumers use det
++  // only to detect genuine poles; do not introduce a false seam at z=0.
++  return { t, Y, z, det: -det / z, systemDet: det }
++}
++
++function solveLegacyRightHysteresisPoint(z, params) {
+   const { b1, b2, c } = params
+   const p = P(z, b1, b2)
+   const q = Q(z, b1, b2)
+@@ -93,7 +133,7 @@ export function solveRightHysteresisPoint(z, params) {
+ 
+ // Hys^- = S^- cap H_L and, by symmetry, Hys^-(z) = (t_+(z), -Y_+(z), z).
+ export function solveLeftHysteresisPoint(z, params) {
+-  const point = solveRightHysteresisPoint(z, params)
++  const point = solveLegacyRightHysteresisPoint(z, params)
+   if (!point) return null
+   return { ...point, Y: -point.Y, coords: [point.t, -point.Y, point.z] }
+ }
+@@ -109,3 +149,5 @@ export function sonicLineYCoeff(z, { b1, b2 }) {
+ export function sonicLineConst(z, { b1, b2, c }) {
+   return 2 * c * P(z, b1, b2)
+ }
++
++
+diff --git a/tests/hysMinusProjection.test.js b/tests/hysMinusProjection.test.js
+index 890227b..b1d6268 100644
+--- a/tests/hysMinusProjection.test.js
++++ b/tests/hysMinusProjection.test.js
+@@ -10,9 +10,15 @@ test('Hys-minus projections equal opposite Hys-plus projections across the exten
+       const left = solveLeftHysteresisPoint(z, params)
+       const right = solveRightHysteresisPoint(z, params)
+       assert.ok(left && right)
+-      const coordinates = ({ u, v }) => ({ u, v })
+-      assert.deepEqual(coordinates(projectPointMinus(left, params)), coordinates(projectPointPlus(right, params)))
+-      assert.deepEqual(coordinates(projectPointPlus(left, params)), coordinates(projectPointMinus(right, params)))
++      const close = (a, b) => {
++        for (const axis of ['u', 'v']) {
++          assert.ok(Math.abs(a[axis] - b[axis]) <= 1e-10 * Math.max(1, Math.abs(a[axis]), Math.abs(b[axis])))
++        }
++      }
++      // The right solver now uses the literal tangency polynomial, while
++      // the left solver preserves its original arithmetic and roundoff.
++      close(projectPointMinus(left, params), projectPointPlus(right, params))
++      close(projectPointPlus(left, params), projectPointMinus(right, params))
+     }
+   }
+ })
+diff --git a/tests/hysteresisRightLiteral.test.js b/tests/hysteresisRightLiteral.test.js
+new file mode 100644
+index 0000000..639a1df
+--- /dev/null
++++ b/tests/hysteresisRightLiteral.test.js
+@@ -0,0 +1,45 @@
++import test from 'node:test'
++import assert from 'node:assert/strict'
++import { hysteresisRightImplicitF, rightHysteresisCoefficients, solveRightHysteresisPoint, solveLeftHysteresisPoint, sonicImplicitF } from '../src/entities/surfaceImplicit/sonic.js'
++import { projectPointMinus, projectPointPlus } from '../src/entities/geometry/stateProjections.js'
++import { hysPlusMinusImplicit, hysPlusPlusImplicit } from '../src/entities/hysteresis/stateImplicit/index.js'
++
++const params = { b1: 8, b2: 0.2, c: 1 }
++test('H_R is the literal tangency polynomial even away from S_R', () => {
++  for (const z of [-3, -0.2, 0, 0.7, 4]) {
++    const { b1, b2, c } = params, t = 0.37, Y = -0.81
++    const expected = (1 + z ** 2) * (1 + 3 * (b1 + 1) * z ** 2 + b2 * (b1 + 1) ** 2 * z ** 3) * Y
++      + 2 * b1 * (1 + z ** 2) * (b2 - z + 2 * b2 * (b1 + 1) * z ** 2 - 3 * (b1 + 1) * z ** 3) * t
++      + 2 * c * (1 + b2 * z + (b1 + 1) * z ** 2 + 2 * b2 * (b1 + 1) * z ** 3 - 2 * (b1 + 1) * z ** 4)
++    assert.ok(Math.abs(hysteresisRightImplicitF(Y, t, z, params) - expected) < 1e-12 * Math.max(1, Math.abs(expected)))
++  }
++})
++
++test('right solver satisfies both equations and the existing projected eliminations', () => {
++  for (const z of [-10, -1, -0.2, 0, 0.2, 1, 10]) {
++    const p = solveRightHysteresisPoint(z, params)
++    assert.ok(p)
++    const { hT, hY, hC } = rightHysteresisCoefficients(z, params)
++    const scale = 1 + Math.abs(hT * p.t) + Math.abs(hY * p.Y) + Math.abs(hC)
++    assert.ok(Math.abs(hysteresisRightImplicitF(p.Y, p.t, z, params)) / scale < 1e-12)
++    assert.ok(Math.abs(sonicImplicitF(p.Y, p.t, z, params)) / scale < 1e-12)
++    for (const [project, implicit] of [[projectPointMinus, hysPlusMinusImplicit], [projectPointPlus, hysPlusPlusImplicit]]) {
++      const q = project(p, params)
++      assert.ok(Math.abs(implicit(q.u, q.v, params)) < 1e-4 * (1 + Math.abs(q.u) + Math.abs(q.v)) ** 3)
++    }
++  }
++})
++
++test('zero section is explicitly degenerate and preserves the finite branch limit', () => {
++  const p = solveRightHysteresisPoint(0, params)
++  assert.equal(p.systemDet, 0)
++  assert.equal(p.degenerateSection, true)
++  assert.ok(p.det !== 0)
++})
++
++test('left hysteresis retains its previous numerical result', () => {
++  assert.deepEqual(solveLeftHysteresisPoint(0, params), {
++    t: -0.09533898305084747, Y: 1.6949152542372883, z: 0, det: 37.76,
++    coords: [-0.09533898305084747, 1.6949152542372883, 0],
++  })
++})

@@ -31,12 +31,15 @@ function renderMarkdown(source) {
   const lines = source.trim().split(/\r?\n/)
   const nodes = []
   let list = []
+  let listType = 'ul'
   let code = []
   let inCode = false
+  let math = null
 
   const flushList = () => {
     if (!list.length) return
-    nodes.push(<ul key={`list-${nodes.length}`}>{list.map((item, index) => <li key={index}>{inlineMarkdown(item)}</li>)}</ul>)
+    const List = listType
+    nodes.push(<List key={`list-${nodes.length}`}>{list.map((item, index) => <li key={index}>{inlineMarkdown(item)}</li>)}</List>)
     list = []
   }
   const flushCode = () => {
@@ -46,6 +49,20 @@ function renderMarkdown(source) {
   }
 
   lines.forEach((line) => {
+    if (line.trim() === '\\[') {
+      flushList()
+      math = []
+      return
+    }
+    if (line.trim() === '\\]' && math) {
+      nodes.push(<div className="wm-docs-math" key={`math-${nodes.length}`}>{`\\[${math.join('\n')}\\]`}</div>)
+      math = null
+      return
+    }
+    if (math) {
+      math.push(line)
+      return
+    }
     if (line.startsWith('```')) {
       if (inCode) flushCode()
       else flushList()
@@ -64,9 +81,12 @@ function renderMarkdown(source) {
       nodes.push(<Tag key={`heading-${nodes.length}`}>{inlineMarkdown(heading[2])}</Tag>)
       return
     }
-    const item = line.match(/^[-*]\s+(.+)$/)
+    const item = line.match(/^([-*]|\d+\.)\s+(.+)$/)
     if (item) {
-      list.push(item[1])
+      const nextListType = item[1].endsWith('.') ? 'ol' : 'ul'
+      if (list.length && nextListType !== listType) flushList()
+      listType = nextListType
+      list.push(item[2])
       return
     }
     flushList()

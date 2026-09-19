@@ -47,17 +47,25 @@ export function solveSonicBranchSeparatorPoint(side, z, params) {
   return { t, Y, z }
 }
 
-export function hysteresisRightImplicitF(Y, t, z, { b1, b2, c }) {
+export function rightHysteresisCoefficients(z, { b1, b2, c }) {
+  const k = b1 + 1
+  const hY = (1 + z * z) * (1 + 3 * k * z * z + b2 * k * k * z ** 3)
+  const hT = 2 * b1 * (1 + z * z) * (b2 - z + 2 * b2 * k * z * z - 3 * k * z ** 3)
+  const hC = 2 * c * (1 + b2 * z + k * z * z + 2 * b2 * k * z ** 3 - 2 * k * z ** 4)
+  return { hT, hY, hC }
+}
+
+export function hysteresisRightImplicitF(Y, t, z, params) {
+  // H_R = (det B_+)dot is the tangency condition of the Hugoniot locus
+  // to the right sonic surface. This is the literal H_R, not H_R + f S_R.
+  const { hT, hY, hC } = rightHysteresisCoefficients(z, params)
+  return hT * t + hY * Y + hC
+}
+
+export function legacyHysteresisRightImplicitF(Y, t, z, { b1, b2, c }) {
   const q = Q(z, b1, b2)
 
-// Condição de tangência da folha de Hugoniot à sônica direita.
-// Hys+ é definida conjuntamente por S_R = 0 e H_R = 0.
-// A expressão abaixo é uma forma equivalente de H_R = 0,
-// multiplicada por 2z(1+z^2):
-//
-// -4b1(1+z^2)Q(z)t
-// +(b1+1)(1+z^2)[b2 - 4z - b2(b1+1)z^2]Y
-// -4czQ(z) = 0.
+  // Retained exclusively for the unchanged Hys- inspection diagnostic.
   const tCoeff = -4 * b1 * (1 + z * z) * q
   const yCoeff = (b1 + 1) * (1 + z * z) * (b2 - 4 * z - b2 * (b1 + 1) * z * z)
   const constTerm = -4 * c * z * q
@@ -66,6 +74,30 @@ export function hysteresisRightImplicitF(Y, t, z, { b1, b2, c }) {
 }
 
 export function solveRightHysteresisPoint(z, params) {
+  const { b1, b2, c } = params
+  const p = P(z, b1, b2)
+  const q = Q(z, b1, b2)
+
+  // Resolve simultaneamente S_R=0 e H_R=0. Assim H_R e' renderizada
+  // como curva contida em S_R, e nao como superficie independente.
+  const sT = -2 * b1 * (1 + z * z) * ((b1 + 1) * z ** 3 - b2 + 3 * z)
+  const sY = (1 + z * z) * q
+  const sC = 2 * c * p
+
+  const { hT, hY, hC } = rightHysteresisCoefficients(z, params)
+
+  const det = sT * hY - sY * hT
+  if (!Number.isFinite(det) || Math.abs(det / z) < 1e-10) return null
+
+  const t = (-sC * hY + sY * hC) / det
+  const Y = (-sT * hC + sC * hT) / det
+
+  if (!Number.isFinite(Y) || !Number.isFinite(t)) return null
+
+  return { t, Y, z, det }
+}
+
+function solveLegacyRightHysteresisPoint(z, params) {
   const { b1, b2, c } = params
   const p = P(z, b1, b2)
   const q = Q(z, b1, b2)
@@ -93,7 +125,7 @@ export function solveRightHysteresisPoint(z, params) {
 
 // Hys^- = S^- cap H_L and, by symmetry, Hys^-(z) = (t_+(z), -Y_+(z), z).
 export function solveLeftHysteresisPoint(z, params) {
-  const point = solveRightHysteresisPoint(z, params)
+  const point = solveLegacyRightHysteresisPoint(z, params)
   if (!point) return null
   return { ...point, Y: -point.Y, coords: [point.t, -point.Y, point.z] }
 }
@@ -109,3 +141,5 @@ export function sonicLineYCoeff(z, { b1, b2 }) {
 export function sonicLineConst(z, { b1, b2, c }) {
   return 2 * c * P(z, b1, b2)
 }
+
+

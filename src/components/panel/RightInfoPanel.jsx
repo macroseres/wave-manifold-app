@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Section } from './PanelPrimitives'
-import { ProbeRow, HoverPointCard } from './rightInfo/inspectionCards'
+import { ProbeRow, HoverPointCard, InspectionModeSummary } from './rightInfo/inspectionCards'
 import { ProbeCurveOptions } from './rightInfo/inspectionOptions'
 import { SolutionCurveOptions } from './rightInfo/solutionOptions'
 import { defaultCurveVisibility, defaultSolutionVisibility } from './rightInfo/panelDefaults'
@@ -41,6 +41,7 @@ function SolutionTab({ solutionCurveVisibility, setSolutionCurveVisibility }) {
 }
 
 function InspectionTab({
+  activeView,
   slowPoint,
   fastPoint,
   hoveredInspectionPoint,
@@ -50,16 +51,17 @@ function InspectionTab({
 }) {
   return (
     <div className="right-mode-content" role="tabpanel" aria-label="Modo Inspecao">
-      <Section title="Modo Inspecao" defaultOpen={true} accent="#facc15">
-        <HoverPointCard point={hoveredInspectionPoint} params={params} />
+      <InspectionModeSummary activeView={activeView} probeCount={[slowPoint, fastPoint].filter(Boolean).length} />
+      <Section title="Sondas" defaultOpen={true} accent="#facc15">
+        {activeView === '3d' ? <HoverPointCard point={hoveredInspectionPoint} params={params} /> : null}
         <div className="inspection-probe-stack">
-          <ProbeRow label="Sonda lenta" point={slowPoint} params={params} />
-          <ProbeRow label="Sonda rapida" point={fastPoint} params={params} />
+          <ProbeRow branch="slow" label="Sonda lenta" point={slowPoint} params={params} />
+          <ProbeRow branch="fast" label="Sonda rápida" point={fastPoint} params={params} />
         </div>
       </Section>
-      <Section title="Opcoes da inspecao" defaultOpen={true} accent="#38bdf8">
-        <ProbeCurveOptions branch="slow" title="Sonda lenta" visibility={inspectionCurveVisibility} setVisibility={setInspectionCurveVisibility} />
-        <ProbeCurveOptions branch="fast" title="Sonda rapida" visibility={inspectionCurveVisibility} setVisibility={setInspectionCurveVisibility} />
+      <Section title="Curvas pelas sondas" defaultOpen={true} accent="#38bdf8">
+        <ProbeCurveOptions branch="slow" title="Família lenta" visibility={inspectionCurveVisibility} setVisibility={setInspectionCurveVisibility} />
+        <ProbeCurveOptions branch="fast" title="Família rápida" visibility={inspectionCurveVisibility} setVisibility={setInspectionCurveVisibility} />
       </Section>
     </div>
   )
@@ -80,6 +82,7 @@ function ShortcutSection() {
 }
 
 export default function RightInfoPanel({
+  activeView = '3d',
   inspectionModeEnabled = false,
   solutionModeEnabled = false,
   inspectionProbesByBranch = { slow: null, fast: null },
@@ -116,6 +119,7 @@ export default function RightInfoPanel({
       {showSolutionTab ? <SolutionTab solutionCurveVisibility={solutionCurveVisibility} setSolutionCurveVisibility={setSolutionCurveVisibility} /> : null}
       {showInspectionTab ? (
         <InspectionTab
+          activeView={activeView}
           slowPoint={slowPoint}
           fastPoint={fastPoint}
           hoveredInspectionPoint={hoveredInspectionPoint}

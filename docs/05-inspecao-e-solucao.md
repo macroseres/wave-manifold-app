@@ -2,9 +2,11 @@
 
 ## Modo de inspeção
 
-O modo de inspeção fica disponível depois que ao menos um estado inicial é selecionado. Uma sonda pode ser criada e movida sobre a variedade. Ao arrastá-la com `Ctrl`, ela procura o ponto mais próximo entre as curvas disponíveis.
+O modo de inspeção fica disponível depois que ao menos um estado inicial é selecionado. Uma sonda lenta e uma sonda rápida podem ser criadas e movidas tanto na variedade quanto no espaço de estados. Ao arrastar uma sonda com `Ctrl` na vista 3D, ela procura o ponto mais próximo entre as curvas disponíveis.
 
 Para cada sonda, o app pode mostrar as duas orientações de Hugoniot e a rarefação associada. Marcadores de interseção e informações do ponto ajudam a comparar estados, coordenadas e velocidades.
+
+O painel de inspeção apresenta \((\tau,Y,z)\), a velocidade \(s\) e os dois estados \((u^-,v^-)\) e \((u^+,v^+)\). Os mesmos dados são preservados quando o usuário alterna entre **Variedade** e **Estados**.
 
 ## Modo solução
 
@@ -19,6 +21,8 @@ Cada grupo pode combinar arcos de Hugoniot, rarefação e composta. Os arcos sã
 ## Admissibilidade e orientação
 
 Os segmentos são orientados a partir de suas âncoras e filtrados segundo a variação da velocidade. Interseções sônicas, pontos de inflexão e encontros entre curvas delimitam os trechos que podem permanecer na solução.
+
+As convenções implementadas são: a rarefação lenta percorre o sentido de velocidade crescente; a rarefação rápida percorre o sentido de velocidade decrescente; os choques e as compostas são recortados de acordo com a orientação admissível da cadeia correspondente.
 
 ## Perfil e diagnósticos
 

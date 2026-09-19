@@ -18,12 +18,12 @@ export function ProbeCurveOptions({ branch, title, visibility, setVisibility }) 
   }
 
   return (
-    <div className="mode-status-card inspection-options-card">
-      <strong>{title}</strong>
+    <div className={`mode-status-card inspection-options-card ${branch}`}>
+      <strong><i aria-hidden="true" />{title}</strong>
       <div className="toggle-grid">
-        <Toggle checked={values.hugoniotMinus !== false} onChange={(checked) => update('hugoniotMinus', checked)} label={<><MathLabel tex={"\\mathcal H_-"} /><span> passando pela sonda</span></>} color="#d4af37" />
-        <Toggle checked={values.hugoniotPlus !== false} onChange={(checked) => update('hugoniotPlus', checked)} label={<><MathLabel tex={"\\mathcal H_+"} /><span> passando pela sonda</span></>} color="#d4af37" />
-        <Toggle checked={values.rarefaction !== false} onChange={(checked) => update('rarefaction', checked)} label={<><MathLabel tex={"\\mathcal R"} /><span> passando pela sonda</span></>} color="#d4af37" />
+        <Toggle checked={values.hugoniotMinus !== false} onChange={(checked) => update('hugoniotMinus', checked)} label={<><MathLabel tex={"\\mathcal H_-"} /><span> Hugoniot −</span></>} color="#d4af37" />
+        <Toggle checked={values.hugoniotPlus !== false} onChange={(checked) => update('hugoniotPlus', checked)} label={<><MathLabel tex={"\\mathcal H_+"} /><span> Hugoniot +</span></>} color="#d4af37" />
+        <Toggle checked={values.rarefaction !== false} onChange={(checked) => update('rarefaction', checked)} label={<><MathLabel tex={"\\mathcal R"} /><span> Rarefação</span></>} color="#d4af37" />
       </div>
     </div>
   )
