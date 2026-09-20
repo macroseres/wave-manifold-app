@@ -39,3 +39,9 @@ Os testes cobrem equações implícitas, compactificação, projeções, interse
 ## Manutenção da documentação
 
 Os seis arquivos Markdown de `docs/` alimentam simultaneamente a leitura no GitHub e a janela de documentação do app. Alterações conceituais devem ser feitas nesses arquivos; o próximo build incorporará o mesmo conteúdo na aplicação.
+
+## Escopo matemático atual
+
+O núcleo implementado cobre a variedade de ondas do modelo de Schaeffer–Shearer, suas projeções, curvas de Hugoniot e rarefação, curvas de inflexão e coincidência, superfícies sônicas, saturações e cadeias compostas usadas pelo solucionador.
+
+A teoria geral permite refinar a variedade em câmaras determinadas pelos sinais do determinante, traço e discriminante de \(DF(U^\pm)-sI\). O aplicativo já utiliza parte dessa estrutura por meio das superfícies sônicas e das saturações da coincidência, mas ainda não oferece uma classificação espectral completa das câmaras, superfícies de Hopf ou choques complexos e subcompressivos. Essa distinção deve ser preservada em futuras extensões e na redação da interface.

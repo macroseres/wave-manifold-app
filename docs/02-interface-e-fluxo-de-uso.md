@@ -11,7 +11,7 @@
 
 1. Escolha um caso de Schaeffer–Shearer ou ajuste os parâmetros.
 2. Ative no painel esquerdo as superfícies e curvas de interesse.
-3. Na superfície característica, clique para selecionar \(C_s\) e use `Shift` + clique para selecionar \(C_f\). Os pontos determinam \(U_L\) e \(U_R\).
+3. Fazer clique na superfície característica, se o clique for na \(C_s\) o ponto determina \(U_L\) e se o clique for na \(C_f\) o ponto determina \(U_R\).
 4. Ative **Inspeção** para examinar curvas ligadas a um estado, tanto na variedade quanto no espaço de estados.
 5. Com os dois estados selecionados, ative **Solução** para construir os arcos admissíveis.
 6. Compare a variedade 3D, o espaço de estados e o perfil resultante.

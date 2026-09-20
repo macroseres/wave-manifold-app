@@ -61,6 +61,8 @@ export default function VisualizationControlsPanel({
   setShowExtensionCoincidenceMinus,
   setShowExtensionCoincidencePlus,
   setShowSonicLeft,
+  setShowHopfPlus,
+  setShowHopfMinus,
   setShowSonicRight,
   showAxes,
   showBifurcationRight,
@@ -116,6 +118,8 @@ export default function VisualizationControlsPanel({
   showExtensionCoincidenceMinus,
   showExtensionCoincidencePlus,
   showSonicLeft,
+  showHopfPlus,
+  showHopfMinus,
   showSonicRight,
   waveColors,
 }) {
@@ -133,15 +137,15 @@ export default function VisualizationControlsPanel({
           <Toggle checked={showRarefactionFastMinusProjection} onChange={setShowRarefactionFastMinusProjection} label={<MathLabel tex="\pi_-(R_+(U_R))" />} color={waveColors.rarefactionFast} />
           <Toggle checked={showCompositeSlowMinusProjection} onChange={setShowCompositeSlowMinusProjection} label={<MathLabel tex="\pi_-(K_-(U_L))" />} color={waveColors.compositeSlow} />
           <Toggle checked={showCompositeFastMinusProjection} onChange={setShowCompositeFastMinusProjection} label={<MathLabel tex="\pi_-(K_+(U_R))" />} color={waveColors.compositeFast} />
-          <Toggle checked={showDoubleSonicMinusProjection} onChange={setShowDoubleSonicMinusProjection} label={<><MathLabel tex={"\\pi_-(\\mathcal{DS})"} /><span> : Dupla sônica</span></>} color={waveColors.doubleSonic} />
+          <Toggle checked={showDoubleSonicMinusProjection} onChange={setShowDoubleSonicMinusProjection} label={<><MathLabel tex="\pi_-(\mathcal{DS})" /><span> : Dupla sônica</span></>} color={waveColors.doubleSonic} />
           <Toggle checked={showHugoniotMinusMinusProjection} onChange={setShowHugoniotMinusMinusProjection} label={<MathLabel tex="\pi_-(H_-(U_L))" />} color={waveColors.hugoniotMinus} />
           <Toggle checked={showHugoniotPlusMinusProjection} onChange={setShowHugoniotPlusMinusProjection} label={<MathLabel tex="\pi_-(H_+(U_R))" />} color={waveColors.hugoniotPlus} />
-          <Toggle checked={showHysteresisSelfIntersectionMinusProjection} onChange={setShowHysteresisSelfIntersectionMinusProjection} label={<><MathLabel tex={"\\pi_-(\\operatorname{sat}_{-}^{*}(\\operatorname{Hys}^{+}))"} /><span> : Autointerseção</span></>} color={waveColors.hysteresisSelfIntersection} />
-          <Toggle checked={showExtensionMinusMinusProjection} onChange={setShowExtensionMinusMinusProjection} label={<><MathLabel tex={"\\pi_-(\\operatorname{ext}_-(\\mathcal{E}))"} /><span> : Inclusão na coincidência</span></>} color={waveColors.extensionCoincidenceMinus} />
-          <Toggle checked={showExtensionPlusMinusProjection} onChange={setShowExtensionPlusMinusProjection} label={<><MathLabel tex={"\\pi_-(\\operatorname{ext}_+(\\mathcal{E}))"} /><span> : Projeção da extensão</span></>} color={waveColors.extensionCoincidencePlus} />
-          <Toggle checked={showInflectionMinusProjection} onChange={setShowInflectionMinusProjection} label={<MathLabel tex={"\\pi_-(\\mathcal{J})"} />} color={waveColors.inflection} />
-          <Toggle checked={showHysPlusMinusProjection} onChange={setShowHysPlusMinusProjection} label={<><MathLabel tex={"\\pi_-(\\operatorname{Hys}^+)"} /><span> : Projeção no espaço de estados</span></>} color={waveColors.hysPlusMinusProjection} />
-          <Toggle checked={showHysMinusMinusProjection} onChange={setShowHysMinusMinusProjection} label={<><MathLabel tex={"\\pi_-(\\operatorname{Hys}^-)"} /><span> : Projeção no espaço de estados</span></>} color={waveColors.hysMinusMinusProjection} />
+          <Toggle checked={showHysteresisSelfIntersectionMinusProjection} onChange={setShowHysteresisSelfIntersectionMinusProjection} label={<><MathLabel tex="\pi_-(\operatorname{sat}_{-}^{*}(\operatorname{Hys}^{+}))" /><span> : Autointerseção</span></>} color={waveColors.hysteresisSelfIntersection} />
+          <Toggle checked={showExtensionMinusMinusProjection} onChange={setShowExtensionMinusMinusProjection} label={<><MathLabel tex="\pi_-(\operatorname{ext}_-(\mathcal{E}))" /><span> : Inclusão na coincidência</span></>} color={waveColors.extensionCoincidenceMinus} />
+          <Toggle checked={showExtensionPlusMinusProjection} onChange={setShowExtensionPlusMinusProjection} label={<><MathLabel tex="\pi_-(\operatorname{ext}_+(\mathcal{E}))" /><span> : Projeção da extensão</span></>} color={waveColors.extensionCoincidencePlus} />
+          <Toggle checked={showInflectionMinusProjection} onChange={setShowInflectionMinusProjection} label={<MathLabel tex="\pi_-(\mathcal{J})" />} color={waveColors.inflection} />
+          <Toggle checked={showHysPlusMinusProjection} onChange={setShowHysPlusMinusProjection} label={<><MathLabel tex="\pi_-(\operatorname{Hys}^+)" /><span> : Projeção no espaço de estados</span></>} color={waveColors.hysPlusMinusProjection} />
+          <Toggle checked={showHysMinusMinusProjection} onChange={setShowHysMinusMinusProjection} label={<><MathLabel tex="\pi_-(\operatorname{Hys}^-)" /><span> : Projeção no espaço de estados</span></>} color={waveColors.hysMinusMinusProjection} />
         </div>
       </Section>
       <Section title={<>Projeções <MathLabel tex="\pi_+" /></>} defaultOpen={true} accent="#f472b6">
@@ -153,13 +157,13 @@ export default function VisualizationControlsPanel({
           <Toggle checked={showRarefactionFastPlusProjection} onChange={setShowRarefactionFastPlusProjection} label={<MathLabel tex="\pi_+(R_+(U_R))" />} color={waveColors.rarefactionFast} />
           <Toggle checked={showCompositeSlowPlusProjection} onChange={setShowCompositeSlowPlusProjection} label={<MathLabel tex="\pi_+(K_-(U_L))" />} color={waveColors.compositeSlow} />
           <Toggle checked={showCompositeFastPlusProjection} onChange={setShowCompositeFastPlusProjection} label={<MathLabel tex="\pi_+(K_+(U_R))" />} color={waveColors.compositeFast} />
-          <Toggle checked={showDoubleSonicPlusProjection} onChange={setShowDoubleSonicPlusProjection} label={<><MathLabel tex={"\\pi_+(\\mathcal{DS})"} /><span> : Dupla sônica</span></>} color={waveColors.doubleSonic} />
-          <Toggle checked={showHysteresisSelfIntersectionPlusProjection} onChange={setShowHysteresisSelfIntersectionPlusProjection} label={<><MathLabel tex={"\\pi_+(\\operatorname{sat}_{-}^{*}(\\operatorname{Hys}^{+}))"} /><span> : Autointerseção</span></>} color={waveColors.hysteresisSelfIntersection} />
-          <Toggle checked={showExtensionMinusPlusProjection} onChange={setShowExtensionMinusPlusProjection} label={<><MathLabel tex={"\\pi_+(\\operatorname{ext}_-(\\mathcal{E}))"} /><span> : Projeção da extensão</span></>} color={waveColors.extensionCoincidenceMinus} />
-          <Toggle checked={showExtensionPlusPlusProjection} onChange={setShowExtensionPlusPlusProjection} label={<><MathLabel tex={"\\pi_+(\\operatorname{ext}_+(\\mathcal{E}))"} /><span> : Inclusão na coincidência</span></>} color={waveColors.extensionCoincidencePlus} />
-          <Toggle checked={showInflectionPlusProjection} onChange={setShowInflectionPlusProjection} label={<MathLabel tex={"\\pi_+(\\mathcal{J})"} />} color={waveColors.inflection} />
-          <Toggle checked={showHysPlusPlusProjection} onChange={setShowHysPlusPlusProjection} label={<><MathLabel tex={"\\pi_+(\\operatorname{Hys}^+)"} /><span> : Projeção no espaço de estados</span></>} color={waveColors.hysPlusPlusProjection} />
-          <Toggle checked={showHysMinusPlusProjection} onChange={setShowHysMinusPlusProjection} label={<><MathLabel tex={"\\pi_+(\\operatorname{Hys}^-)"} /><span> : Projeção no espaço de estados</span></>} color={waveColors.hysMinusPlusProjection} />
+          <Toggle checked={showDoubleSonicPlusProjection} onChange={setShowDoubleSonicPlusProjection} label={<><MathLabel tex="\pi_+(\mathcal{DS})" /><span> : Dupla sônica</span></>} color={waveColors.doubleSonic} />
+          <Toggle checked={showHysteresisSelfIntersectionPlusProjection} onChange={setShowHysteresisSelfIntersectionPlusProjection} label={<><MathLabel tex="\pi_+(\operatorname{sat}_{-}^{*}(\operatorname{Hys}^{+}))" /><span> : Autointerseção</span></>} color={waveColors.hysteresisSelfIntersection} />
+          <Toggle checked={showExtensionMinusPlusProjection} onChange={setShowExtensionMinusPlusProjection} label={<><MathLabel tex="\pi_+(\operatorname{ext}_-(\mathcal{E}))" /><span> : Projeção da extensão</span></>} color={waveColors.extensionCoincidenceMinus} />
+          <Toggle checked={showExtensionPlusPlusProjection} onChange={setShowExtensionPlusPlusProjection} label={<><MathLabel tex="\pi_+(\operatorname{ext}_+(\mathcal{E}))" /><span> : Inclusão na coincidência</span></>} color={waveColors.extensionCoincidencePlus} />
+          <Toggle checked={showInflectionPlusProjection} onChange={setShowInflectionPlusProjection} label={<MathLabel tex="\pi_+(\mathcal{J})" />} color={waveColors.inflection} />
+          <Toggle checked={showHysPlusPlusProjection} onChange={setShowHysPlusPlusProjection} label={<><MathLabel tex="\pi_+(\operatorname{Hys}^+)" /><span> : Projeção no espaço de estados</span></>} color={waveColors.hysPlusPlusProjection} />
+          <Toggle checked={showHysMinusPlusProjection} onChange={setShowHysMinusPlusProjection} label={<><MathLabel tex="\pi_+(\operatorname{Hys}^-)" /><span> : Projeção no espaço de estados</span></>} color={waveColors.hysMinusPlusProjection} />
         </div>
       </Section>
       </>
@@ -168,44 +172,44 @@ export default function VisualizationControlsPanel({
       <Section title="Referências geométricas" defaultOpen={true} accent="#38bdf8">
         <div className="toggle-grid">
           <Toggle checked={showAxes} onChange={setShowAxes} label="Eixos" />
-          <Toggle checked={showCharacteristic} onChange={setShowCharacteristic} label={<><MathLabel tex={"\\mathcal{C}"} /><span> : Características</span></>} color={waveColors.characteristicFast} />
-          <Toggle checked={showCoincidence} onChange={setShowCoincidence} label={<><MathLabel tex={"\\mathcal{E}"} /><span> : Coincidência </span></>} color={waveColors.coincidence} />
+          <Toggle checked={showCharacteristic} onChange={setShowCharacteristic} label={<><MathLabel tex="\mathcal{C}" /><span> : Características</span></>} color={waveColors.characteristicFast} />
+          <Toggle checked={showCoincidence} onChange={setShowCoincidence} label={<><MathLabel tex="\mathcal{E}" /><span> : Coincidência </span></>} color={waveColors.coincidence} />
         </div>
       </Section>
       <Section title="Superfícies e fronteiras" defaultOpen={true} accent="#f97316">
         <div className="toggle-grid">
-          <Toggle checked={showSonicLeft} onChange={setShowSonicLeft} label={<><MathLabel tex={"\\mathcal{S}^- = \\mathcal{S}^-_s \\cup\\mathcal{S}^-_f"} /><span> : Sônica Esquerda</span></>} color={waveColors.sonicLeftSlow} />
-          <Toggle checked={showSonicRight} onChange={setShowSonicRight} label={<><MathLabel tex={"\\mathcal{S}^+ = \\mathcal{S}^+_s\\cup\\mathcal{S}^+_f"} /><span> : Sônica Direita</span></>} color={waveColors.sonicRightFast} />
-          <Toggle checked={showDoubleSonic} onChange={setShowDoubleSonic} label={<><MathLabel tex={"\\mathcal{DS}"} /><span> : Dupla Sônica </span></>} color={waveColors.doubleSonic} />
-          <Toggle checked={showInflectionSlow || showInflectionFast} onChange={(checked) => { setShowInflectionSlow(checked); setShowInflectionFast(checked) }} label={<><MathLabel tex={"\\mathcal{J}"} /><span> : Inflexões </span></>} color={waveColors.inflection ?? waveColors.inflectionSlow} />
-          <Toggle checked={showHysteresisLeft ?? showHysteresis} onChange={setShowHysteresisLeft ?? setShowHysteresis} label={<><MathLabel tex={"\\operatorname{Hys}^-"} /><span> : Histerese Esquerda</span></>} color={waveColors.hysteresisLeft ?? '#64748b'} />
-          <Toggle checked={showHysteresisRight ?? showHysteresis} onChange={setShowHysteresisRight ?? setShowHysteresis} label={<><MathLabel tex={"\\operatorname{Hys}^+"} /><span> : Histerese Direita</span></>} color={waveColors.hysteresisRight ?? '#111827'} />
-          <Toggle checked={showBifurcationRight} onChange={setShowBifurcationRight} label={<><MathLabel tex={"\\mathcal{B}^+"} /><span> : Bifurcação Secundária Direita</span></>} color={waveColors.bifurcationRight} />
-          <Toggle checked={showSaturated} onChange={setShowSaturated} label={<><MathLabel tex={"\\operatorname{sat}_-(\\operatorname{Hys}^+)"} /><span> : Saturada de </span><MathLabel tex={"\\operatorname{Hys}^+"} /> por <MathLabel tex={"H_-"} /></>} color="#f97316" />
-          <Toggle checked={showSaturatedPlus} onChange={setShowSaturatedPlus} label={<><MathLabel tex={"\\operatorname{sat}_+(\\operatorname{Hys}^+)"} /><span> : Saturada de </span><MathLabel tex={"\\operatorname{Hys}^+"} /> por <MathLabel tex={"H_+"} /></>} color="#34d399" />
-          <Toggle checked={showHysteresisSelfIntersection} onChange={setShowHysteresisSelfIntersection} label={<><MathLabel tex={"\\operatorname{sat}_-^*(\\operatorname{Hys}^+)"} /><span> : Autointerseção de </span><MathLabel tex={"\\operatorname{sat}_-(\\operatorname{Hys}^+)"} /><span> em <MathLabel tex={"U_*"} /></span></>} color={waveColors.hysteresisSelfIntersection} />
-          <Toggle checked={showSaturatedCoincidence} onChange={setShowSaturatedCoincidence} label={<><MathLabel tex={"\\operatorname{sat}_-(\\mathcal{E})"} /><span> : Saturada de </span> <MathLabel tex={"\\mathcal{E}"} /> por <MathLabel tex={"H_-"} /></>} color={waveColors.saturatedCoincidence} />
-          <Toggle checked={showSaturatedCoincidencePlus} onChange={setShowSaturatedCoincidencePlus} label={<><MathLabel tex={"\\operatorname{sat}_+(\\mathcal{E})"} /><span> : Saturada de </span> <MathLabel tex={"\\mathcal{E}"} /> por <MathLabel tex={"H_+"} /></>} color={waveColors.saturatedCoincidencePlus} />
-          <Toggle checked={showExtensionCoincidenceMinus} onChange={setShowExtensionCoincidenceMinus} label={<><MathLabel tex={"\\operatorname{ext}_-(\\mathcal{E})=\\operatorname{sat}_-(\\mathcal{E})\\cap\\mathcal{S}^-"} /></>} color={waveColors.extensionCoincidenceMinus} />
-          <Toggle checked={showExtensionCoincidencePlus} onChange={setShowExtensionCoincidencePlus} label={<><MathLabel tex={"\\operatorname{ext}_+(\\mathcal{E})=\\operatorname{sat}_+(\\mathcal{E})\\cap\\mathcal{S}^+"} /></>} color={waveColors.extensionCoincidencePlus} />
+          <Toggle checked={showSonicLeft} onChange={setShowSonicLeft} label={<><MathLabel tex="\mathcal{S}^- = \mathcal{S}^-_s \cup\mathcal{S}^-_f" /><span> : Sônica Esquerda</span></>} color={waveColors.sonicLeftSlow} />
+          <Toggle checked={showSonicRight} onChange={setShowSonicRight} label={<><MathLabel tex="\mathcal{S}^+ = \mathcal{S}^+_s\cup\mathcal{S}^+_f" /><span> : Sônica Direita</span></>} color={waveColors.sonicRightFast} />
+          <Toggle checked={showHopfPlus} onChange={setShowHopfPlus} label={<><MathLabel tex="\mathcal{Hopf}^+" /><span> : Superficie de Hopf direita</span></>} color={waveColors.hopfPlus} />
+          <Toggle checked={showHopfMinus} onChange={setShowHopfMinus} label={<><MathLabel tex="\mathcal{Hopf}^-" /><span> : Superficie de Hopf esquerda</span></>} color={waveColors.hopfMinus} />
+          <Toggle checked={showDoubleSonic} onChange={setShowDoubleSonic} label={<><MathLabel tex="\mathcal{DS}" /><span> : Dupla Sônica </span></>} color={waveColors.doubleSonic} />
+          <Toggle checked={showInflectionSlow || showInflectionFast} onChange={(checked) => { setShowInflectionSlow(checked); setShowInflectionFast(checked) }} label={<><MathLabel tex="\mathcal{J}" /><span> : Inflexões </span></>} color={waveColors.inflection ?? waveColors.inflectionSlow} />
+          <Toggle checked={showHysteresisLeft ?? showHysteresis} onChange={setShowHysteresisLeft ?? setShowHysteresis} label={<><MathLabel tex="\operatorname{Hys}^-" /><span> : Histerese Esquerda</span></>} color={waveColors.hysteresisLeft ?? '#64748b'} />
+          <Toggle checked={showHysteresisRight ?? showHysteresis} onChange={setShowHysteresisRight ?? setShowHysteresis} label={<><MathLabel tex="\operatorname{Hys}^+" /><span> : Histerese Direita</span></>} color={waveColors.hysteresisRight ?? '#111827'} />
+          <Toggle checked={showBifurcationRight} onChange={setShowBifurcationRight} label={<><MathLabel tex="\mathcal{B}^+" /><span> : Bifurcação Secundária Direita</span></>} color={waveColors.bifurcationRight} />
+          <Toggle checked={showSaturated} onChange={setShowSaturated} label={<><MathLabel tex="\operatorname{sat}_-(\operatorname{Hys}^+)" /><span> : Saturada de </span><MathLabel tex="\operatorname{Hys}^+" /> por <MathLabel tex="H_-" /></>} color="#f97316" />
+          <Toggle checked={showSaturatedPlus} onChange={setShowSaturatedPlus} label={<><MathLabel tex="\operatorname{sat}_+(\operatorname{Hys}^+)" /><span> : Saturada de </span><MathLabel tex="\operatorname{Hys}^+" /> por <MathLabel tex="H_+" /></>} color="#34d399" />
+          <Toggle checked={showHysteresisSelfIntersection} onChange={setShowHysteresisSelfIntersection} label={<><MathLabel tex="\operatorname{sat}_-^*(\operatorname{Hys}^+)" /><span> : Autointerseção de </span><MathLabel tex="\operatorname{sat}_-(\operatorname{Hys}^+)" /><span> em <MathLabel tex="U_*" /></span></>} color={waveColors.hysteresisSelfIntersection} />
+          <Toggle checked={showSaturatedCoincidence} onChange={setShowSaturatedCoincidence} label={<><MathLabel tex="\operatorname{sat}_-(\mathcal{E})" /><span> : Saturada de </span> <MathLabel tex="\mathcal{E}" /> por <MathLabel tex="H_-" /></>} color={waveColors.saturatedCoincidence} />
+          <Toggle checked={showSaturatedCoincidencePlus} onChange={setShowSaturatedCoincidencePlus} label={<><MathLabel tex="\operatorname{sat}_+(\mathcal{E})" /><span> : Saturada de </span> <MathLabel tex="\mathcal{E}" /> por <MathLabel tex="H_+" /></>} color={waveColors.saturatedCoincidencePlus} />
+          <Toggle checked={showExtensionCoincidenceMinus} onChange={setShowExtensionCoincidenceMinus} label={<><MathLabel tex="\operatorname{ext}_-(\mathcal{E})=\operatorname{sat}_-(\mathcal{E})\cap\mathcal{S}^-" /></>} color={waveColors.extensionCoincidenceMinus} />
+          <Toggle checked={showExtensionCoincidencePlus} onChange={setShowExtensionCoincidencePlus} label={<><MathLabel tex="\operatorname{ext}_+(\mathcal{E})=\operatorname{sat}_+(\mathcal{E})\cap\mathcal{S}^+" /></>} color={waveColors.extensionCoincidencePlus} />
         </div>
       </Section>
       <Section title="Família lenta" defaultOpen={true} accent="#22c55e">
         <div className="toggle-grid">
-          <Toggle checked={showHugoniotMinus} onChange={setShowHugoniotMinus} label={<><MathLabel tex={"H_-(U_L)"} /><span> : Hugoniot Forward</span></>} color={waveColors.hugoniotMinus ?? '#0f172a'} />
-          <Toggle checked={showRarefactionSlow} onChange={setShowRarefactionSlow} label={<><MathLabel tex={"\\mathcal{R}_-(U_L)"} /><span> : Rarefação Lenta </span></>} color={waveColors.rarefactionSlow} />
-          <Toggle checked={showCompositeSlow} onChange={setShowCompositeSlow} label={<><MathLabel tex={"\\mathcal{K}_-(U_L)"} /><span> : Composta Lenta </span></>} color={waveColors.compositeSlow ?? waveColors.composite} />
-          <Toggle checked={showCompositeSaturatedSlow} onChange={setShowCompositeSaturatedSlow} label={<><MathLabel tex={"\\operatorname{sat}_{-}(\\mathcal{R}_-)"} /><span> : Superfície saturada lenta </span></>} color={waveColors.compositeSaturatedSlow ?? '#60a5fa'} />
+          <Toggle checked={showHugoniotMinus} onChange={setShowHugoniotMinus} label={<><MathLabel tex="H_-(U_L)" /><span> : Hugoniot Forward</span></>} color={waveColors.hugoniotMinus ?? '#0f172a'} />
+          <Toggle checked={showRarefactionSlow} onChange={setShowRarefactionSlow} label={<><MathLabel tex="\mathcal{R}_-(U_L)" /><span> : Rarefação Lenta </span></>} color={waveColors.rarefactionSlow} />
+          <Toggle checked={showCompositeSlow} onChange={setShowCompositeSlow} label={<><MathLabel tex="\mathcal{K}_-(U_L)" /><span> : Composta Lenta </span></>} color={waveColors.compositeSlow ?? waveColors.composite} />
+          <Toggle checked={showCompositeSaturatedSlow} onChange={setShowCompositeSaturatedSlow} label={<><MathLabel tex="\operatorname{sat}_{-}(\mathcal{R}_-)" /><span> : Superfície saturada lenta </span></>} color={waveColors.compositeSaturatedSlow ?? '#60a5fa'} />
         </div>
       </Section>
       <Section title="Família rápida" defaultOpen={true} accent="#a78bfa">
         <div className="toggle-grid">
           <Toggle checked={showHugoniotPlus} onChange={setShowHugoniotPlus} label={<><MathLabel tex={"H_+(U_R)"} /><span> : Hugoniot Backward</span></>} color={waveColors.hugoniotPlus ?? '#0f172a'} />
-          <Toggle checked={showRarefactionFast} onChange={setShowRarefactionFast} label={<><MathLabel tex={"\\mathcal{R}_+(U_R)"} /><span> : Rarefação Rápida</span></>} color={waveColors.rarefactionFast} />
-          <Toggle checked={showCompositeFast} onChange={setShowCompositeFast} label={<><MathLabel tex={"\\mathcal{K}_+(U_R)"} /><span> : Composta Rápida</span></>} color={waveColors.compositeFast ?? waveColors.composite} />
-          <Toggle checked={showCompositeSaturatedFast} onChange={setShowCompositeSaturatedFast} label={<><MathLabel tex={"\\operatorname{sat}_{+}(\\mathcal{R}_+)"} /><span> : Superfície saturada rápida</span></>} color={waveColors.compositeSaturatedFast ?? '#f472b6'} />
-          
-          <div className="visualization-note">As curvas exibidas correspondem às folhas completas das bifolheações ativas.</div>
+          <Toggle checked={showRarefactionFast} onChange={setShowRarefactionFast} label={<><MathLabel tex="\mathcal{R}_+(U_R)" /><span> : Rarefação Rápida</span></>} color={waveColors.rarefactionFast} />
+          <Toggle checked={showCompositeFast} onChange={setShowCompositeFast} label={<><MathLabel tex="\mathcal{K}_+(U_R)" /><span> : Composta Rápida</span></>} color={waveColors.compositeFast ?? waveColors.composite} />
+          <Toggle checked={showCompositeSaturatedFast} onChange={setShowCompositeSaturatedFast} label={<><MathLabel tex="\operatorname{sat}_{+}(\mathcal{R}_+)" /><span> : Superfície saturada rápida</span></>} color={waveColors.compositeSaturatedFast ?? '#f472b6'} />
         </div>
       </Section>
 

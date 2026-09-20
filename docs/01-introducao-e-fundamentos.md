@@ -69,6 +69,48 @@ Seus autovalores \(\lambda_s\leq\lambda_f\) determinam as famílias lenta e ráp
 
 A variedade \(\mathcal W\) é exibida nas coordenadas \((\tau,Y,z)\). Cada ponto representa uma relação entre dois estados conectados por uma onda e contém a informação necessária para recuperar os estados esquerdo e direito e a velocidade da onda.
 
+Essa descrição nasce diretamente da condição de Rankine–Hugoniot. Para dois estados \(U^-\) e \(U^+\), defina
+
+\[
+\bar U=\frac{U^-+U^+}{2},
+\qquad
+\Delta U=U^+-U^-.
+\]
+
+Como o fluxo é quadrático, a diferença de fluxos é exatamente
+
+\[
+F(U^+)-F(U^-)=DF(\bar U)\,\Delta U.
+\]
+
+Portanto, para uma descontinuidade com velocidade \(s\), a relação de Rankine–Hugoniot
+
+\[
+F(U^+)-F(U^-)=s\,(U^+-U^-)
+\]
+
+é equivalente ao problema de autovalor
+
+\[
+DF(\bar U)\,\Delta U=s\,\Delta U.
+\]
+
+Esse é o passo geométrico essencial: em vez de procurar diretamente quatro coordenadas de estado e uma velocidade, descreve-se o estado médio, a direção do salto e sua amplitude. A variedade de ondas reúne precisamente as combinações que satisfazem esse problema de autovalor.
+
+Na convenção do app,
+
+\[
+\Delta U=Y(z,1)^{\mathsf T}.
+\]
+
+Quando \(Y\ne0\), a condição de pertencer a \(\mathcal W\) pode ser escrita de forma escalar como
+
+\[
+(1,-z)\,DF(\bar U)(z,1)^{\mathsf T}=0,
+\]
+
+e a velocidade é o autovalor correspondente. A coordenada \(\tau\) parametriza a reta de estados médios compatíveis com a direção \(z\). Assim, \((\tau,Y,z)\) fornece três coordenadas para a variedade.
+
 No código, a coordenada \(\tau\) ainda aparece internamente com o nome `t`. Essa convenção preserva a compatibilidade dos cálculos existentes.
 
 ## Estados e projeções
@@ -103,6 +145,8 @@ v^E(z)=-\frac{cz^2}{1+z^2}.
 
 Assim, \(\pi_-(\tau,Y,z)=U^-\) e \(\pi_+(\tau,Y,z)=U^+\). No plano característico \(Y=0\), os dois estados coincidem.
 
+O caso \(Y=0\) não representa um choque com salto nulo a ser descartado. Ele forma a superfície característica \(\mathcal C\) dentro da própria variedade e funciona como fronteira natural entre curvas de choque e curvas características. Trocar os estados \(U^-\) e \(U^+\) corresponde à reflexão \(Y\mapsto -Y\), mantendo \(\bar U\) e \(z\).
+
 ## Famílias características
 
 A superfície característica possui duas folhas, associadas às famílias lenta e rápida. Elas são indicadas por \(C_s\) e \(C_f\). A escolha de um ponto em cada folha fornece os estados iniciais usados na inspeção e na construção da solução.
@@ -114,6 +158,10 @@ O modelo utiliza os parâmetros \(a\), \(b_1\), \(b_2\) e \(c\). O parâmetro \(
 ## Princípio de interpretação
 
 As definições matemáticas determinam os objetos; os métodos numéricos os aproximam; a renderização apenas apresenta os resultados. Por isso, resolução, janela de cálculo e tolerâncias podem alterar a aparência e a precisão numérica, mas não a definição matemática.
+
+## Referência conceitual
+
+A organização geométrica acima segue as ideias de Bradley J. Plohr em *Wave Manifold for Quadratic Models* (rascunho de 22 de junho de 2023), especialmente a redução da condição de Rankine–Hugoniot a um problema de autovalor no estado médio, a inclusão da superfície característica na variedade e a interpretação das superfícies sônicas por invariantes espectrais. A notação foi adaptada às coordenadas \((\tau,Y,z)\) usadas pelo aplicativo.
 
 ## Sobre o projeto
 

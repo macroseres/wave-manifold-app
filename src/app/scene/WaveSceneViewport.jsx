@@ -304,6 +304,16 @@ function WaveSceneViewport({
             />
           )}
 
+          <ImplicitSurface type="hopf"
+            params={params} view={view} resolution={resolution}
+            opacity={opacity} wireframe={showWireframe}
+            direction="plus" visible={visibility.showHopfPlus}
+          />
+          <ImplicitSurface type="hopf"
+            params={params} view={view} resolution={resolution}
+            opacity={opacity} wireframe={showWireframe}
+            direction="minus" visible={visibility.showHopfMinus}
+          />
           <ImplicitSurface type="saturated"
             key={`${sceneKey}-saturated`}
             params={params}

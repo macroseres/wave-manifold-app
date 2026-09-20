@@ -1,4 +1,5 @@
 import React from 'react'
+import HopfSurface from '../../../components/surfaces/HopfSurface.jsx'
 
 import CharacteristicSurface from '../../../components/surfaces/CharacteristicSurface.jsx'
 import SonicRightSurface from '../../../components/surfaces/SonicRightSurface.jsx'
@@ -8,6 +9,7 @@ import SaturatedCoincidenceSurface from '../../../components/surfaces/SaturatedC
 import { CompositeSaturatedSlowSurface, CompositeSaturatedFastSurface } from '../../../components/surfaces/CompositeSaturatedSurface.jsx'
 
 const surfaceRegistry = {
+  hopf: HopfSurface,
   characteristic: CharacteristicSurface,
   'sonic-right': SonicRightSurface,
   'sonic-left': SonicLeftSurface,

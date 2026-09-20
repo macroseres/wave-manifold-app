@@ -44,6 +44,10 @@ export default function WaveOverlayPanel({
       setShowSonicRight={actions.setShowSonicRight}
       showSonicLeft={visibility.showSonicLeft}
       setShowSonicLeft={actions.setShowSonicLeft}
+      showHopfPlus={visibility.showHopfPlus}
+      setShowHopfPlus={actions.setShowHopfPlus}
+      showHopfMinus={visibility.showHopfMinus}
+      setShowHopfMinus={actions.setShowHopfMinus}
       showHysteresisSelfIntersection={visibility.showHysteresisSelfIntersection}
       setShowHysteresisSelfIntersection={actions.setShowHysteresisSelfIntersection}
       showSaturatedPlus={visibility.showSaturatedPlus}

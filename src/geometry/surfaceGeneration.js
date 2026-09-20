@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { buildHopfGeometry } from './hopfSurfaceGeometry.js'
 import { buildSonicBranchGeometries } from '../entities/sonic/surfaceModel.js'
 import { buildSaturatedGeometry } from './saturatedSurfaceGeometry.js'
 import { buildSaturatedCoincidenceGeometry } from './saturatedCoincidenceSurfaceGeometry.js'
@@ -8,6 +9,8 @@ export function generateSurfaceBuffers({ type, params, view, resolution, directi
   let geometries
   if (type === 'sonic-left' || type === 'sonic-right') {
     geometries = buildSonicBranchGeometries(type === 'sonic-left' ? 'left' : 'right', params, view, resolution)
+  } else if (type === 'hopf') {
+    geometries = { surface: buildHopfGeometry(params, view, resolution, direction) }
   } else if (type === 'saturated') {
     geometries = { surface: buildSaturatedGeometry(params, view, resolution, direction) }
   } else if (type === 'saturated-coincidence') {

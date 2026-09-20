@@ -671,7 +671,7 @@ function StateSpaceCanvas({
         {renderProbeLabel('fast')}
         {(!selectedMap.slow || !selectedMap.fast) && (
           <div className="state-space-help-label">
-            Selecione <MathLabel tex="C_s" /> com clique e <MathLabel tex="C_f" /> com Shift+clique na visualização 3D.
+            Selecione pontos no <MathLabel tex="C_s" /> e no <MathLabel tex="C_f" /> com clique na visualização 3D.
           </div>
         )}
       </div>

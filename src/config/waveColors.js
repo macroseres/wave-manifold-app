@@ -10,6 +10,8 @@ export const waveColors = {
   shockFast: '#d4af37',
   shockFastNonLocal: '#d4af37',
   sonicLeftFast: '#fca5a5',
+  hopfPlus: '#c084fc',
+  hopfMinus: '#2dd4bf',
   sonicLeftSlow: '#7dd3fc',
   sonicLeftNeutral: '#ffffff',
   sonicRight: '#86efac',

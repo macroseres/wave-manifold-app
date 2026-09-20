@@ -28,7 +28,7 @@ export default function OverlaySettingsPanel({
     <aside className="wm-settings-panel wm-panel">
       <div className="settings-header">
         <strong>Configurações</strong>
-        <button type="button" onClick={onClose} aria-label="Fechar configurações">×</button>
+        <button type="button" onClick={onClose} aria-label="Fechar configurações">x</button>
       </div>
 
       <Section title="Casos de Schaeffer-Shearer" defaultOpen={true} accent="#facc15">

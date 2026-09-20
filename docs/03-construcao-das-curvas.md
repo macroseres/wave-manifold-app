@@ -4,7 +4,9 @@ As curvas são representadas por sequências orientadas de pontos na variedade \
 
 ## Curvas de Hugoniot
 
-Para um estado fixo, a condição de Rankine–Hugoniot define uma folha. O app constrói \(H_-(U_L)\), orientada no sentido `forward`, e \(H_+(U_R)\), orientada no sentido `backward`. As rotinas recuperam os estados ligados ao ponto da variedade e calculam a velocidade da onda.
+Para um estado fixo, a condição de Rankine–Hugoniot define uma curva dentro da variedade. Em \(H_-(U_L)\), mantém-se \(\pi_-=U_L\); em \(H_+(U_R)\), mantém-se \(\pi_+=U_R\). O app constrói a primeira no sentido `forward` e a segunda no sentido `backward`. As rotinas recuperam o outro estado e calculam a velocidade da onda ao longo da curva.
+
+Geometricamente, essas curvas são folhas da folheação de Hugoniot. A reflexão \(Y\mapsto-Y\) troca \(U^-\) por \(U^+\) e relaciona as descrições para frente e para trás.
 
 A velocidade \(s\) associada a \((\tau,Y,z)\) é
 
@@ -20,7 +22,9 @@ Q(z)=1+b_2(b_1+1)z-(b_1+1)z^2.
 
 ## Curvas de rarefação
 
-As rarefações seguem a folha característica correspondente. A família lenta \(\mathcal R^-(U_L)\) e a família rápida \(\mathcal R^+(U_R)\) são amostradas a partir do estado escolhido, respeitando a orientação do autovalor característico.
+As rarefações vivem na superfície característica \(\mathcal C\), onde \(Y=0\), e são curvas integrais dos autovetores de \(DF\). A família lenta \(\mathcal R^-(U_L)\) e a família rápida \(\mathcal R^+(U_R)\) são amostradas a partir do estado escolhido, respeitando a orientação do autovalor característico.
+
+Uma rarefação pode ser parametrizada pela velocidade característica enquanto essa velocidade varia estritamente ao longo da curva. Os pontos em que sua derivada direcional se anula formam a curva de inflexão \(\mathcal J\); nela, a parametrização pela velocidade deixa de ser regular e pode começar uma construção composta.
 
 ## Curvas compostas
 
@@ -34,6 +38,8 @@ Uma curva composta liga um arco de rarefação a uma família de Hugoniot. O app
 - \(\operatorname{Hys}^-\) e \(\operatorname{Hys}^+\): curvas de histerese.
 - \(\mathcal B^+\): bifurcação secundária direita.
 - \(\operatorname{ext}_\pm(\mathcal E)\): interseções das saturações da coincidência com as superfícies sônicas.
+
+A curva de coincidência \(\mathcal E\) é onde os dois autovalores de \(DF\) coincidem. Ela também pode ser entendida como a envoltória das retas de estado médio com direção característica fixa. Por isso, a projeção da superfície característica no espaço de estados perde regularidade sobre \(\mathcal E\).
 
 ## Histerese direita e sua projeção
 

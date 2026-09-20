@@ -60,6 +60,10 @@ export default function useOverlayPanelController(props) {
     setShowSonicRight,
     showSonicLeft,
     setShowSonicLeft,
+    showHopfPlus,
+    setShowHopfPlus,
+    showHopfMinus,
+    setShowHopfMinus,
     showSaturated,
     showDoubleSonicMinusProjection,
     showHysteresisSelfIntersectionMinusProjection,
@@ -358,6 +362,8 @@ export default function useOverlayPanelController(props) {
     setShowHysMinusPlusProjection,
   ]
   const sceneSetters = [
+    setShowHopfPlus,
+    setShowHopfMinus,
     setShowAxes,
     setShowCharacteristic,
     setShowSonicRight,
@@ -425,6 +431,10 @@ export default function useOverlayPanelController(props) {
   }
 
   const visualizationPanelProps = {
+    showHopfPlus,
+    setShowHopfPlus,
+    showHopfMinus,
+    setShowHopfMinus,
     activeView,
     activeEntry,
     clearSelectedState,

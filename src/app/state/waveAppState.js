@@ -71,6 +71,8 @@ export const initialWaveAppState = {
   showCharacteristic: true,
   showSonicRight: false,
   showSonicLeft: false,
+  showHopfPlus: false,
+  showHopfMinus: false,
   showSaturated: false,
   showSaturatedPlus: false,
   showHysteresisSelfIntersection: false,

@@ -6,8 +6,8 @@ export const defaultParams = {
 }
 
 export const defaultView = {
-  yMin: -4,
-  yMax: 4.5,
+  yMin: -3.5,
+  yMax: 3.5,
   tMin: -1,
   tMax: 1,
   zMin: -0.8,

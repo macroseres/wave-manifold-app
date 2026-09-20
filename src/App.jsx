@@ -62,6 +62,8 @@ export default function App() {
   const visibility = useMemo(() => ({
     showSonicRight: waveState.showSonicRight,
     showSonicLeft: waveState.showSonicLeft,
+    showHopfPlus: waveState.showHopfPlus,
+    showHopfMinus: waveState.showHopfMinus,
     showSaturated: waveState.showSaturated,
     showSaturatedPlus: waveState.showSaturatedPlus,
     showHysteresisSelfIntersection: waveState.showHysteresisSelfIntersection,
@@ -108,6 +110,8 @@ export default function App() {
     waveState.showExtensionCoincidenceMinus,
     waveState.showExtensionCoincidencePlus,
     waveState.showSonicLeft,
+    waveState.showHopfPlus,
+    waveState.showHopfMinus,
     waveState.showSonicRight,
   ])
   const orbitControlsRef = useRef(null)
