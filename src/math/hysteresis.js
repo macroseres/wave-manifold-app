@@ -2,5 +2,5 @@ export {
   hysteresisRightImplicitF,
   solveLeftHysteresisPoint,
   solveRightHysteresisPoint,
-  solveSecondaryRightBifurcationSegments,
+  solveSecondaryLeftBifurcationSegments, solveSecondaryRightBifurcationSegments,
 } from './surfaceImplicitCore.js'

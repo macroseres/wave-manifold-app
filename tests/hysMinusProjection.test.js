@@ -10,9 +10,12 @@ test('Hys-minus projections equal opposite Hys-plus projections across the exten
       const left = solveLeftHysteresisPoint(z, params)
       const right = solveRightHysteresisPoint(z, params)
       assert.ok(left && right)
-      const coordinates = ({ u, v }) => ({ u, v })
-      assert.deepEqual(coordinates(projectPointMinus(left, params)), coordinates(projectPointPlus(right, params)))
-      assert.deepEqual(coordinates(projectPointPlus(left, params)), coordinates(projectPointMinus(right, params)))
+      const assertSameState = (actual, expected) => {
+        const scale = Math.max(1, Math.abs(expected.u), Math.abs(expected.v))
+        assert.ok(Math.hypot(actual.u - expected.u, actual.v - expected.v) < 1e-10 * scale)
+      }
+      assertSameState(projectPointMinus(left, params), projectPointPlus(right, params))
+      assertSameState(projectPointPlus(left, params), projectPointMinus(right, params))
     }
   }
 })

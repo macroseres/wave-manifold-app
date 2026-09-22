@@ -1,3 +1,3 @@
 export {
-  solveSecondaryRightBifurcationSegments,
+  solveSecondaryLeftBifurcationSegments, solveSecondaryRightBifurcationSegments,
 } from './surfaceImplicitCore.js'

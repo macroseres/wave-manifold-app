@@ -1,5 +1,23 @@
 # 4. Construção das superfícies
 
+## Saturações da histerese esquerda
+
+Para cada ponto \(h(s)\) da curva \(\operatorname{Hys}^-\), o app constrói
+as folhas de Hugoniot que conservam, respectivamente, o estado esquerdo e o direito:
+
+\[
+\operatorname{sat}_-(\operatorname{Hys}^-)
+=\bigcup_s H_-(\pi_-(h(s))),\qquad
+\operatorname{sat}_+(\operatorname{Hys}^-)
+=\bigcup_s H_+(\pi_+(h(s))).
+\]
+
+São duas saturações independentes da mesma curva. Os controles aparecem nessa
+ordem em **Superfícies e fronteiras**, abaixo de \(\mathcal B^-\).
+A construção utiliza diretamente `solveLeftHysteresisPoint`, preservando a
+definição legada de histerese esquerda do projeto. As malhas são geradas em
+worker, com recorte em \(\tau,Y\), compactificação de \(z\) e separação nos polos.
+
 ## Superfície característica
 
 A superfície característica \(\mathcal C\) é o conjunto \(Y=0\) dentro da variedade. Nela, os estados esquerdo e direito coincidem e a velocidade \(s\) é um autovalor de \(DF(U)\). Suas folhas lenta e rápida servem de origem para a seleção dos estados iniciais.

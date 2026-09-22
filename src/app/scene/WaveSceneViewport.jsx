@@ -358,11 +358,23 @@ function WaveSceneViewport({
           <WaveCurve type="hysteresis-left" params={params} view={calcView} resolution={resolution} visible={visibility.showHysteresisLeft} />
           <WaveCurve type="hysteresis-right" params={params} view={calcView} resolution={resolution} visible={visibility.showHysteresisRight} />
           <WaveCurve type="coincidence" view={view} visible={visibility.showCoincidence} />
+          <WaveCurve type="secondary-left-bifurcation" params={params} view={calcView} resolution={resolution} visible={visibility.showBifurcationLeft} />
           <WaveCurve type="secondary-right-bifurcation" params={params} view={calcView} resolution={resolution} visible={visibility.showBifurcationRight} />
+          <ImplicitSurface type="saturated" source="left" direction="minus"
+            params={params} view={view} resolution={resolution}
+            opacity={opacity} wireframe={showWireframe}
+            visible={visibility.showSaturatedLeftMinus}
+          />
+          <ImplicitSurface type="saturated" source="left" direction="plus"
+            params={params} view={view} resolution={resolution}
+            opacity={opacity} wireframe={showWireframe}
+            visible={visibility.showSaturatedLeftPlus}
+          />
           <WaveCurve type="inflection-slow" params={params} view={calcView} resolution={resolution} visible={visibility.showInflectionSlow} />
           <WaveCurve type="inflection-fast" params={params} view={calcView} resolution={resolution} visible={visibility.showInflectionFast} />
           <WaveCurve type="double-sonic" params={params} view={calcView} resolution={resolution} visible={visibility.showDoubleSonic} />
           <WaveCurve type="hysteresis-self-intersection" params={params} view={calcView} visible={visibility.showHysteresisSelfIntersection} />
+          <WaveCurve type="hysteresis-self-intersection" source="left" direction="plus" params={params} view={calcView} visible={visibility.showLeftHysteresisSelfIntersection} />
           <WaveCurve type="extension-coincidence-minus" params={params} view={calcView} visible={visibility.showExtensionCoincidenceMinus} />
           <WaveCurve type="extension-coincidence-plus" params={params} view={calcView} visible={visibility.showExtensionCoincidencePlus} />
 

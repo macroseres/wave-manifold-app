@@ -94,7 +94,7 @@ export function Section({ title, children, defaultOpen = true, accent = '#64748b
 export function CoordinateRow({ point }) {
   return (
     <div className="tuple-line">
-      <MathLabel tex={"(\\tau,Y,z)"} />
+      <MathLabel tex="(\tau,Y,z)" />
       <span>=</span>
       <span>({formatNumber(point?.t)}, {formatNumber(point?.Y)}, {formatNumber(point?.z)})</span>
     </div>

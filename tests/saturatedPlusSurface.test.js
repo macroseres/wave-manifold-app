@@ -5,6 +5,25 @@ import { generateSurfaceBuffers } from '../src/geometry/surfaceGeneration.js'
 import { solveRightHysteresisPoint, computeRightStateFromWavePoint, solveBackwardHugoniotPointForFixedRightState } from '../src/entities/surfaceImplicit/index.js'
 import { defaultParams, defaultView } from '../src/config/viewDefaults.js'
 
+test('Hys plus crosses zero without a false pole or an unstable seed', () => {
+  for (const params of [defaultParams, { b1: 3, b2: 0, c: 2 }, { b1: 5, b2: -.4, c: .7 }]) {
+    const { b1, b2, c } = params
+    const denominator = 2 + b2 * b2 * (b1 + 1)
+    const expectedT = -c * b2 * (b1 + 1) / (b1 * denominator)
+    const expectedY = -4 * c / denominator
+    const zero = solveRightHysteresisPoint(0, params)
+    assert.ok(zero)
+    for (const z of [-1e-10, -Number.EPSILON, 0, Number.EPSILON, 1e-10]) {
+      const point = solveRightHysteresisPoint(z, params)
+      assert.ok(point)
+      assert.ok(Math.abs(point.t - expectedT) < 1e-8)
+      assert.ok(Math.abs(point.Y - expectedY) < 1e-8)
+      // The sheet builder discards rows whose determinants change sign.
+      assert.ok(point.det * zero.det > 0)
+    }
+  }
+})
+
 test('sat plus Hys plus preserves the right state along each leaf and contains Hys plus', () => {
   for (const params of [defaultParams, { b1: 3, b2: 0, c: 2 }, { b1: 5, b2: -.4, c: .7 }]) {
     for (const seed of [-12, -1, -.3, 0, .4, 1, 12]) {

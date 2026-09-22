@@ -79,26 +79,26 @@ export default function ParameterMapView({
               <label className="curve-toggle-row">
                 <input type="checkbox" checked={visibleParameterCurves.c1} onChange={(e) => updateVisibleParameterCurve('c1', e.target.checked)} />
                 <span className="curve-swatch" />
-                <MathLabel tex={"C_1: b_2^2-4(b_1-1)=0"} />
+                <MathLabel tex="C_1: b_2^2-4(b_1-1)=0" />
               </label>
               <label className="curve-toggle-row">
                 <input type="checkbox" checked={visibleParameterCurves.c2} onChange={(e) => updateVisibleParameterCurve('c2', e.target.checked)} />
                 <span className="curve-swatch c2" />
-                <MathLabel tex={"C_2: b_2^2+\\frac{4}{b_1+1}=0"} />
+                <MathLabel tex="C_2: b_2^2+\frac{4}{b_1+1}=0" />
               </label>
               <label className="curve-toggle-row">
                 <input type="checkbox" checked={visibleParameterCurves.c3} onChange={(e) => updateVisibleParameterCurve('c3', e.target.checked)} />
                 <span className="curve-swatch c3" />
-                <MathLabel tex={"C_3: (b_1-1)(b_1+2)^2-(b_1+1)b_2^2=0"} />
+                <MathLabel tex="C_3: (b_1-1)(b_1+2)^2-(b_1+1)b_2^2=0" />
               </label>
             </div>
           </div>
           <div className="stage-param-model-card">
             <div className="model-card-title">Parâmetros do Fluxo</div>
-            <RangeControl label={<MathVar tex="b_1" />} min={parameterWindow.b1Min} max={parameterWindow.b1Max} step={0.1} value={params.b1} onChange={(v) => updateParam('b1', v)} />
-            <RangeControl label={<MathVar tex="b_2" />} min={parameterWindow.b2Min} max={parameterWindow.b2Max} step={0.1} value={params.b2} onChange={(v) => updateParam('b2', v)} />
-            <RangeControl label={<MathVar tex="c" />} min={-4} max={4} step={0.1} value={params.c} onChange={(v) => updateParam('c', v)} />
-            <RangeControl label={<MathVar tex="a" />} min={-5} max={5} step={0.1} value={params.a ?? 0} onChange={(v) => updateParam('a', v)} />
+            <RangeControl label={<MathLabel tex="b_1" />} min={parameterWindow.b1Min} max={parameterWindow.b1Max} step={0.1} value={params.b1} onChange={(v) => updateParam('b1', v)} />
+            <RangeControl label={<MathLabel tex="b_2" />} min={parameterWindow.b2Min} max={parameterWindow.b2Max} step={0.1} value={params.b2} onChange={(v) => updateParam('b2', v)} />
+            <RangeControl label={<MathLabel tex="c" />} min={-4} max={4} step={0.1} value={params.c} onChange={(v) => updateParam('c', v)} />
+            <RangeControl label={<MathLabel tex="a" />} min={-5} max={5} step={0.1} value={params.a ?? 0} onChange={(v) => updateParam('a', v)} />
             <button onClick={resetParams} className="primary-button">Resetar parâmetros</button>
           </div>
         </div>

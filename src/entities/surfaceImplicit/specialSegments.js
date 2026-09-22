@@ -2,6 +2,13 @@ import { P, Q, A } from './algebra.js'
 import { sonicLineTCoeff, sonicLineConst } from './sonic.js'
 import { pushSegment, inflectionZDomain, clipInflectionSegmentToTauWindow, uniqueFiniteLocal } from './helpers.js'
 import { VISUAL_Z_MAX, VISUAL_Z_MIN, visualZToPhysical } from '../../geometry/zCompactification.js'
+import { reflectDaggerSegments } from '../shared/reflection.js'
+
+// Dagger exchanges the two states: B- is B+ reflected in Y=0.
+export function solveSecondaryLeftBifurcationSegments(params, view, samples = 260, options = {}) {
+  const reflectedView = { ...view, yMin: -view.yMax, yMax: -view.yMin }
+  return reflectDaggerSegments(solveSecondaryRightBifurcationSegments(params, reflectedView, samples, options))
+}
 
 export function solveCoincidenceSegments(view) {
   if (view.tMin > 0 || view.tMax < 0 || view.yMin > 0 || view.yMax < 0) return []

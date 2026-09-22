@@ -19,7 +19,7 @@ export default function Axes({ view }) {
       </Html>
 
       <Html position={[0, yMax + 0.10, 0]} center>
-        <div style={{ color: axisColor, fontWeight: 'bold', fontSize: 16 }}>Y</div>
+        <div style={{ color: axisColor, fontWeight: 'bold', fontSize: 16, transform: 'translateY(-14px)' }}>Y</div>
       </Html>
 
       <Html position={[0, 0, VISUAL_Z_MAX + 0.05]} center>

@@ -3,5 +3,5 @@ export { uEquilibrium, vEquilibrium, uEquilibriumPrime, rarefactionDerivativeDtD
 export { sonicImplicitF, sonicLeftImplicitF, sonicLeftBranchIndicator, sonicRightBranchIndicator, solveSonicBranchSeparatorPoint, hysteresisRightImplicitF, solveRightHysteresisPoint, solveLeftHysteresisPoint, sonicLineTCoeff, sonicLineYCoeff, sonicLineConst } from './sonic.js'
 export { defaultParams, defaultView } from '../../config/viewDefaults.js'
 export { waveColors } from '../../config/waveColors.js'
-export { solveCoincidenceSegments, solveSecondaryRightBifurcationSegments, solveInflectionSegments, solveDoubleSonicSegments } from './specialSegments.js'
+export { solveCoincidenceSegments, solveSecondaryLeftBifurcationSegments, solveSecondaryRightBifurcationSegments, solveInflectionSegments, solveDoubleSonicSegments } from './specialSegments.js'
 export { solveCharacteristicHugoniotPointForFixedState, solveCharacteristicHugoniotIntersections, inflectionPointAtZ, computeRarefactionInflectionIntersection, computeHugoniotIntersections } from './intersections.js'

@@ -36,10 +36,24 @@ Uma curva composta liga um arco de rarefação a uma família de Hugoniot. O app
 - \(\mathcal J\): curvas de inflexão lenta e rápida.
 - \(\mathcal{DS}\): conjunto de dupla sonicidade.
 - \(\operatorname{Hys}^-\) e \(\operatorname{Hys}^+\): curvas de histerese.
-- \(\mathcal B^+\): bifurcação secundária direita.
+- \(\mathcal B^-\) e \(\mathcal B^+\): bifurcações secundárias esquerda e direita.
 - \(\operatorname{ext}_\pm(\mathcal E)\): interseções das saturações da coincidência com as superfícies sônicas.
 
 A curva de coincidência \(\mathcal E\) é onde os dois autovalores de \(DF\) coincidem. Ela também pode ser entendida como a envoltória das retas de estado médio com direção característica fixa. Por isso, a projeção da superfície característica no espaço de estados perde regularidade sobre \(\mathcal E\).
+
+## Bifurcação secundária esquerda
+
+A reflexão \((\tau,Y,z)\mapsto(\tau,-Y,z)\) da bifurcação direita fornece
+
+\[
+\mathcal B^-:\quad P(z)=0,\qquad
+2b_1z(1+z^2)\tau+A(z)Y=0,
+\]
+
+com \(P(z)=1+b_2z+(b_1-1)z^2\) e \(A(z)=1+b_2z-z^2\).
+Cada raiz real gera uma reta a \(z\) constante, recortada na janela de
+\(\tau,Y\). A visualização compactificada inclui raízes além da janela física
+de \(z\). Se \(b_2^2-4(b_1-1)<0\), não há essas retas reais.
 
 ## Histerese direita e sua projeção
 

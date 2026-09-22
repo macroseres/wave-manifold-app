@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { hysPlusMinusImplicit, hysPlusPlusImplicit } from '../entities/hysteresis/stateImplicit/index.js'
-import { computeLeftStateFromWavePoint, computeRightStateFromWavePoint, solveRightHysteresisPoint } from '../entities/surfaceImplicit/index.js'
+import { computeLeftStateFromWavePoint, computeRightStateFromWavePoint, solveRightHysteresisPoint, solveLeftHysteresisPoint } from '../entities/surfaceImplicit/index.js'
 import { solveHugoniotPointForFixedState, solveBackwardHugoniotPointForFixedRightState } from '../entities/waves/index.js'
 import { visualZToPhysical } from './zCompactification.js'
 
@@ -33,12 +33,13 @@ function clipPolygon(polygon, axis, bound, sign) {
   return result
 }
 
-export function buildSaturatedGeometry(params, view, resolution = 40, direction = 'minus') {
+export function buildSaturatedGeometry(params, view, resolution = 40, direction = 'minus', source = 'right') {
   const geometry = new THREE.BufferGeometry()
   if (view.tMax <= view.tMin || view.yMax <= view.yMin || view.zMax <= view.zMin) return geometry
   const seedCount = Math.max(600, Math.min(1200, Math.round(resolution * 12)))
   const leafCount = Math.max(360, Math.min(720, Math.round(resolution * 7)))
   const margin = 1e-4
+  const solveSeed = source === 'left' ? solveLeftHysteresisPoint : solveRightHysteresisPoint
   const projectState = direction === 'plus' ? computeRightStateFromWavePoint : computeLeftStateFromWavePoint
   const solveLeaf = direction === 'plus' ? solveBackwardHugoniotPointForFixedRightState : solveHugoniotPointForFixedState
   const zHats = Array.from({ length: leafCount + 1 }, (_, i) => -1 + margin + (2 - 2 * margin) * i / leafCount)
@@ -63,7 +64,7 @@ export function buildSaturatedGeometry(params, view, resolution = 40, direction 
     for (let i = 1; i < ids.length - 1; i++) indices.push(ids[0], ids[i], ids[i + 1])
   }
   const sampleRow = (seedHat) => {
-    const seed = solveRightHysteresisPoint(visualZToPhysical(seedHat), params)
+    const seed = solveSeed(visualZToPhysical(seedHat), params)
     if (!seed) return null
     const state = projectState(seed.t, seed.Y, seed.z, params)
     if (!state) return null
@@ -98,17 +99,18 @@ export function buildSaturatedGeometry(params, view, resolution = 40, direction 
   }
   // The seed parameter is projective: its two infinite ends can represent
   // the same generator state. Leaving these rows apart opens a whole leaf.
-  if (hysteresisSeedHasFiniteSeam(params, direction)) connectRows(previous, first, true)
+  if (hysteresisSeedHasFiniteSeam(params, direction, source)) connectRows(previous, first, true)
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
   geometry.setIndex(indices)
   geometry.computeVertexNormals()
   return geometry
 }
 
-export function hysteresisSeedHasFiniteSeam(params, direction = 'minus') {
+export function hysteresisSeedHasFiniteSeam(params, direction = 'minus', source = 'right') {
+  const solveSeed = source === 'left' ? solveLeftHysteresisPoint : solveRightHysteresisPoint
   const project = direction === 'plus' ? computeRightStateFromWavePoint : computeLeftStateFromWavePoint
   const values = [-1e7, 1e7, -1e8, 1e8].map(z => {
-    const p = solveRightHysteresisPoint(z, params)
+    const p = solveSeed(z, params)
     const s = p && project(p.t, p.Y, p.z, params)
     return s && [s.u, s.v]
   })

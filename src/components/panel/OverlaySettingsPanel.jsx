@@ -49,19 +49,19 @@ export default function OverlaySettingsPanel({
       </Section>
 
       <Section title="Escalas e resolução" defaultOpen={true} accent="#9333ea">
-        <RangeControl label={<><span>Escala visual de </span><MathVar tex="Y" /></>} min={0.5} max={2} step={0.1} value={yScale} onChange={(v) => updateScale('yScale', v, setYScale)} />
-        <RangeControl label={<><span>Escala visual de </span><MathVar tex={displayCoordinateTex.tau} /></>} min={0.5} max={6} step={0.1} value={tScale} onChange={(v) => updateScale('tScale', v, setTScale)} />
-        <RangeControl label={<><span>Escala visual de </span><MathVar tex="\hat z" /></>} min={1} max={6} step={0.1} value={zScale} onChange={(v) => updateScale('zScale', v, setZScale)} />
+        <RangeControl label={<><span>Escala visual de </span><MathLabel tex="Y" /></>} min={0.5} max={2} step={0.1} value={yScale} onChange={(v) => updateScale('yScale', v, setYScale)} />
+        <RangeControl label={<><span>Escala visual de </span><MathLabel tex={displayCoordinateTex.tau} /></>} min={0.5} max={6} step={0.1} value={tScale} onChange={(v) => updateScale('tScale', v, setTScale)} />
+        <RangeControl label={<><span>Escala visual de </span><MathLabel tex="\hat z" /></>} min={1} max={6} step={0.1} value={zScale} onChange={(v) => updateScale('zScale', v, setZScale)} />
         <RangeControl label="Resolução" min={32} max={88} step={4} value={resolution} onChange={setResolution} />
         <RangeControl label="Opacidade" min={0.1} max={1.0} step={0.05} value={opacity} onChange={setOpacity} />
         <button type="button" onClick={resetCaseScales} className="primary-button">Redefinir escalas do caso</button>
       </Section>
 
       <Section title="Janela de desenho" defaultOpen={true} accent="#64748b">
-        <RangeControl label={<MathVar tex="Y_{\\min}" />} min={-10} max={-0.5} step={0.5} value={view.yMin} onChange={(v) => updateView('yMin', v)} />
-        <RangeControl label={<MathVar tex="Y_{\\max}" />} min={0.5} max={10} step={0.5} value={view.yMax} onChange={(v) => updateView('yMax', v)} />
-        <RangeControl label={<MathVar tex="\tau_{\\min}" />} min={-2} max={0} step={0.5} value={view.tMin} onChange={(v) => updateView('tMin', v)} />
-        <RangeControl label={<MathVar tex="\tau_{\\max}" />} min={0} max={2} step={0.5} value={view.tMax} onChange={(v) => updateView('tMax', v)} />
+        <RangeControl label={<MathLabel tex="Y_{\min}" />} min={-10} max={-0.5} step={0.5} value={view.yMin} onChange={(v) => updateView('yMin', v)} />
+        <RangeControl label={<MathLabel tex="Y_{\max}" />} min={0.5} max={10} step={0.5} value={view.yMax} onChange={(v) => updateView('yMax', v)} />
+        <RangeControl label={<MathLabel tex="\tau_{\min}" />} min={-2} max={0} step={0.5} value={view.tMin} onChange={(v) => updateView('tMin', v)} />
+        <RangeControl label={<MathLabel tex="\tau_{\max}" />} min={0} max={2} step={0.5} value={view.tMax} onChange={(v) => updateView('tMax', v)} />
         <button onClick={resetDrawingView} className="primary-button">Resetar janela</button>
       </Section>
     </aside>

@@ -75,22 +75,22 @@ export function legacyHysteresisRightImplicitF(Y, t, z, { b1, b2, c }) {
 
 export function solveRightHysteresisPoint(z, params) {
   const { b1, b2, c } = params
-  const p = P(z, b1, b2)
-  const q = Q(z, b1, b2)
-
-  // Resolve simultaneamente S_R=0 e H_R=0. Assim H_R e' renderizada
-  // como curva contida em S_R, e nao como superficie independente.
-  const sT = -2 * b1 * (1 + z * z) * ((b1 + 1) * z ** 3 - b2 + 3 * z)
-  const sY = (1 + z * z) * q
-  const sC = 2 * c * p
-
-  const { hT, hY, hC } = rightHysteresisCoefficients(z, params)
-
-  const det = sT * hY - sY * hT
-  if (!Number.isFinite(det) || Math.abs(det / z) < 1e-10) return null
-
-  const t = (-sC * hY + sY * hC) / det
-  const Y = (-sT * hC + sC * hT) / det
+  const k = b1 + 1
+  const evaluate = coefficients => coefficients.reduceRight((value, coefficient) => value * z + coefficient, 0)
+  // Cramer's determinant and both numerators share a factor z. Cancel it
+  // analytically: z=0 is a removable singularity, not a break in Hys+.
+  // det is the regularized determinant (the original determinant / z),
+  // so consumers detecting poles by its sign also remain continuous at zero.
+  const denominator = evaluate([2 + b2 * b2 * k, -3 * b2 * k,
+    8 * k + b2 * b2 * k * k, -2 * b2 * k * k, 6 * k * k, b2 * k ** 3])
+  const det = -2 * b1 * (1 + z * z) ** 2 * denominator
+  if (!Number.isFinite(det) || Math.abs(det) < 1e-10) return null
+  const numeratorT = evaluate([b2 * k, b2 * b2 * k - 4 * k + 2, -2 * b2 * k,
+    b2 * b2 * k * k - 4 * k * k + 4 * k, -b2 * k * k * (k + 2), 2 * k * k])
+  const numeratorY = evaluate([2, 2 * b2 * k, 2, 2 * b2 * k * (k + 1),
+    -2 * k * k, 2 * b2 * k * k, -2 * k * k])
+  const t = -c * numeratorT / (b1 * (1 + z * z) * denominator)
+  const Y = -2 * c * numeratorY / ((1 + z * z) * denominator)
 
   if (!Number.isFinite(Y) || !Number.isFinite(t)) return null
 

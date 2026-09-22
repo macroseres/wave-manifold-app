@@ -49,7 +49,9 @@ export default function WaveOverlayPanel({
       showHopfMinus={visibility.showHopfMinus}
       setShowHopfMinus={actions.setShowHopfMinus}
       showHysteresisSelfIntersection={visibility.showHysteresisSelfIntersection}
+      showLeftHysteresisSelfIntersection={visibility.showLeftHysteresisSelfIntersection}
       setShowHysteresisSelfIntersection={actions.setShowHysteresisSelfIntersection}
+      setShowLeftHysteresisSelfIntersection={actions.setShowLeftHysteresisSelfIntersection}
       showSaturatedPlus={visibility.showSaturatedPlus}
       setShowSaturatedPlus={actions.setShowSaturatedPlus}
       showDoubleSonicMinusProjection={state.showDoubleSonicMinusProjection}
@@ -142,6 +144,12 @@ export default function WaveOverlayPanel({
       setShowHysteresisRight={actions.setShowHysteresisRight}
       showCoincidence={visibility.showCoincidence}
       setShowCoincidence={actions.setShowCoincidence}
+      showBifurcationLeft={visibility.showBifurcationLeft}
+      setShowBifurcationLeft={actions.setShowBifurcationLeft}
+      showSaturatedLeftMinus={visibility.showSaturatedLeftMinus}
+      setShowSaturatedLeftMinus={actions.setShowSaturatedLeftMinus}
+      showSaturatedLeftPlus={visibility.showSaturatedLeftPlus}
+      setShowSaturatedLeftPlus={actions.setShowSaturatedLeftPlus}
       showBifurcationRight={visibility.showBifurcationRight}
       setShowBifurcationRight={actions.setShowBifurcationRight}
       showInflectionSlow={visibility.showInflectionSlow}
