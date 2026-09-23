@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import introduction from '../../../docs/01-introducao-e-fundamentos.md?raw'
 import interfaceFlow from '../../../docs/02-interface-e-fluxo-de-uso.md?raw'
 import curves from '../../../docs/03-construcao-das-curvas.md?raw'
@@ -99,6 +99,7 @@ function renderMarkdown(source) {
 
 export default function DocumentationViewer({ open, onClose, initialChapter = 'introducao' }) {
   const [chapterIndex, setChapterIndex] = useState(() => Math.max(0, chapters.findIndex(chapter => chapter.id === initialChapter)))
+  const contentRef = useRef(null)
   const chapter = chapters[chapterIndex]
   const content = useMemo(() => renderMarkdown(chapter.source), [chapter])
 
@@ -116,24 +117,28 @@ export default function DocumentationViewer({ open, onClose, initialChapter = 'i
     }
   }, [chapterIndex, onClose, open])
 
+  useEffect(() => {
+    if (contentRef.current) contentRef.current.scrollTop = 0
+  }, [chapterIndex])
+
   if (!open) return null
 
   return (
     <div className="wm-docs-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <section className="wm-docs-dialog" role="dialog" aria-modal="true" aria-label="Documentação do Wave Manifold Explorer">
         <header className="wm-docs-header">
-          <div><span>Wave Manifold Explorer</span><strong>Documentação</strong></div>
+          <div><span>Documentação · capítulo {chapterIndex + 1} de {chapters.length}</span><strong>{chapter.title}</strong></div>
           <button type="button" onClick={onClose} aria-label="Fechar documentação">×</button>
         </header>
         <div className="wm-docs-layout">
           <nav className="wm-docs-nav" aria-label="Capítulos da documentação">
             {chapters.map((item, index) => (
-              <button key={item.id} type="button" className={index === chapterIndex ? 'active' : ''} onClick={() => setChapterIndex(index)}>
+              <button key={item.id} type="button" className={index === chapterIndex ? 'active' : ''} aria-current={index === chapterIndex ? 'page' : undefined} onClick={() => setChapterIndex(index)}>
                 <span>{index + 1}</span>{item.title}
               </button>
             ))}
           </nav>
-          <article className="wm-docs-content">{content}</article>
+          <article ref={contentRef} className="wm-docs-content" tabIndex="0">{content}</article>
         </div>
         <footer className="wm-docs-footer">
           <button type="button" disabled={chapterIndex === 0} onClick={() => setChapterIndex((index) => index - 1)}>← Anterior</button>

@@ -584,11 +584,20 @@ export default function VisualizationControlsPanel({
             checked={showCoincidence}
             onChange={setShowCoincidence}
             color={waveColors.coincidence}
-            label={<><MathLabel tex={String.raw`\mathcal{E}`} /><span> : Coincidência</span></>}
+            label={<><MathLabel tex="\mathcal{E}" /><span> : Coincidência</span></>}
             helper={{
-              title: <><MathLabel tex={String.raw`\mathcal{E}`} /><span> — Coincidência</span></>,
+              title: <><MathLabel tex="\mathcal{E}" /><span> — Coincidência</span></>,
               description: (
-                <><p>{"Coincidência: os dois valores característicos coincidem."}</p></>
+                <>
+                  <p>Como <MathLabel tex="\mathcal{C} = \{Y=0\}" /> e, neste modelo, a coincidência corresponde a <MathLabel tex="\tau=0" />, temos:</p>
+                  <div className="tooltip-equation"><MathLabel tex="\mathcal{E} = \{(\tau, Y, z)\in\mathcal{W} : Y=0, \tau = 0\}" />.</div>
+                  <p>Se <MathLabel tex="P\in\mathcal{C}" />, as duas projeções representam o mesmo estado:</p>
+                  <div className="tooltip-equation"><MathLabel tex="\pi_-(P) = \pi_+(P) = U" />.</div>
+                  <p>A coincidência reúne os pontos em que as velocidades características lenta e rápida desse estado são iguais:</p>
+                  <div className="tooltip-equation"><MathLabel tex="\mathcal{E} = \{P\in\mathcal{C} : \lambda_s(\pi(P)) = \lambda_f(\pi(P))\}" />.</div>
+                  <p>Na superfície característica, usamos a projeção comum:</p>
+                  <div className="tooltip-equation"><MathLabel tex="\pi = \pi_-|_{\mathcal{C}} = \pi_+|_{\mathcal{C}}" />.</div>
+                </>
               ),
               documentation: "curvas",
             }}
@@ -601,7 +610,7 @@ export default function VisualizationControlsPanel({
             helper={{
               title: <><MathLabel tex="\mathcal{C}=\mathcal{C}_s\cup\mathcal{E}\cup\mathcal{C}_f" /><span> — Características</span></>,
               description: (
-                <><p>Plano Característico <MathLabel tex="Y=0" /> em <MathLabel tex="(\tau,Y,\hat{z})" />, com as regiões das famílias lenta e rápida.</p></>
+                <><p>Plano característico <MathLabel tex="Y=0" /> em <MathLabel tex="(\tau,Y,\hat{z})" />, dividido nas folhas lenta <MathLabel tex="\mathcal{C}_s" /> e rápida <MathLabel tex="\mathcal{C}_f" />.</p></>
               ),
               documentation: "curvas",
             }}

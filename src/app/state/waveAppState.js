@@ -62,9 +62,9 @@ const initialInspectionCurveVisibility = {
 export const initialWaveAppState = {
   params: defaultParams,
   view: defaultView,
-  yScale: 0.6,
+  yScale: 0.8,
   tScale: 3.0,
-  zScale: 3.0,
+  zScale: 4.0,
   resolution: 40,
   opacity: 0.75,
   showAxes: true,

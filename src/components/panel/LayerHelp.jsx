@@ -21,13 +21,14 @@ export default function LayerHelp({ children, helper }) {
   const show = (event) => {
     keep()
     const rect = anchor.current.getBoundingClientRect()
-    const width = Math.min(380, window.innerWidth - 24)
+    const width = Math.min(400, window.innerWidth - 24)
+    const maxHeight = Math.min(420, window.innerHeight - 24)
     // Mouse hover starts beside the pointer; keyboard focus uses the row.
     // Keep the popup stationary so its documentation button stays reachable.
     const x = event.type === 'mouseenter' ? event.clientX : rect.left
     const y = event.type === 'mouseenter' ? event.clientY : rect.bottom
     const left = x + width + 24 <= window.innerWidth ? x + 12 : Math.max(12, x - width - 12)
-    const nextPosition = { left, top: Math.max(12, Math.min(y + 12, window.innerHeight - 292)), width }
+    const nextPosition = { left, top: Math.max(12, Math.min(y + 12, window.innerHeight - maxHeight - 12)), width }
     timer.current = setTimeout(() => {
       dismissActiveHelp?.()
       dismissActiveHelp = close

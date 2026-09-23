@@ -2913,13 +2913,27 @@ body {
   color: #f8fafc;
 }
 
+.wm-docs-nav button.active {
+  border-left-color: #22d3ee;
+  box-shadow: inset 3px 0 0 rgba(34, 211, 238, 0.75);
+}
+
+.wm-docs-nav button.active span {
+  background: rgba(34, 211, 238, 0.2);
+  color: #cffafe;
+}
+
 .wm-docs-content {
   max-width: 850px;
   padding: 30px 42px 48px;
   overflow-y: auto;
+  outline: none;
   font-size: var(--wm-font-body);
   line-height: 1.72;
+  scroll-behavior: smooth;
 }
+
+.wm-docs-content:focus-visible { box-shadow: inset 0 0 0 2px rgba(34, 211, 238, 0.36); }
 
 .wm-docs-content h1 {
   margin: 0 0 24px;
@@ -2928,7 +2942,9 @@ body {
 }
 
 .wm-docs-content h2 {
-  margin: 30px 0 10px;
+  margin: 32px 0 12px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.15);
   color: #7dd3fc;
   font-size: 18px;
 }
@@ -2947,9 +2963,15 @@ body {
   margin-top: 5px;
 }
 
+.wm-docs-content li::marker { color: #38bdf8; font-weight: 700; }
+
 .wm-docs-math {
   margin: 12px 0 18px;
   overflow-x: auto;
+  padding: 11px 14px;
+  border: 1px solid rgba(125, 211, 252, 0.12);
+  border-radius: 9px;
+  background: rgba(2, 9, 18, 0.38);
   color: #f8fafc;
   text-align: center;
 }
@@ -3118,13 +3140,12 @@ body {
 .scene-hover-tooltip {
   position: fixed;
   z-index: 30;
-  min-width: 214px;
-  max-width: 280px;
-  padding: 8px 9px;
-  border: 1px solid rgba(34, 211, 238, 0.55);
-  border-radius: 10px;
-  background: rgba(2, 9, 18, 0.92);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  width: min(288px, calc(100vw - 24px));
+  overflow: hidden;
+  border: 1px solid rgba(103, 232, 249, 0.5);
+  border-radius: 12px;
+  background: rgba(3, 12, 23, 0.96);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.46), 0 0 0 1px rgba(34, 211, 238, 0.07);
   color: #e5f9ff;
   font-size: var(--wm-font-aux);
   line-height: 1.25;
@@ -3133,8 +3154,10 @@ body {
 }
 
 .scene-hover-tooltip-title {
-  margin-bottom: 6px;
-  color: #a5f3fc;
+  padding: 9px 11px;
+  border-bottom: 1px solid rgba(103, 232, 249, 0.22);
+  background: linear-gradient(90deg, rgba(8, 145, 178, 0.24), rgba(8, 145, 178, 0.04));
+  color: #cffafe;
   font-size: var(--wm-font-title);
   font-weight: 800;
   overflow: hidden;
@@ -3144,20 +3167,24 @@ body {
 
 .scene-hover-tooltip-row {
   display: grid;
-  grid-template-columns: 46px minmax(0, 1fr);
+  grid-template-columns: 52px minmax(0, 1fr);
   align-items: center;
-  gap: 7px;
-  padding: 3px 0;
+  gap: 9px;
+  padding: 6px 11px;
   border-top: 1px solid rgba(148, 163, 184, 0.12);
 }
 
+.scene-hover-tooltip-title + .scene-hover-tooltip-row { border-top: 0; }
+
+.scene-hover-tooltip-row:nth-child(odd) { background: rgba(15, 23, 42, 0.3); }
+
 .scene-hover-tooltip-row span {
-  color: #93c5fd;
+  color: #7dd3fc;
   font-weight: 700;
 }
 
 .scene-hover-tooltip-row strong {
-  color: #ffffff;
+  color: #f8fafc;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   font-size: var(--wm-font-aux);
   font-weight: 700;
@@ -3311,16 +3338,17 @@ button, input, select, textarea {
   animation: layer-help-appear 120ms ease-out;
   position: fixed;
   z-index: 1000;
-  max-height: min(280px, calc(100vh - 24px));
+  max-height: min(420px, calc(100vh - 24px));
   overflow: auto;
-  padding: 12px;
-  border: 1px solid #526b83;
-  border-radius: 8px;
-  background: #0b1929;
+  border: 1px solid rgba(103, 232, 249, 0.34);
+  border-left: 3px solid #22d3ee;
+  border-radius: 12px;
+  background: rgba(7, 20, 34, 0.98);
   color: #e2e8f0;
-  box-shadow: 0 8px 24px #0008;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.52), 0 0 0 1px rgba(255, 255, 255, 0.025);
   font-size: 13px;
-  line-height: 1.45;
+  line-height: 1.52;
+  scrollbar-gutter: stable;
 }
 
 .layer-help-definition {
@@ -3329,21 +3357,28 @@ button, input, select, textarea {
   padding-bottom: 5px;
 }
 
-.layer-help-popover p { margin: 8px 0; }
+.layer-help-popover p { margin: 9px 0; }
 .layer-help-title {
-  padding-bottom: 9px;
-  border-bottom: 1px solid #526b8366;
-  font-size: 13px;
-  font-weight: 700;
-  color: #e0f2fe;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(103, 232, 249, 0.2);
+  background: linear-gradient(90deg, rgba(8, 145, 178, 0.2), rgba(7, 20, 34, 0.98));
+  font-size: 14px;
+  font-weight: 800;
+  color: #cffafe;
   overflow-x: auto;
 }
-.layer-help-description { padding: 2px 0 8px; }
+.layer-help-description { padding: 5px 14px 10px; }
 .layer-help-description ul { margin: 8px 0; padding-left: 18px; }
 .layer-help-description li + li { margin-top: 5px; }
 .layer-help-footer {
-  padding-top: 9px;
-  border-top: 1px solid #526b8366;
+  position: sticky;
+  bottom: 0;
+  padding: 10px 14px;
+  border-top: 1px solid rgba(103, 232, 249, 0.18);
+  background: rgba(7, 20, 34, 0.98);
 }
 .layer-help-section {
   margin: 10px 0;
@@ -3361,14 +3396,17 @@ button, input, select, textarea {
   padding: 4px 0;
 }
 .layer-help-popover button {
-  padding: 6px 8px;
-  border: 1px solid #526b83;
-  border-radius: 5px;
-  background: #123047;
-  color: #e0f2fe;
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid rgba(34, 211, 238, 0.38);
+  border-radius: 7px;
+  background: rgba(8, 145, 178, 0.16);
+  color: #cffafe;
   font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
 }
+.layer-help-popover button:hover { border-color: #67e8f9; background: rgba(8, 145, 178, 0.26); }
 .layer-help-popover button:focus-visible { outline: 2px solid #38bdf8; }
 
 @keyframes layer-help-appear {
@@ -3378,4 +3416,15 @@ button, input, select, textarea {
 
 @media (prefers-reduced-motion: reduce) {
   .layer-help-popover { animation: none; }
+}
+
+.tooltip-equation {
+  width: 100%;
+  text-align: center;
+  margin: 8px 0;
+  padding: 7px 8px;
+  overflow-x: auto;
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  border-radius: 7px;
+  background: rgba(2, 9, 18, 0.52);
 }

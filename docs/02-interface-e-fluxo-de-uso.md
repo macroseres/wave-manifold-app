@@ -11,7 +11,7 @@
 
 1. Escolha um caso de Schaeffer–Shearer ou ajuste os parâmetros.
 2. Ative no painel esquerdo as superfícies e curvas de interesse.
-3. Fazer clique na superfície característica, se o clique for na \(C_s\) o ponto determina \(U_L\) e se o clique for na \(C_f\) o ponto determina \(U_R\).
+3. Clique na superfície característica: um ponto em \(C_s\) determina \(U_L\), enquanto um ponto em \(C_f\) determina \(U_R\).
 4. Ative **Inspeção** para examinar curvas ligadas a um estado, tanto na variedade quanto no espaço de estados.
 5. Com os dois estados selecionados, ative **Solução** para construir os arcos admissíveis.
 6. Compare a variedade 3D, o espaço de estados e o perfil resultante.
@@ -25,6 +25,10 @@ Em **Ajustes**, podem ser alteradas as escalas dos eixos, a resolução numéric
 ## Camadas da cena
 
 O painel esquerdo agrupa as camadas em referências geométricas, superfícies e fronteiras, família lenta e família rápida. **Ocultar tudo** e **Mostrar tudo** ajudam a isolar construções; **Limpar seleções** remove os estados escolhidos.
+
+Ao manter o ponteiro sobre uma camada, aparece um cartão curto com sua definição e seu papel geométrico. O botão **Abrir documentação** leva diretamente ao capítulo relacionado. Esses cartões servem como consulta rápida; as deduções, equações e limitações ficam registradas nos seis capítulos.
+
+Na variedade 3D, passar o ponteiro sobre uma sonda, interseção ou ponto notável mostra outro cartão com \((\tau,Y,z)\), os estados \(U^-\) e \(U^+\) e a velocidade \(s\). Valores indicados por `−` não estão definidos para aquele objeto ou ainda não foram calculados.
 
 ## Inspeção no espaço de estados
 
