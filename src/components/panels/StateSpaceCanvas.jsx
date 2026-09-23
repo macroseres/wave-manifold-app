@@ -1,6 +1,6 @@
 import { findHysteresisDoubleStates } from '../../geometry/hysteresisSelfIntersection.js'
 import { buildDoubleSonicStateProjection } from '../../geometry/doubleSonicStateProjection.js'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import MathLabel from './MathLabel'
 import CompositeSegmentsWorker from '../../workers/compositeSegments.worker?worker'
 import { RAREFACTION, clampResolutionSamples } from '../../config/numerics'

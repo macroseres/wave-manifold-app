@@ -18,8 +18,9 @@ O princípio arquitetural é manter o cálculo independente de React e Three.js 
 Pastas representam responsabilidades ou domínios; os painéis visuais ficam em
 `components/panels/` e sua coordenação em `app/panels/`. Componentes React usam
 PascalCase, funções e propriedades usam camelCase, e hooks usam o prefixo `use`.
-As pastas `core/` e `math/` conservam entradas de compatibilidade; novas
-implementações matemáticas pertencem a `entities/`.
+As implementações matemáticas pertencem a `entities/`. A entrada
+`core/types/mathTypes.js` mantém os aliases de tipos ainda cobertos por testes;
+as antigas fachadas sem consumidores foram removidas.
 
 Em `components/objects/`, cada pasta identifica o objeto desenhado:
 `hugoniot`, `rarefaction`, `composite`, `characteristic`, `sonic`, `coincidence`,
@@ -60,6 +61,14 @@ As curvas implícitas no espaço de estados são extraídas por contorno em grad
 As curvas de rarefação e composta mais custosas são calculadas em Web Workers. A interface recebe segmentos serializáveis e mantém a renderização separada do cálculo.
 
 ## Execução local
+
+Os valores iniciais de cada caso de Schaeffer–Shearer ficam em
+`src/components/panels/schaefferShearerConfig.js`: parâmetros, escalas,
+resolução e limites da janela. `defaultParams` e `defaultView`, usados como
+referência pelos módulos matemáticos, testes e benchmark, são derivados do caso IV.
+Os controles de redefinição usam o caso ativo. Escalas, resolução e janela
+personalizadas são salvas por caso no navegador e têm prioridade ao reabrir;
+redefinir reaplica os valores declarados no arquivo.
 
 ```text
 npm install

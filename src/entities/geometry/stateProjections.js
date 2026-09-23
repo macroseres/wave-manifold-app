@@ -64,7 +64,4 @@ export function projectPointPlus(point, params) {
   return projectPlus(point.t, point.Y ?? 0, point.z, params)
 }
 
-export function projectPointStates(point, params) {
-  if (!point) return null
-  return projectStates(point.t, point.Y ?? 0, point.z, params)
-}
+

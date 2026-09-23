@@ -2,16 +2,6 @@ export function pushSegment(segments, current) {
   if (current.length >= 2) segments.push(current)
 }
 
-export function inExpandedWindow(point, view, marginFactor = 0.02) {
-  const yTol = marginFactor * Math.max(1, view.yMax - view.yMin)
-  const tTol = marginFactor * Math.max(1, view.tMax - view.tMin)
-  return (
-    point.z >= view.zMin && point.z <= view.zMax &&
-    point.t >= view.tMin - tTol && point.t <= view.tMax + tTol &&
-    point.Y >= view.yMin - yTol && point.Y <= view.yMax + yTol
-  )
-}
-
 export function inflectionZDomain(view) {
   // A curva de inflexao J vive em Y=0, isto e, na propria superficie
   // caracteristica. Para fins de desenho ela deve ser recortada pela

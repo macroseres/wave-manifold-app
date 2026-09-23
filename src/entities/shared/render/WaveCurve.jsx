@@ -1,5 +1,5 @@
 import HysteresisSaturationSelfIntersectionCurve from '../../../components/objects/hysteresis/HysteresisSaturationSelfIntersectionCurve.jsx'
-import React from 'react'
+
 
 import CoincidenceCurve from '../../../components/objects/coincidence/CoincidenceCurve.jsx'
 import { HysteresisLeftCurve, HysteresisRightCurve } from '../../../components/objects/hysteresis/HysteresisCurves.jsx'

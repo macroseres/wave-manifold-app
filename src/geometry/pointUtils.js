@@ -10,10 +10,6 @@ export function withCoords(point) {
   return validWavePoint(point) ? { ...point, coords: point.coords ?? [point.t, point.Y, point.z] } : null
 }
 
-export function cleanSegment(segment) {
-  return (segment ?? []).map(withCoords).filter(Boolean)
-}
-
 export function coarsenPoints(points, maxPoints) {
   if (!Array.isArray(points) || points.length <= maxPoints) return points ?? []
   const out = []
@@ -39,26 +35,4 @@ export function normalizedPointDistance(a, b, view) {
   return Math.sqrt(normalizedPointDistance2(a, b, view))
 }
 
-export function splitContinuousWavePoints(points, view, maxJump = 0.38) {
-  const segments = []
-  let current = []
 
-  for (const point of points) {
-    if (!validWavePoint(point)) {
-      if (current.length >= 2) segments.push(current)
-      current = []
-      continue
-    }
-
-    const decorated = withCoords(point)
-    const previous = current[current.length - 1]
-    if (previous && normalizedPointDistance(previous, decorated, view) > maxJump) {
-      if (current.length >= 2) segments.push(current)
-      current = []
-    }
-    current.push(decorated)
-  }
-
-  if (current.length >= 2) segments.push(current)
-  return segments
-}

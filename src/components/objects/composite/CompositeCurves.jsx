@@ -211,11 +211,5 @@ function CompositeFastCurveImpl(props) {
 export const CompositeSlowCurve = React.memo(CompositeSlowCurveImpl)
 export const CompositeFastCurve = React.memo(CompositeFastCurveImpl)
 
-// Funções mantidas apenas como aliases de compatibilidade para chamadas antigas.
-// A visualização atual usa CompositeSlowCurve e CompositeFastCurve.
-export function CompositeSlowArcCurve(props) { return <CompositeSlowCurve {...props} /> }
-export function CompositeFastArcCurve(props) { return <CompositeFastCurve {...props} /> }
-
-export default React.memo(CompositeCurveBase)
 
 

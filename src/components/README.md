@@ -6,7 +6,7 @@ superfícies do mesmo objeto ficam juntas, incluindo suas saturações.
 | Pasta em `objects/` | Arquivos e objetos desenhados |
 | --- | --- |
 | `characteristic/` | `CharacteristicSurface.jsx`: característica C, com folhas lenta e rápida |
-| `hugoniot/` | `HugoniotCurve.jsx`: folhas H₋ e H₊; `ShockCurve.jsx`: arcos de choque |
+| `hugoniot/` | `HugoniotCurve.jsx`: folhas H₋ e H₊ |
 | `rarefaction/` | `RarefactionCurve.jsx`, `RarefactionArcCurve.jsx`: rarefações e seus arcos; `RarefactionSaturationSurfaces.jsx`: saturações das rarefações lenta e rápida |
 | `composite/` | `CompositeCurves.jsx`: curvas compostas lenta e rápida |
 | `sonic/` | `SonicMinusSurface.jsx`: S⁻; `SonicPlusSurface.jsx`: S⁺ |
@@ -16,7 +16,7 @@ superfícies do mesmo objeto ficam juntas, incluindo suas saturações.
 | `inflection/` | `InflectionCurves.jsx`: inflexões lenta e rápida J₋ e J₊ |
 | `doubleSonic/` | `DoubleSonicCurve.jsx`: dupla sônica DS |
 | `hopf/` | `HopfSurface.jsx`: superfícies de Hopf |
-| `solution/` | `FastWaveCurve.jsx`, `AdmissibleArcCurve.jsx`, `IntermediateSlowSurface.jsx`: construções que combinam famílias de ondas |
+| `solution/` | `AdmissibleArcCurve.jsx`: arcos admissíveis das famílias de ondas |
 | `shared/` | `CurveSegments.jsx`, `OrientedArcMarkers.jsx`, `smoothCurve.js`: desenho de segmentos, marcadores e suavização compartilhados |
 
 A saturação usada na construção das compostas é gerada pela **rarefação**;

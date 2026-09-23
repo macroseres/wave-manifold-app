@@ -1,7 +1,7 @@
 export { P, Q, A } from './algebra.js'
 export { uEquilibrium, vEquilibrium, uEquilibriumPrime, rarefactionDerivativeDtDz, barU, barV, computeStateFromCharacteristicPoint, computeLeftStateFromWavePoint, computeRightStateFromWavePoint, solveHugoniotPointForFixedState, solveBackwardHugoniotPointForFixedRightState, waveSpeed } from './state.js'
 export { sonicImplicitF, sonicLeftImplicitF, sonicLeftBranchIndicator, sonicRightBranchIndicator, solveSonicBranchSeparatorPoint, hysteresisRightImplicitF, solveRightHysteresisPoint, solveLeftHysteresisPoint, sonicLineTCoeff, sonicLineYCoeff, sonicLineConst } from './sonic.js'
-export { defaultParams, defaultView } from '../../config/viewDefaults.js'
+export { defaultParams, defaultView } from '../../components/panels/schaefferShearerConfig.js'
 export { waveColors } from '../../config/waveColors.js'
 export { solveCoincidenceSegments, solveSecondaryLeftBifurcationSegments, solveSecondaryRightBifurcationSegments, solveInflectionSegments, solveDoubleSonicSegments } from './specialSegments.js'
 export { solveCharacteristicHugoniotPointForFixedState, solveCharacteristicHugoniotIntersections, inflectionPointAtZ, computeRarefactionInflectionIntersection, computeHugoniotIntersections } from './intersections.js'

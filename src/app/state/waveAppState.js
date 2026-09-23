@@ -1,7 +1,9 @@
 import { useCallback, useMemo, useReducer } from 'react'
 
-import { defaultParams, defaultView } from '../../config/viewDefaults'
 import { readCaseDrawings } from '../../components/panels/schaefferCaseStorage.js'
+import { drawingDefaultForCase, parametersDefaultForCase } from '../../components/panels/schaefferShearerConfig.js'
+
+const initialCaseDrawing = drawingDefaultForCase('iv')
 
 export const initialSolutionCurveVisibility = {
   slow: {
@@ -61,12 +63,10 @@ const initialInspectionCurveVisibility = {
 }
 
 export const initialWaveAppState = {
-  params: defaultParams,
-  view: defaultView,
-  yScale: 0.8,
-  tauScale: 3.0,
-  zScale: 4.0,
-  resolution: 40,
+  params: parametersDefaultForCase('iv'),
+  view: initialCaseDrawing.view,
+  ...initialCaseDrawing.scales,
+  resolution: initialCaseDrawing.resolution,
   opacity: 0.75,
   showAxes: true,
   showCharacteristic: true,
@@ -162,10 +162,6 @@ function waveAppReducer(state, action) {
     }
     case 'patch':
       return { ...state, ...action.patch }
-    case 'resetParams':
-      return { ...state, params: defaultParams }
-    case 'resetView':
-      return { ...state, view: defaultView }
     case 'zoomIn':
       return { ...state, zoomSignal: state.zoomSignal + 1 }
     case 'zoomOut':
@@ -215,8 +211,6 @@ export function useWaveAppState() {
     const nextActions = {
       dispatch,
       patch: (patch) => dispatch({ type: 'patch', patch }),
-      resetParams: () => dispatch({ type: 'resetParams' }),
-      resetView: () => dispatch({ type: 'resetView' }),
       zoomIn: () => dispatch({ type: 'zoomIn' }),
       zoomOut: () => dispatch({ type: 'zoomOut' }),
       clearSelection: () => dispatch({ type: 'clearSelection' }),

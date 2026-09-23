@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { ZCompactifiedLine as Line } from '../../../app/scene/ZCompactification'
 import { waveColors } from '../../../entities/surfaceImplicit'
 import { buildHysteresisCurveSegments, solveLeftHysteresisPoint, solveRightHysteresisPoint } from '../../../entities/hysteresis'

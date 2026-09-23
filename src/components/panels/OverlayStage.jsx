@@ -1,4 +1,3 @@
-import React from 'react'
 import MathLabel from './MathLabel'
 import StateSpaceCanvas, { SolutionCanvas } from './StateSpaceCanvas'
 import ParameterMapView from './ParameterMapView'

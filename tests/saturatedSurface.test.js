@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { saturatedHysteresisImplicit, buildHysteresisSaturationGeometry } from '../src/geometry/hysteresisSaturationGeometry.js'
 import { solveRightHysteresisPoint, computeLeftStateFromWavePoint } from '../src/entities/surfaceImplicit/index.js'
 import { solveHugoniotPointForFixedState } from '../src/entities/waves/index.js'
-import { defaultParams, defaultView } from '../src/config/viewDefaults.js'
+import { defaultParams, defaultView } from '../src/components/panels/schaefferShearerConfig.js'
 import { physicalZToVisual } from '../src/geometry/zCompactification.js'
 
 test('implicit saturation contains the original hysteresis leaves', () => {

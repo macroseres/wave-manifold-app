@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import * as THREE from 'three'
 import { physicalPointToVisual } from '../../../geometry/zCompactification'
 

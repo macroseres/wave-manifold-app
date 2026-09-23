@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import introduction from '../../../docs/01-introducao-e-fundamentos.md?raw'
 import interfaceFlow from '../../../docs/02-interface-e-fluxo-de-uso.md?raw'
 import curves from '../../../docs/03-construcao-das-curvas.md?raw'

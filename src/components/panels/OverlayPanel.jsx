@@ -1,4 +1,3 @@
-import React from 'react'
 import VisualizationControlsPanel from './VisualizationControlsPanel'
 import RightInfoPanel from './RightInfoPanel'
 import OverlayTopBar from './OverlayTopBar'
@@ -21,7 +20,6 @@ export default function OverlayPanel(props) {
     resolution,
     opacity,
     setOpacity,
-    resetParams,
     selectedEntries = [],
     activeView = '3d',
     setActiveView,
@@ -184,7 +182,7 @@ export default function OverlayPanel(props) {
           resetParameterWindow: controller.resetParameterWindow,
           params,
           updateParam: controller.updateParam,
-          resetParams,
+          resetParams: controller.resetCaseParams,
         }}
       />
 

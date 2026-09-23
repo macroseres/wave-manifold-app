@@ -1,5 +1,4 @@
-import { solveInflectionSegments } from '../entities/inflection/index.js'
-import { solveRightHysteresisPoint } from '../entities/hysteresis/index.js'
+
 import { projectPointMinus, projectPointPlus } from '../entities/geometry/stateProjections.js'
 import { solveSonicBranchSeparatorPoint } from '../entities/surfaceImplicit/sonic.js'
 import { hugoniotMinusImplicit } from './hugoniotStateImplicit.js'
@@ -223,23 +222,6 @@ export function buildCharacteristicProjectionSamples(view, params, branch, sampl
   return points
 }
 
-
-export function buildInflectionProjectionSegments(view, params, branch) {
-  const segments3d = solveInflectionSegments(params, view, 560, branch)
-  return segments3d
-    .map((segment) => segment
-      .map(([t, Y, z]) => {
-        const manifold = { t, Y: Y ?? 0, z, branch }
-        const state = projectPointMinus(manifold, params)
-        return state && Number.isFinite(state.u) && Number.isFinite(state.v)
-          ? { manifold, state }
-          : null
-      })
-      .filter(Boolean))
-    .filter((segment) => segment.length >= 2)
-}
-
-
 export function expandedStateBounds(bounds, factor = 0.04) {
   if (!bounds) return null
   const uSpan = Math.max(1e-9, bounds.uMax - bounds.uMin)
@@ -280,72 +262,6 @@ export function hysZSearchWindow(view, bounds) {
 
   const radius = Math.min(80, Math.max(12, 6 * viewRadius, 4 * stateRadius))
   return { zMin: -radius, zMax: radius }
-}
-
-export function buildHysPlusProjectionSegments(view, params, side = 'minus', bounds = null, samples = 5200) {
-  if (!view || !params) return []
-
-  const zWindow = hysZSearchWindow(view, bounds)
-  if (!Number.isFinite(zWindow.zMin) || !Number.isFinite(zWindow.zMax) || zWindow.zMax <= zWindow.zMin) return []
-
-  const clipBounds = expandedStateBounds(bounds, 0.06)
-  const segments = []
-  let current = []
-  let previous = null
-  const maxJump = 0.22 * Math.max(
-    1,
-    Math.abs(bounds?.uMax - bounds?.uMin || 0),
-    Math.abs(bounds?.vMax - bounds?.vMin || 0),
-  )
-
-  const flush = () => {
-    if (current.length >= 2) segments.push(current)
-    current = []
-  }
-
-  for (let i = 0; i < samples; i += 1) {
-    const z = zWindow.zMin + (i / Math.max(1, samples - 1)) * (zWindow.zMax - zWindow.zMin)
-    const manifold = solveRightHysteresisPoint(z, params)
-    if (!manifold) { flush(); previous = null; continue }
-
-    const projected = side === 'plus'
-      ? projectPointPlus(manifold, params)
-      : projectPointMinus(manifold, params)
-    const u = side === 'plus' ? projected?.uPlus : projected?.uMinus
-    const v = side === 'plus' ? projected?.vPlus : projected?.vMinus
-    if (!Number.isFinite(u) || !Number.isFinite(v) || Math.abs(u) > 1e6 || Math.abs(v) > 1e6) {
-      flush(); previous = null; continue
-    }
-
-    const sample = { manifold: { ...manifold, branch: `hys-plus-${side}` }, state: { u, v } }
-    const inside = stateInsideBounds(sample.state, clipBounds)
-    const previousInside = previous ? stateInsideBounds(previous.state, clipBounds) : false
-
-    if (!inside) {
-      // Se estamos saindo da janela, guardamos o primeiro ponto externo.
-      // Assim o traço é cortado pelo próprio canvas exatamente na fronteira,
-      // em vez de parar antes dela.
-      if (current.length && previousInside) current.push(sample)
-      flush()
-      previous = sample
-      continue
-    }
-
-    if (!current.length && previous && !previousInside) current.push(previous)
-
-    const last = current[current.length - 1]
-    if (last) {
-      const jump = Math.hypot(sample.state.u - last.state.u, sample.state.v - last.state.v)
-      if (jump > maxJump) {
-        flush()
-        if (previous && !previousInside) current.push(previous)
-      }
-    }
-    current.push(sample)
-    previous = sample
-  }
-  flush()
-  return segments
 }
 
 export function branchCharacteristicWindow(view, branch) {

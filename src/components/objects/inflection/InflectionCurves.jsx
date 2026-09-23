@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { solveInflectionSegments, waveColors } from '../../../entities/surfaceImplicit'
 import CurveSegments from '../shared/CurveSegments'
 

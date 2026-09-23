@@ -3,9 +3,26 @@ import assert from 'node:assert/strict'
 import { readCaseDrawings, saveCaseDrawings } from '../src/components/panels/schaefferCaseStorage.js'
 import {
   drawingDefaultForCase,
+  parametersDefaultForCase,
+  defaultParams,
+  defaultView,
   initialSchaefferShearerCasePresets,
   schaefferShearerCases,
 } from '../src/components/panels/schaefferShearerConfig.js'
+
+test('generic defaults come from case IV and parameter resets respect each case', () => {
+  assert.deepEqual(defaultParams, parametersDefaultForCase('iv'))
+  assert.deepEqual(defaultView, initialSchaefferShearerCasePresets.iv.view)
+  for (const { key } of schaefferShearerCases) {
+    const params = parametersDefaultForCase(key)
+    assert.equal(params.b1, initialSchaefferShearerCasePresets[key].params.b1)
+    assert.equal(params.b2, initialSchaefferShearerCasePresets[key].params.b2)
+    assert.equal(params.a, 0)
+    assert.equal(params.c, 1)
+    params.b1 = 999
+    assert.notEqual(parametersDefaultForCase(key).b1, 999)
+  }
+})
 
 test('every Schaeffer case has independent scales, resolution, and drawing bounds', () => {
   const presets = schaefferShearerCases.map(({ key }) => initialSchaefferShearerCasePresets[key])

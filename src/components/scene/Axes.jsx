@@ -1,4 +1,3 @@
-import React from 'react'
 import { Html, Line as VisualLine } from '@react-three/drei'
 import { ZCompactifiedLine as Line } from '../../app/scene/ZCompactification'
 import { displayCoordinates } from '../../ui/display'

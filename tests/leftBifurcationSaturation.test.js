@@ -4,7 +4,7 @@ import { solveSecondaryLeftBifurcationSegments } from '../src/entities/bifurcati
 import { P, A } from '../src/entities/surfaceImplicit/algebra.js'
 import { solveLeftHysteresisPoint, computeLeftStateFromWavePoint, computeRightStateFromWavePoint, solveHugoniotPointForFixedState, solveBackwardHugoniotPointForFixedRightState } from '../src/entities/surfaceImplicit/index.js'
 import { generateSurfaceBuffers } from '../src/geometry/surfaceGeneration.js'
-import { defaultParams } from '../src/config/viewDefaults.js'
+import { defaultParams } from '../src/components/panels/schaefferShearerConfig.js'
 
 test('B- satisfies its equations and clips to an asymmetric Y window', () => {
   const view = { tMin: -.8, tMax: 1.3, yMin: .2, yMax: 3, zMin: -1, zMax: 1 }

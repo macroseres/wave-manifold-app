@@ -1,4 +1,3 @@
-import React from 'react'
 import HopfSurface from '../../../components/objects/hopf/HopfSurface.jsx'
 
 import CharacteristicSurface from '../../../components/objects/characteristic/CharacteristicSurface.jsx'

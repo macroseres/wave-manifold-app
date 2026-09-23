@@ -1,6 +1,6 @@
-import React from 'react'
 import MathLabel from './MathLabel'
-import { MathVar, RangeControl, Section } from './PanelPrimitives'
+import { controlsForCase } from './schaefferShearerConfig.js'
+import { RangeControl, Section } from './PanelPrimitives'
 
 export default function OverlaySettingsPanel({
   schaefferShearerCases,
@@ -25,6 +25,7 @@ export default function OverlaySettingsPanel({
   resetDrawingView,
   onClose,
 }) {
+  const controls = controlsForCase(selectedSchaefferShearerCase)
   return (
     <aside className="wm-settings-panel wm-panel">
       <div className="settings-header">
@@ -51,19 +52,19 @@ export default function OverlaySettingsPanel({
 
       <Section title="Escalas e resolução" defaultOpen={true} accent="#9333ea">
         <p className="parameter-card-description">Escalas, resolução e janela do caso {schaefferShearerCases.find((item) => item.key === selectedSchaefferShearerCase)?.label} são salvas automaticamente neste navegador para a próxima abertura.</p>
-        <RangeControl label={<><span>Escala visual de </span><MathLabel tex="Y" /></>} min={0.5} max={2} step={0.1} value={yScale} onChange={(v) => updateScale('yScale', v, setYScale)} />
-        <RangeControl label={<><span>Escala visual de </span><MathLabel tex={displayCoordinateTex.tau} /></>} min={0.5} max={6} step={0.1} value={tauScale} onChange={(v) => updateScale('tauScale', v, setTauScale)} />
-        <RangeControl label={<><span>Escala visual de </span><MathLabel tex="\hat z" /></>} min={1} max={6} step={0.1} value={zScale} onChange={(v) => updateScale('zScale', v, setZScale)} />
-        <RangeControl label="Resolução" min={32} max={88} step={4} value={resolution} onChange={setResolution} />
-        <RangeControl label="Opacidade" min={0.1} max={1.0} step={0.05} value={opacity} onChange={setOpacity} />
+        <RangeControl label={<><span>Escala visual de </span><MathLabel tex="Y" /></>} {...controls.yScale} value={yScale} onChange={(v) => updateScale('yScale', v, setYScale)} />
+        <RangeControl label={<><span>Escala visual de </span><MathLabel tex={displayCoordinateTex.tau} /></>} {...controls.tauScale} value={tauScale} onChange={(v) => updateScale('tauScale', v, setTauScale)} />
+        <RangeControl label={<><span>Escala visual de </span><MathLabel tex="\hat z" /></>} {...controls.zScale} value={zScale} onChange={(v) => updateScale('zScale', v, setZScale)} />
+        <RangeControl label="Resolução" {...controls.resolution} value={resolution} onChange={setResolution} />
+        <RangeControl label="Opacidade" {...controls.opacity} value={opacity} onChange={setOpacity} />
         <button type="button" onClick={() => { resetCaseScales(); resetCaseResolution() }} className="primary-button">Redefinir escalas e resolução</button>
       </Section>
 
       <Section title="Janela de desenho" defaultOpen={true} accent="#64748b">
-        <RangeControl label={<MathLabel tex="Y_{\min}" />} min={-10} max={-0.5} step={0.5} value={view.yMin} onChange={(v) => updateView('yMin', v)} />
-        <RangeControl label={<MathLabel tex="Y_{\max}" />} min={0.5} max={10} step={0.5} value={view.yMax} onChange={(v) => updateView('yMax', v)} />
-        <RangeControl label={<MathLabel tex="\tau_{\min}" />} min={-2} max={0} step={0.5} value={view.tMin} onChange={(v) => updateView('tMin', v)} />
-        <RangeControl label={<MathLabel tex="\tau_{\max}" />} min={0} max={2} step={0.5} value={view.tMax} onChange={(v) => updateView('tMax', v)} />
+        <RangeControl label={<MathLabel tex="Y_{\min}" />} {...controls.yMin} value={view.yMin} onChange={(v) => updateView('yMin', v)} />
+        <RangeControl label={<MathLabel tex="Y_{\max}" />} {...controls.yMax} value={view.yMax} onChange={(v) => updateView('yMax', v)} />
+        <RangeControl label={<MathLabel tex="\tau_{\min}" />} {...controls.tMin} value={view.tMin} onChange={(v) => updateView('tMin', v)} />
+        <RangeControl label={<MathLabel tex="\tau_{\max}" />} {...controls.tMax} value={view.tMax} onChange={(v) => updateView('tMax', v)} />
         <button type="button" onClick={resetDrawingView} className="primary-button">Redefinir janela do caso</button>
       </Section>
     </aside>

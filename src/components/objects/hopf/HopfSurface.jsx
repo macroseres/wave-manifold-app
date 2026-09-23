@@ -1,4 +1,3 @@
-import React from 'react'
 import * as THREE from 'three'
 import { useSurfaceGeometry } from '../../../hooks/useSurfaceGeometry'
 import { ZCompactifiedMesh } from '../../../app/scene/ZCompactification'

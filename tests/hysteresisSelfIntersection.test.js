@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { findHysteresisDoubleStates, buildHysteresisSelfIntersectionSegments } from '../src/geometry/hysteresisSelfIntersection.js'
-import { defaultParams, defaultView } from '../src/config/viewDefaults.js'
+import { defaultParams, defaultView } from '../src/components/panels/schaefferShearerConfig.js'
 import { computeLeftStateFromWavePoint, computeRightStateFromWavePoint, solveRightHysteresisPoint, solveLeftHysteresisPoint } from '../src/entities/surfaceImplicit/index.js'
 
 test('left hysteresis saturation does not reuse the right hysteresis double leaf', () => {

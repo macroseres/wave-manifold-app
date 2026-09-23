@@ -1,5 +1,5 @@
 import { performance } from 'node:perf_hooks'
-import { defaultParams as params, defaultView as view } from '../src/config/viewDefaults.js'
+import { defaultParams as params, defaultView as view } from '../src/components/panels/schaefferShearerConfig.js'
 import { buildSonicBranchGeometries } from '../src/entities/sonic/surfaceModel.js'
 import { buildHysteresisSaturationGeometry } from '../src/geometry/hysteresisSaturationGeometry.js'
 import { buildSaturatedCoincidenceGeometry } from '../src/geometry/coincidenceSaturationGeometry.js'

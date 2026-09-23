@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import * as THREE from 'three'
 import { FORWARD_HUGONIOT, normalizeHugoniotDirection } from '../../../../hugoniot/directions.js'
 import { buildGeometryForRarefactionSaturationSegment } from '../../../../../geometry/rarefactionSaturationGeometry.js'

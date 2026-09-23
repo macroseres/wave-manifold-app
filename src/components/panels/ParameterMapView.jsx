@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import { useRef } from 'react'
 import MathLabel from './MathLabel'
 import ParameterRangeControl from './ParameterRangeControl'
 import ParameterCanvas from './ParameterCanvas'

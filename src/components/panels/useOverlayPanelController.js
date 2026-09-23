@@ -6,6 +6,7 @@ import {
   parameterPointMeta,
   schaefferShearerCases,
   drawingDefaultForCase,
+  parametersDefaultForCase,
   initialSchaefferShearerCasePresets,
   initialParameterWindow,
   constrainPointToCase,
@@ -301,6 +302,15 @@ export default function useOverlayPanelController(props) {
     const defaults = drawingDefaultForCase(selectedSchaefferShearerCase)
     setView(defaults.view)
     updateSelectedSchaefferShearerPreset((preset) => ({ ...preset, view: { ...defaults.view } }))
+  }
+
+  const resetCaseParams = () => {
+    const defaults = parametersDefaultForCase(selectedSchaefferShearerCase)
+    setParams(defaults)
+    updateSelectedSchaefferShearerPreset((preset) => ({
+      ...preset,
+      params: { b1: defaults.b1, b2: defaults.b2 },
+    }))
   }
 
   const resetCaseScales = () => {
@@ -651,6 +661,7 @@ export default function useOverlayPanelController(props) {
     updateVisibleParameterCurve,
     resetCaseScales,
     resetDrawingView,
+    resetCaseParams,
     resetParameterWindow,
     visualizationPanelProps,
     visibleParameterCurves,

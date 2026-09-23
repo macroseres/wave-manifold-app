@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { saturatedHysteresisImplicit } from '../src/geometry/hysteresisSaturationGeometry.js'
 import { generateSurfaceBuffers } from '../src/geometry/surfaceGeneration.js'
 import { solveRightHysteresisPoint, computeRightStateFromWavePoint, solveBackwardHugoniotPointForFixedRightState } from '../src/entities/surfaceImplicit/index.js'
-import { defaultParams, defaultView } from '../src/config/viewDefaults.js'
+import { defaultParams, defaultView } from '../src/components/panels/schaefferShearerConfig.js'
 
 test('Hys plus crosses zero without a false pole or an unstable seed', () => {
   for (const params of [defaultParams, { b1: 3, b2: 0, c: 2 }, { b1: 5, b2: -.4, c: .7 }]) {

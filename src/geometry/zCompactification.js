@@ -18,11 +18,6 @@ export function physicalPointToVisual(point) {
   return [coords[0], coords[1], physicalZToVisual(coords[2])]
 }
 
-export function visualPointToPhysical(point) {
-  const coords = Array.isArray(point) ? point : [point.x, point.y, point.z]
-  return [coords[0], coords[1], visualZToPhysical(coords[2])]
-}
-
 export function compactifyZPositionArray(array) {
   const output = new Float32Array(array)
   for (let index = 2; index < output.length; index += 3) output[index] = physicalZToVisual(output[index])

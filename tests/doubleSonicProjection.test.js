@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { buildDoubleSonicStateProjection } from '../src/geometry/doubleSonicStateProjection.js'
-import { defaultParams as params } from '../src/config/viewDefaults.js'
+import { defaultParams as params } from '../src/components/panels/schaefferShearerConfig.js'
 import { projectPointMinus, projectPointPlus } from '../src/entities/geometry/stateProjections.js'
 import { sonicImplicitF, sonicLeftImplicitF } from '../src/entities/surfaceImplicit/sonic.js'
 

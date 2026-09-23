@@ -1,4 +1,3 @@
-import React from 'react'
 
 import OverlayPanel from '../../components/panels/OverlayPanel'
 
@@ -24,8 +23,6 @@ export default function WaveOverlayPanel({
       view={state.view}
       calculationView={calculationView}
       setView={actions.setView}
-      resetParams={actions.resetParams}
-      resetView={actions.resetView}
       yScale={state.yScale}
       setYScale={actions.setYScale}
       tauScale={state.tauScale}

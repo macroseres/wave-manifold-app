@@ -4,7 +4,7 @@ import { buildImplicitSurfaceGeometry } from '../src/entities/implicitGeometry/i
 import { generateSurfaceBuffers, surfaceBufferSize } from '../src/geometry/surfaceGeneration.js'
 import { buildSaturatedCoincidenceGeometry } from '../src/geometry/coincidenceSaturationGeometry.js'
 import { compactifyZPositionArray } from '../src/geometry/zCompactification.js'
-import { defaultParams as params, defaultView as view } from '../src/config/viewDefaults.js'
+import { defaultParams as params, defaultView as view } from '../src/components/panels/schaefferShearerConfig.js'
 
 test('implicit extraction evaluates every lattice point once, including NaN values', () => {
   for (const invalid of [false, true]) {

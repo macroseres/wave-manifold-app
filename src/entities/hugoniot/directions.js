@@ -9,6 +9,4 @@ export function isBackwardHugoniot(direction) {
   return normalizeHugoniotDirection(direction) === BACKWARD_HUGONIOT
 }
 
-export function hugoniotDirectionLabel(direction) {
-  return isBackwardHugoniot(direction) ? 'H_+' : 'H_-'
-}
+

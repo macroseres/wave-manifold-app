@@ -1,4 +1,3 @@
-import React from 'react'
 import MathLabel from '../MathLabel'
 import { Toggle } from '../PanelPrimitives'
 import { defaultCurveVisibility } from './panelDefaults'

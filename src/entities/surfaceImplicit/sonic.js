@@ -62,17 +62,6 @@ export function hysteresisRightImplicitF(Y, t, z, params) {
   return hT * t + hY * Y + hC
 }
 
-export function legacyHysteresisRightImplicitF(Y, t, z, { b1, b2, c }) {
-  const q = Q(z, b1, b2)
-
-  // Retained exclusively for the unchanged Hys- inspection diagnostic.
-  const tCoeff = -4 * b1 * (1 + z * z) * q
-  const yCoeff = (b1 + 1) * (1 + z * z) * (b2 - 4 * z - b2 * (b1 + 1) * z * z)
-  const constTerm = -4 * c * z * q
-
-  return tCoeff * t + yCoeff * Y + constTerm
-}
-
 export function solveRightHysteresisPoint(z, params) {
   const { b1, b2, c } = params
   const k = b1 + 1

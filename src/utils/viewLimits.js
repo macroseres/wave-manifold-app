@@ -19,22 +19,6 @@ function expandInterval(min, max, margin) {
   }
 }
 
-export function expandView(view, margin = VIEW_LIMITS.curveMargin) {
-  const t = expandInterval(view.tMin, view.tMax, margin)
-  const y = expandInterval(view.yMin, view.yMax, margin)
-  const z = expandInterval(view.zMin, view.zMax, margin)
-
-  return {
-    ...view,
-    tMin: t.min,
-    tMax: t.max,
-    yMin: y.min,
-    yMax: y.max,
-    zMin: z.min,
-    zMax: z.max,
-  }
-}
-
 export function expandViewZ(view, margin = VIEW_LIMITS.curveMargin) {
   const z = expandInterval(view.zMin, view.zMax, margin)
   return {

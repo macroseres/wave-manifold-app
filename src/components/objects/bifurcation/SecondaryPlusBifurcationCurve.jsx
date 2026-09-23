@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { ZCompactifiedLine as Line } from '../../../app/scene/ZCompactification'
 import { buildSecondaryRightBifurcationSegments } from '../../../entities/bifurcation'
 import { waveColors } from '../../../config/waveColors'

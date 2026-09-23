@@ -3,7 +3,7 @@ import { createWaveBifoliation, createWaveCurve, createWaveLeaf } from '../../sh
 import { finite, compositeBaseRarefactionSampleCount, buildCompositeBaseRarefaction } from './sampling.js'
 import { buildHugoniotBifoliation, buildRarefactionBifoliation } from '../../waves/basicBifoliations.js'
 import { orientationFromDirection } from '../../waves/orientation.js'
-import { COMPOSITE, HUGONIOT, RAREFACTION, clampResolutionSamples } from '../../../config/numerics.js'
+import { COMPOSITE, HUGONIOT, clampResolutionSamples } from '../../../config/numerics.js'
 import { compositeContinuationView, makeRarefactionParam, makeCompositeLevelFunction, findRarefactionSonicAnchors } from './parametrization.js'
 import { traceLevelSet } from './continuation.js'
 import { extractGlobalCompositeLevelSet } from './marchingSquares.js'

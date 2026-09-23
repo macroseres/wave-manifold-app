@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo } from 'react'
+import { Fragment, useMemo } from 'react'
 import { ZCompactifiedLine as Line } from '../../../app/scene/ZCompactification'
 import OrientedArcMarkers from '../shared/OrientedArcMarkers'
 import { FORWARD_HUGONIOT } from '../../../entities/hugoniot/directions'

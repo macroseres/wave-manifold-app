@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { buildLeftHysteresisCurve, buildRightHysteresisCurve } from '../src/entities/hysteresis/curveSegments.js'
 import { solveLeftHysteresisPoint, solveRightHysteresisPoint } from '../src/entities/surfaceImplicit/index.js'
 import { physicalZToVisual } from '../src/geometry/zCompactification.js'
-import { defaultParams as params, defaultView as view } from '../src/config/viewDefaults.js'
+import { defaultParams as params, defaultView as view } from '../src/components/panels/schaefferShearerConfig.js'
 
 test('both hysteresis curves reach compactified tails and keep exact solver points', () => {
   for (const [build, solve] of [[buildLeftHysteresisCurve, solveLeftHysteresisPoint], [buildRightHysteresisCurve, solveRightHysteresisPoint]]) {

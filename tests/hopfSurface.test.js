@@ -4,7 +4,7 @@ import { hopfPlus, hopfMinus, hopfTracePlus, hopfTraceMinus, hopfSpectrum, HOPF_
 import { buildHopfGeometry } from '../src/geometry/hopfSurfaceGeometry.js'
 import { generateSurfaceBuffers } from '../src/geometry/surfaceGeneration.js'
 import { visualZToPhysical } from '../src/geometry/zCompactification.js'
-import { defaultParams, defaultView } from '../src/config/viewDefaults.js'
+import { defaultParams, defaultView } from '../src/components/panels/schaefferShearerConfig.js'
 
 const parameterCases = [defaultParams, { a: 2, b1: 3, b2: -1, c: 0.7 }, { a: -3, b1: -2, b2: 1, c: -1 }]
 

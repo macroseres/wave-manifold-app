@@ -3,7 +3,7 @@ const STORAGE_KEY = 'wave-manifold.schaeffer-drawing.v1'
 function validDrawing(value) {
   if (!value || !value.scales || !value.view) return false
   const { scales, view, resolution } = value
-  if (!Number.isInteger(resolution) || resolution < 32 || resolution > 88) return false
+  if (!Number.isInteger(resolution) || resolution <= 0) return false
   if (!['yScale', 'tauScale', 'zScale'].every(key => Number.isFinite(scales[key]) && scales[key] > 0)) return false
   return ['y', 't', 'z'].every(axis => (
     Number.isFinite(view[`${axis}Min`]) && Number.isFinite(view[`${axis}Max`])

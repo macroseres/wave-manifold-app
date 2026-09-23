@@ -1,4 +1,3 @@
-import React from 'react'
 
 function fmtTooltip(value) {
   return Number.isFinite(value) ? value.toFixed(5) : '-'

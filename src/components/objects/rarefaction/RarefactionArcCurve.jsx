@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import * as THREE from 'three'
+
 import { ZCompactifiedLine as Line } from '../../../app/scene/ZCompactification'
 import OrientedArcMarkers from '../shared/OrientedArcMarkers'
 import { waveColors } from '../../../config/waveColors'

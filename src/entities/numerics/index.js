@@ -4,10 +4,6 @@ export function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
 }
 
-export function isFiniteNumber(value) {
-  return Number.isFinite(value)
-}
-
 export function safeEval(fn, x) {
   const y = fn(x)
   return Number.isFinite(y) ? y : Number.NaN

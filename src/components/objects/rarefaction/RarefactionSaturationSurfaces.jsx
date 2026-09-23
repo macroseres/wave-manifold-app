@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import * as THREE from 'three'
 import { FORWARD_HUGONIOT, BACKWARD_HUGONIOT } from '../../../entities/hugoniot/directions'
 import { waveColors } from '../../../config/waveColors'

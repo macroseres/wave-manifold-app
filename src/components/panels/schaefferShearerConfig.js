@@ -1,5 +1,3 @@
-import { defaultView } from '../../config/viewDefaults.js'
-
 export const parameterPalette = {
   curves: {
     c1: '#a0a3a5',
@@ -50,84 +48,211 @@ export const schaefferShearerCases = [
   { key: 'iv', label: 'IV' },
 ]
 
-export const defaultSchaefferShearerScales = {
-  yScale: 0.6,
-  tauScale: 3.0,
-  zScale: 3.0,
-}
-
-
 export function drawingDefaultForCase(caseKey, preset) {
-  const explicit = schaefferShearerCaseDrawingDefaults[caseKey]
+  const explicit = schaefferShearerCaseDrawingDefaults[caseKey] ?? schaefferShearerCaseDrawingDefaults.iv
   return {
-    scales: { ...(preset?.scales ?? explicit?.scales ?? defaultSchaefferShearerScales) },
-    view: { ...(preset?.view ?? explicit?.view ?? defaultView) },
-    resolution: preset?.resolution ?? explicit?.resolution ?? 40,
+    scales: { ...(preset?.scales ?? explicit.scales) },
+    view: { ...(preset?.view ?? explicit.view) },
+    resolution: preset?.resolution ?? explicit.resolution,
   }
 }
 
+// Valores iniciais de cada caso: edite somente o bloco do caso desejado.
+// view: yMin/yMax = Y_min/Y_max; tMin/tMax = tau_min/tau_max; zMin/zMax = z_min/z_max.
+// Esses valores são usados na primeira abertura (sem ajustes salvos) e ao redefinir.
+// Ajustes salvos no navegador têm prioridade nas aberturas seguintes.
+// controls define min/max/step das barras, independentemente dos valores iniciais.
+// Ex.: no bloco ia, controls.yMin = { min: -20, max: -0.1, step: 0.1 }.
+// Mantenha os valores iniciais dentro dos intervalos das respectivas barras.
 export const initialSchaefferShearerCasePresets = {
   iv: {
     resolution: 40,
+    controls: {
+      yScale: { min: 0.5, max: 2, step: 0.1 },
+      tauScale: { min: 0.5, max: 6, step: 0.1 },
+      zScale: { min: 1, max: 6, step: 0.1 },
+      resolution: { min: 32, max: 88, step: 4 },
+      opacity: { min: 0.1, max: 1, step: 0.05 },
+      yMin: { min: -10, max: -0.5, step: 0.1 },
+      yMax: { min: 0.5, max: 10, step: 0.1 },
+      tMin: { min: -2, max: 0, step: 0.1 },
+      tMax: { min: 0, max: 2, step: 0.1 },
+    },
     params: { b1: 8, b2: 0.2 },
-    scales: { ...defaultSchaefferShearerScales },
-    view: { ...defaultView },
+    scales: { yScale: 0.8, tauScale: 2.5, zScale: 4.0 },
+    view: { tMin: -1.5, tMax: 1.5, yMin: -3.5, yMax: 3.5, zMin: -2, zMax: 2 },
   },
   iiia: {
     resolution: 40,
+    controls: {
+      yScale: { min: 0.5, max: 2, step: 0.1 },
+      tauScale: { min: 0.5, max: 6, step: 0.1 },
+      zScale: { min: 1, max: 6, step: 0.1 },
+      resolution: { min: 32, max: 88, step: 4 },
+      opacity: { min: 0.1, max: 1, step: 0.05 },
+      yMin: { min: -10, max: -0.5, step: 0.1 },
+      yMax: { min: 0.5, max: 10, step: 0.1 },
+      tMin: { min: -2, max: 0, step: 0.1 },
+      tMax: { min: 0, max: 2, step: 0.1 },
+    },
     params: { b1: 4, b2: 4 },
     scales: { yScale: 0.6, tauScale: 2.5, zScale: 2.5 },
-    view: { ...defaultView, tMin: -1.5, tMax: 1.5, zMin: -2, zMax: 2 },
+    view: { tMin: -1.5, tMax: 1.5, yMin: -3.5, yMax: 3.5, zMin: -2, zMax: 2 },
   },
   iiib: {
     resolution: 40,
+    controls: {
+      yScale: { min: 0.5, max: 2, step: 0.1 },
+      tauScale: { min: 0.5, max: 6, step: 0.1 },
+      zScale: { min: 1, max: 6, step: 0.1 },
+      resolution: { min: 32, max: 88, step: 4 },
+      opacity: { min: 0.1, max: 1, step: 0.05 },
+      yMin: { min: -10, max: -0.5, step: 0.1 },
+      yMax: { min: 0.5, max: 10, step: 0.1 },
+      tMin: { min: -2, max: 0, step: 0.1 },
+      tMax: { min: 0, max: 2, step: 0.1 },
+    },
     params: { b1: 2, b2: 4 },
-    scales: { ...defaultSchaefferShearerScales },
-    view: { ...defaultView },
+    scales: { yScale: 0.6, tauScale: 2.5, zScale: 2.5 },
+    view: { tMin: -1.5, tMax: 1.5, yMin: -3.5, yMax: 3.5, zMin: -2, zMax: 2 },
   },
   iiic: {
     resolution: 40,
+    controls: {
+      yScale: { min: 0.5, max: 2, step: 0.1 },
+      tauScale: { min: 0.5, max: 6, step: 0.1 },
+      zScale: { min: 1, max: 6, step: 0.1 },
+      resolution: { min: 32, max: 88, step: 4 },
+      opacity: { min: 0.1, max: 1, step: 0.05 },
+      yMin: { min: -10, max: -0.5, step: 0.1 },
+      yMax: { min: 0.5, max: 10, step: 0.1 },
+      tMin: { min: -2, max: 0, step: 0.1 },
+      tMax: { min: 0, max: 2, step: 0.1 },
+    },
     params: { b1: 0.5, b2: 1 },
-    scales: { ...defaultSchaefferShearerScales },
-    view: { ...defaultView },
+    scales: { yScale: 0.6, tauScale: 2.5, zScale: 2.5 },
+    view: { tMin: -1.5, tMax: 1.5, yMin: -3.5, yMax: 3.5, zMin: -2, zMax: 2 },
   },
   iia: {
     resolution: 40,
+    controls: {
+      yScale: { min: 0.5, max: 2, step: 0.1 },
+      tauScale: { min: 0.5, max: 6, step: 0.1 },
+      zScale: { min: 1, max: 6, step: 0.1 },
+      resolution: { min: 32, max: 88, step: 4 },
+      opacity: { min: 0.1, max: 1, step: 0.05 },
+      yMin: { min: -10, max: -0.5, step: 0.1 },
+      yMax: { min: 0.5, max: 10, step: 0.1 },
+      tMin: { min: -2, max: 0, step: 0.1 },
+      tMax: { min: 0, max: 2, step: 0.1 },
+    },
     params: { b1: -0.5, b2: 1 },
-    scales: { ...defaultSchaefferShearerScales },
-    view: { ...defaultView },
+    scales: { yScale: 0.6, tauScale: 2.5, zScale: 2.5 },
+    view: { tMin: -1.5, tMax: 1.5, yMin: -3.5, yMax: 3.5, zMin: -2, zMax: 2 },
   },
   iib: {
     resolution: 40,
+    controls: {
+      yScale: { min: 0.5, max: 2, step: 0.1 },
+      tauScale: { min: 0.5, max: 6, step: 0.1 },
+      zScale: { min: 1, max: 6, step: 0.1 },
+      resolution: { min: 32, max: 88, step: 4 },
+      opacity: { min: 0.1, max: 1, step: 0.05 },
+      yMin: { min: -10, max: -0.5, step: 0.1 },
+      yMax: { min: 0.5, max: 10, step: 0.1 },
+      tMin: { min: -2, max: 0, step: 0.1 },
+      tMax: { min: 0, max: 2, step: 0.1 },
+    },
     params: { b1: -2.5, b2: 3 },
-    scales: { ...defaultSchaefferShearerScales },
-    view: { ...defaultView },
+    scales: { yScale: 0.6, tauScale: 2.5, zScale: 2.5 },
+    view: { tMin: -1.5, tMax: 1.5, yMin: -3.5, yMax: 3.5, zMin: -2, zMax: 2 },
   },
   iic: {
     resolution: 40,
+    controls: {
+      yScale: { min: 0.5, max: 2, step: 0.1 },
+      tauScale: { min: 0.5, max: 6, step: 0.1 },
+      zScale: { min: 1, max: 6, step: 0.1 },
+      resolution: { min: 32, max: 88, step: 4 },
+      opacity: { min: 0.1, max: 1, step: 0.05 },
+      yMin: { min: -10, max: -0.5, step: 0.1 },
+      yMax: { min: 0.5, max: 10, step: 0.1 },
+      tMin: { min: -2, max: 0, step: 0.1 },
+      tMax: { min: 0, max: 2, step: 0.1 },
+    },
     params: { b1: -4.5, b2: 2 },
-    scales: { ...defaultSchaefferShearerScales },
-    view: { ...defaultView },
+    scales: { yScale: 0.6, tauScale: 2.5, zScale: 2.5 },
+    view: { tMin: -1.5, tMax: 1.5, yMin: -3.5, yMax: 3.5, zMin: -2, zMax: 2 },
   },
   ia: {
     resolution: 40,
+    controls: {
+      yScale: { min: 0.5, max: 2, step: 0.1 },
+      tauScale: { min: 0.5, max: 6, step: 0.1 },
+      zScale: { min: 1, max: 6, step: 0.1 },
+      resolution: { min: 32, max: 88, step: 4 },
+      opacity: { min: 0.1, max: 1, step: 0.05 },
+      yMin: { min: -10, max: -0.5, step: 0.1 },
+      yMax: { min: 0.5, max: 10, step: 0.1 },
+      tMin: { min: -2, max: 0, step: 0.1 },
+      tMax: { min: 0, max: 2, step: 0.1 },
+    },
     params: { b1: -1.5, b2: 0.5 },
-    scales: { ...defaultSchaefferShearerScales },
-    view: { ...defaultView },
+    scales: { yScale: 0.6, tauScale: 2.5, zScale: 2.5 },
+    view: { tMin: -1.5, tMax: 1.5, yMin: -3.5, yMax: 3.5, zMin: -2, zMax: 2 },
   },
   ib: {
     resolution: 40,
+    controls: {
+      yScale: { min: 0.5, max: 2, step: 0.1 },
+      tauScale: { min: 0.5, max: 6, step: 0.1 },
+      zScale: { min: 1, max: 6, step: 0.1 },
+      resolution: { min: 32, max: 88, step: 4 },
+      opacity: { min: 0.1, max: 1, step: 0.05 },
+      yMin: { min: -10, max: -0.5, step: 0.1 },
+      yMax: { min: 0.5, max: 10, step: 0.1 },
+      tMin: { min: -2, max: 0, step: 0.1 },
+      tMax: { min: 0, max: 2, step: 0.1 },
+    },
     params: { b1: -2, b2: 1 },
-    scales: { ...defaultSchaefferShearerScales },
-    view: { ...defaultView },
+    scales: { yScale: 0.6, tauScale: 2.5, zScale: 2.5 },
+    view: { tMin: -1.5, tMax: 1.5, yMin: -3.5, yMax: 3.5, zMin: -2, zMax: 2 },
   },
   ic: {
     resolution: 40,
+    controls: {
+      yScale: { min: 0.5, max: 2, step: 0.1 },
+      tauScale: { min: 0.5, max: 6, step: 0.1 },
+      zScale: { min: 1, max: 6, step: 0.1 },
+      resolution: { min: 32, max: 88, step: 4 },
+      opacity: { min: 0.1, max: 1, step: 0.05 },
+      yMin: { min: -10, max: -0.5, step: 0.1 },
+      yMax: { min: 0.5, max: 10, step: 0.1 },
+      tMin: { min: -2, max: 0, step: 0.1 },
+      tMax: { min: 0, max: 2, step: 0.1 },
+    },
     params: { b1: -3, b2: 0.5 },
-    scales: { ...defaultSchaefferShearerScales },
-    view: { ...defaultView },
+    scales: { yScale: 0.6, tauScale: 2.5, zScale: 2.5 },
+    view: { tMin: -1.5, tMax: 1.5, yMin: -3.5, yMax: 3.5, zMin: -2, zMax: 2 },
   },
 }
+
+// Coeficientes comuns do fluxo; b1 e b2 vêm do bloco de cada caso.
+export function controlsForCase(caseKey) {
+  const preset = initialSchaefferShearerCasePresets[caseKey] ?? initialSchaefferShearerCasePresets.iv
+  return preset.controls
+}
+
+export const defaultFlowCoefficients = { a: 0, c: 1 }
+
+export function parametersDefaultForCase(caseKey) {
+  const preset = initialSchaefferShearerCasePresets[caseKey] ?? initialSchaefferShearerCasePresets.iv
+  return { ...defaultFlowCoefficients, ...preset.params }
+}
+
+// Entradas genéricas usadas pelos módulos matemáticos e benchmarks: caso IV.
+export const defaultParams = parametersDefaultForCase('iv')
+export const defaultView = { ...initialSchaefferShearerCasePresets.iv.view }
 
 // Every case owns its startup/reset values, including all drawing bounds.
 export const schaefferShearerCaseDrawingDefaults = Object.fromEntries(

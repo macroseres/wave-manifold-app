@@ -119,19 +119,6 @@ export function enforcePipelineOrientationFromAnchor(segments, anchorPoint, para
   return [candidates.sort((a, b) => pipelineSegmentLength(b, view) - pipelineSegmentLength(a, view))[0]]
 }
 
-
-export function orientSegmentsByEndpointSpeed(segments, params, orientation) {
-  if (orientation !== SPEED_DECREASES && orientation !== SPEED_INCREASES) return segments ?? []
-  return (segments ?? []).map((segment) => {
-    if (!Array.isArray(segment) || segment.length < 2) return segment ?? []
-    const first = pointSpeed(segment[0], params)
-    const last = pointSpeed(segment[segment.length - 1], params)
-    if (!Number.isFinite(first) || !Number.isFinite(last)) return segment
-    const alreadyOriented = orientation === SPEED_DECREASES ? last <= first : last >= first
-    return alreadyOriented ? segment : [...segment].reverse()
-  }).filter((segment) => segment.length >= 2)
-}
-
 export function relevantStateForPoint(point, params, direction) {
   const coords = coordsOf(point)
   if (!coords) return null

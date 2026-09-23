@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Section } from './PanelPrimitives'
 import { ProbeRow, HoverPointCard, InspectionModeSummary } from './rightInfo/inspectionCards'
 import { ProbeCurveOptions } from './rightInfo/inspectionOptions'

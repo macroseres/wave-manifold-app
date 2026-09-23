@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import * as THREE from 'three'
 import { ZCompactifiedLine as Line } from '../../../app/scene/ZCompactification'
 import { HOVER_RING_RADIUS, HOVER_RING_TUBE, MARKER_HOVER_RING_COLOR, POINT_RADIUS } from './constants.js'

@@ -1,4 +1,4 @@
-import React, { useId, useState } from 'react'
+import { useId, useState } from 'react'
 
 const numberLabel = (value) => String(Number(value.toFixed(8))).replace('.', ',')
 

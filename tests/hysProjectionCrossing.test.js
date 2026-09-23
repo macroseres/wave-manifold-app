@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { buildHysPlusMinusProjection } from '../src/geometry/hysPlusMinusProjection.js'
 import { findHysteresisDoubleStates } from '../src/geometry/hysteresisSelfIntersection.js'
-import { defaultParams } from '../src/config/viewDefaults.js'
+import { defaultParams } from '../src/components/panels/schaefferShearerConfig.js'
 
 test('state projection has four incident edges at the double point', () => {
   const bounds = { uMin: -2, uMax: 2, vMin: -3, vMax: 2 }

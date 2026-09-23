@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Line } from '@react-three/drei'
 import * as THREE from 'three'
 import { compactifyZPositionArray, physicalPointToVisual } from '../../geometry/zCompactification.js'
@@ -6,10 +6,6 @@ import { compactifyZPositionArray, physicalPointToVisual } from '../../geometry/
 export function ZCompactifiedLine({ points = [], ...props }) {
   const visualPoints = useMemo(() => points.map(physicalPointToVisual), [points])
   return <Line points={visualPoints} {...props} dashed={false} />
-}
-
-export function useVisualZPoint(point) {
-  return useMemo(() => physicalPointToVisual(point), [point])
 }
 
 export function useZCompactifiedGeometry(geometry) {

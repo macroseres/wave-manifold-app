@@ -1,4 +1,3 @@
-import React from 'react'
 import MathLabel from '../MathLabel'
 import { waveSpeed } from '../../../entities/surfaceImplicit'
 

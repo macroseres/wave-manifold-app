@@ -4,6 +4,22 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
+// Mark JSX component references without exempting every capitalized identifier.
+const jsxUsage = {
+  meta: { schema: [] },
+  create(context) {
+    return {
+      JSXOpeningElement(node) {
+        let name = node.name
+        while (name.type === 'JSXMemberExpression') name = name.object
+        if (name.type === 'JSXIdentifier' && /^[A-Z]/.test(name.name)) {
+          context.sourceCode.markVariableAsUsed(name.name, node)
+        }
+      },
+    }
+  },
+}
+
 export default defineConfig([
   globalIgnores(['dist', 'node_modules']),
   {
@@ -22,8 +38,10 @@ export default defineConfig([
         sourceType: 'module',
       },
     },
+    plugins: { local: { rules: { 'jsx-usage': jsxUsage } } },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^_' }],
+      'local/jsx-usage': 'error',
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'react-hooks/preserve-manual-memoization': 'off',
       'react-hooks/refs': 'off',
       'react-hooks/set-state-in-effect': 'off',

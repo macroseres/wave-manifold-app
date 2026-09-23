@@ -1,5 +1,5 @@
 import { waveColors } from '../../../config/waveColors.js'
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { ZCompactifiedLine } from '../../../app/scene/ZCompactification'
 import { buildHysteresisSelfIntersectionSegments } from '../../../geometry/hysteresisSelfIntersection'
 

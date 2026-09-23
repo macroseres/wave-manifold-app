@@ -1,7 +1,7 @@
 import { buildRarefactionArcSegments, trimRarefactionArcSegmentsToEndpoint } from '../../../rarefaction/arcSegments.js'
 import { speedModeFromOrientation } from '../../../waves/index.js'
 import { SPEED_DECREASES, SPEED_INCREASES } from '../../../waves/orientation.js'
-import { rarefactionDerivativeDtDz, sonicLeftImplicitF, sonicLineTCoeff, sonicLineConst } from '../../../surfaceImplicit/index.js'
+import { rarefactionDerivativeDtDz, sonicLeftImplicitF } from '../../../surfaceImplicit/index.js'
 import { coordsOf, pointObjectFromCoords, pointSpeed } from '../pipelineShared.js'
 import { normalizedDistance3, scaledSegmentLength, expandViewZForIntersections } from './commonGeometry.js'
 
@@ -179,15 +179,6 @@ export function rk4RarefactionStep(z, t, h, params) {
   if (![k1, k2, k3, k4].every(finite)) return null
   const nextT = t + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
   return finite(nextT) ? nextT : null
-}
-
-export function slowInflectionPointAtZ(z, params) {
-  const tCoeff = sonicLineTCoeff(z, params)
-  const cTerm = sonicLineConst(z, params)
-  if (!finite(tCoeff) || !finite(cTerm) || Math.abs(tCoeff) < 1e-11) return null
-  const t = -cTerm / tCoeff
-  if (!finite(t)) return null
-  return { t, Y: 0, z, coords: [t, 0, z] }
 }
 
 export function slowInflectionResidual(point, params) {
