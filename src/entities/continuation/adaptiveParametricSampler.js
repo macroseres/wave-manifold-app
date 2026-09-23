@@ -1,13 +1,13 @@
-import { toVec3 } from '../shared/types/mathTypes.js'
+import { normalizeWavePoint } from '../shared/types/mathTypes.js'
 
 function finitePoint(point) {
-  return !!toVec3(point)
+  return !!normalizeWavePoint(point)
 }
 
 function normalizedDistance(a, b, scales) {
   if (!finitePoint(a) || !finitePoint(b)) return Number.POSITIVE_INFINITY
-  const pa = toVec3(a)
-  const pb = toVec3(b)
+  const pa = normalizeWavePoint(a)
+  const pb = normalizeWavePoint(b)
   const dt = (pa.t - pb.t) / scales.t
   const dY = (pa.Y - pb.Y) / scales.Y
   const dz = (pa.z - pb.z) / scales.z
@@ -15,8 +15,8 @@ function normalizedDistance(a, b, scales) {
 }
 
 function lerpPoint(a, b, alpha = 0.5) {
-  const pa = toVec3(a)
-  const pb = toVec3(b)
+  const pa = normalizeWavePoint(a)
+  const pb = normalizeWavePoint(b)
   if (!pa || !pb) return null
   return {
     t: (1 - alpha) * pa.t + alpha * pb.t,
@@ -32,7 +32,7 @@ function lerpPoint(a, b, alpha = 0.5) {
 
 function finiteSpeed(point, speedFn) {
   if (!finitePoint(point) || typeof speedFn !== 'function') return Number.NaN
-  const speed = speedFn(toVec3(point))
+  const speed = speedFn(normalizeWavePoint(point))
   return Number.isFinite(speed) ? speed : Number.NaN
 }
 
@@ -106,7 +106,7 @@ export function sampleParametricCurveAdaptive({
   function evalAt(z) {
     try {
       const point = evaluate(z)
-      return finitePoint(point) ? { ...toVec3(point), parameter: z } : null
+      return finitePoint(point) ? { ...normalizeWavePoint(point), parameter: z } : null
     } catch {
       return null
     }

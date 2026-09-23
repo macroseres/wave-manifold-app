@@ -11,14 +11,14 @@ function coordsOf(point) {
 function normalizedDistanceToFixed(point, fixedState, view) {
   const c = coordsOf(point)
   if (!c || !fixedState) return Number.POSITIVE_INFINITY
-  const tScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
+  const tauScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
   const zScale = Math.max(1e-6, Math.abs((view?.zMax ?? 1) - (view?.zMin ?? 0)))
   const yScale = Math.max(1e-6, Math.abs((view?.yMax ?? 1) - (view?.yMin ?? 0)))
   const t0 = fixedState.t
   const y0 = Number.isFinite(fixedState.Y) ? fixedState.Y : 0
   const z0 = fixedState.z
   if (![t0, y0, z0].every(Number.isFinite)) return Number.POSITIVE_INFINITY
-  return Math.hypot((c[0] - t0) / tScale, (c[1] - y0) / yScale, (c[2] - z0) / zScale)
+  return Math.hypot((c[0] - t0) / tauScale, (c[1] - y0) / yScale, (c[2] - z0) / zScale)
 }
 
 function pointFromFixedState(fixedState, template = null) {

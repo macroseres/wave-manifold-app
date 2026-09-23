@@ -1,4 +1,4 @@
-import { parameterPalette } from '../../../components/panel/schaefferShearerConfig.js'
+import { parameterPalette } from '../../../components/panels/schaefferShearerConfig.js'
 import { clampX, clampY } from './canvasContext.js'
 
 function drawStrips(ctx, rect, plotWindow, callback) {

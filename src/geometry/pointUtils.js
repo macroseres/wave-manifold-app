@@ -25,10 +25,10 @@ export function coarsenPoints(points, maxPoints) {
 }
 
 export function normalizedPointDistance2(a, b, view) {
-  const tScale = Math.max(1e-6, view.tMax - view.tMin)
+  const tauScale = Math.max(1e-6, view.tMax - view.tMin)
   const yScale = Math.max(1e-6, view.yMax - view.yMin)
   const zScale = Math.max(1e-6, view.zMax - view.zMin)
-  const dt = ((a.t ?? 0) - (b.t ?? 0)) / tScale
+  const dt = ((a.t ?? 0) - (b.t ?? 0)) / tauScale
   const dy = ((a.Y ?? 0) - (b.Y ?? 0)) / yScale
   const dz = ((a.z ?? 0) - (b.z ?? 0)) / zScale
   return dt * dt + dy * dy + dz * dz

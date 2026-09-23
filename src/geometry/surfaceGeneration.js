@@ -1,8 +1,8 @@
 import * as THREE from 'three'
 import { buildHopfGeometry } from './hopfSurfaceGeometry.js'
 import { buildSonicBranchGeometries } from '../entities/sonic/surfaceModel.js'
-import { buildSaturatedGeometry } from './saturatedSurfaceGeometry.js'
-import { buildSaturatedCoincidenceGeometry } from './saturatedCoincidenceSurfaceGeometry.js'
+import { buildHysteresisSaturationGeometry } from './hysteresisSaturationGeometry.js'
+import { buildSaturatedCoincidenceGeometry } from './coincidenceSaturationGeometry.js'
 import { compactifyZPositionArray } from './zCompactification.js'
 
 export function generateSurfaceBuffers({ type, params, view, resolution, direction }) {
@@ -12,7 +12,7 @@ export function generateSurfaceBuffers({ type, params, view, resolution, directi
   } else if (type === 'hopf') {
     geometries = { surface: buildHopfGeometry(params, view, resolution, direction) }
   } else if (type === 'saturated' || type === 'saturated-left') {
-    geometries = { surface: buildSaturatedGeometry(params, view, resolution, direction, type === 'saturated-left' ? 'left' : 'right') }
+    geometries = { surface: buildHysteresisSaturationGeometry(params, view, resolution, direction, type === 'saturated-left' ? 'left' : 'right') }
   } else if (type === 'saturated-coincidence') {
     geometries = { surface: buildSaturatedCoincidenceGeometry(params, view, resolution, direction) }
   } else {

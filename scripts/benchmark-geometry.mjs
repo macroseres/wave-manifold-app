@@ -1,14 +1,14 @@
 import { performance } from 'node:perf_hooks'
 import { defaultParams as params, defaultView as view } from '../src/config/viewDefaults.js'
 import { buildSonicBranchGeometries } from '../src/entities/sonic/surfaceModel.js'
-import { buildSaturatedGeometry } from '../src/geometry/saturatedSurfaceGeometry.js'
-import { buildSaturatedCoincidenceGeometry } from '../src/geometry/saturatedCoincidenceSurfaceGeometry.js'
+import { buildHysteresisSaturationGeometry } from '../src/geometry/hysteresisSaturationGeometry.js'
+import { buildSaturatedCoincidenceGeometry } from '../src/geometry/coincidenceSaturationGeometry.js'
 import { buildHysteresisSelfIntersectionSegments } from '../src/geometry/hysteresisSelfIntersection.js'
 import { solveDoubleSonicSegments, solveInflectionSegments } from '../src/entities/surfaceImplicit/index.js'
 const cases = {
   sonicLeft: () => buildSonicBranchGeometries('left', params, view, 40),
   sonicRight: () => buildSonicBranchGeometries('right', params, view, 40),
-  saturatedHys: () => buildSaturatedGeometry(params, view, 40),
+  saturatedHys: () => buildHysteresisSaturationGeometry(params, view, 40),
   saturatedE: () => buildSaturatedCoincidenceGeometry(params, view, 40),
   selfIntersection: () => buildHysteresisSelfIntersectionSegments(params, view),
   doubleSonic: () => solveDoubleSonicSegments(params, view, 280),

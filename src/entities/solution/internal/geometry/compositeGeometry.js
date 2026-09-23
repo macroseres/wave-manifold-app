@@ -545,10 +545,10 @@ function sideReferenceFromInflectionToRarefactionStart(inflectionPoint, rarefact
   const origin = coordsOf(inflectionPoint)
   const target = coordsOf(rarefactionStartPoint)
   if (!origin || !target) return null
-  const tScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
+  const tauScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
   const zScale = Math.max(1e-6, Math.abs((view?.zMax ?? 1) - (view?.zMin ?? 0)))
   const targetVector = [
-    (target[0] - origin[0]) / tScale,
+    (target[0] - origin[0]) / tauScale,
     (target[2] - origin[2]) / zScale,
   ]
   return Math.hypot(targetVector[0], targetVector[1]) > 1e-7

@@ -4,6 +4,8 @@ Versao atual da visualizacao das superficies e curvas:
 
 - a interface mostra a variedade nas coordenadas `tau, Y, z`;
 - o nome interno `t` permanece no codigo para preservar os calculos existentes;
+- a escala de τ usa `tauScale`; pontos de domínio usam o contrato `WavePoint`;
+- painéis ficam em `components/panels/`, sua coordenação em `app/panels/` e hooks compartilhados em `hooks/`;
 - clique direito abre o painel textual de inspecao quando aplicado em curvas, marcadores, superficie caracteristica ou sonica esquerda;
 - os marcadores de direcao da velocidade usam cones 3D;
 - os cones usam escala compensada (`arrowScale`) para nao ficarem achatados quando a cena e escalada;

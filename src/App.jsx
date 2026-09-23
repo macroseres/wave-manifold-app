@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
-import WaveOverlayPanel from './app/panel/WaveOverlayPanel'
+import WaveOverlayPanel from './app/panels/WaveOverlayPanel'
 import { buildComputationView } from './utils/viewLimits'
 import { CURVE_Z_MARGIN } from './config/numerics'
 import { useWaveAppState } from './app/state/waveAppState'
@@ -14,7 +14,7 @@ export default function App() {
     params,
     view,
     yScale,
-    tScale,
+    tauScale,
     zScale,
     resolution,
     opacity,
@@ -296,7 +296,7 @@ export default function App() {
         resolution={resolution}
         opacity={opacity}
         yScale={yScale}
-        tScale={tScale}
+        tauScale={tauScale}
         zScale={zScale}
         showWireframe={showWireframe}
         controlsEnabled={controlsEnabled}

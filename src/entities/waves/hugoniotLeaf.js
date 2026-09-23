@@ -1,7 +1,7 @@
 import { BACKWARD_HUGONIOT, normalizeHugoniotDirection } from '../hugoniot/directions.js'
 import { waveSpeed } from '../surfaceImplicit/index.js'
 import { evaluateHugoniotLeafPoint } from './hugoniotBifoliation.js'
-import { makeWaveCurve, makeWaveLeaf } from '../shared/types/mathTypes.js'
+import { createWaveCurve, createWaveLeaf } from '../shared/types/mathTypes.js'
 import { sampleParametricCurveAdaptive } from '../continuation/adaptiveParametricSampler.js'
 import { annotateSpeedsAndAdmissibility, orientSegmentsBySpeed, orientationFromDirection, splitSegmentsAtLargeJumps } from './orientation.js'
 import { HUGONIOT } from '../../config/numerics.js'
@@ -17,8 +17,8 @@ export function buildHugoniotLeaf({ fixedState, params, view, samples = 500, dir
   const name = waveDirection === 'plus' ? 'H_+' : 'H_-'
 
   if (!fixedState) {
-    const curve = makeWaveCurve({ name, family: 'hugoniot', direction: waveDirection, orientation })
-    return makeWaveLeaf({ name, family: 'hugoniot', direction: waveDirection, orientation, curve })
+    const curve = createWaveCurve({ name, family: 'hugoniot', direction: waveDirection, orientation })
+    return createWaveLeaf({ name, family: 'hugoniot', direction: waveDirection, orientation, curve })
   }
 
   // A janela recebida já é o domínio padronizado de desenho/cálculo.
@@ -81,7 +81,7 @@ export function buildHugoniotLeaf({ fixedState, params, view, samples = 500, dir
     orientation,
   )
 
-  const curve = makeWaveCurve({
+  const curve = createWaveCurve({
     name,
     family: 'hugoniot',
     direction: waveDirection,
@@ -98,7 +98,7 @@ export function buildHugoniotLeaf({ fixedState, params, view, samples = 500, dir
     },
   })
 
-  return makeWaveLeaf({
+  return createWaveLeaf({
     name,
     family: 'hugoniot',
     direction: waveDirection,

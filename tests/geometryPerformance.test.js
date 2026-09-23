@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { buildImplicitSurfaceGeometry } from '../src/entities/implicitGeometry/index.js'
 import { generateSurfaceBuffers, surfaceBufferSize } from '../src/geometry/surfaceGeneration.js'
-import { buildSaturatedCoincidenceGeometry } from '../src/geometry/saturatedCoincidenceSurfaceGeometry.js'
+import { buildSaturatedCoincidenceGeometry } from '../src/geometry/coincidenceSaturationGeometry.js'
 import { compactifyZPositionArray } from '../src/geometry/zCompactification.js'
 import { defaultParams as params, defaultView as view } from '../src/config/viewDefaults.js'
 

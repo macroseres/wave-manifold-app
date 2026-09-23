@@ -1,19 +1,11 @@
-# Núcleo matemático da Wave Manifold Explorer
+# Compatibilidade do núcleo matemático
 
-Esta pasta separa cálculo e renderização.
+Esta pasta mantém reexportações para imports antigos. As implementações ficam em
+`src/entities/`; código novo deve importar diretamente da entidade correspondente.
 
-- `types/mathTypes.js`: contratos `Vec3`, `WaveCurve`, `WaveSurface`, `WaveLeaf`.
-- `waves/hugoniotLeaf.js`: folhas orientadas `H_-` e `H_+`.
-- `waves/rarefactionLeaf.js`: folhas orientadas `R_-` e `R_+`.
-- `intersections/stateCurveIntersection.js`: interseção por estados/parametrização, sem Three.js.
-- `continuation/newton.js`: Newton genérico para a próxima substituição das buscas por malha.
-- `continuation/pseudoArclength.js`: contrato inicial para continuação pseudo-arco.
-
-Convenções implementadas:
-
-- `H_-`: orientada por `ds < 0`.
-- `H_+`: orientada por `ds > 0`.
-- `R_-`: orientada por `dλ = ds > 0` sobre a característica.
-- `R_+`: orientada por `dλ = ds < 0` sobre a característica.
-
-A interface React/Three.js deve chamar este núcleo e apenas desenhar os pontos retornados.
+Os contratos `WavePoint`, `WaveCurve`, `WaveSurface`, `WaveLeaf` e
+`WaveBifoliation` ficam em `src/entities/shared/types/mathTypes.js`.
+Esse módulo usa `normalizeWavePoint`, `normalizeWaveSegment`,
+`normalizeWaveSegments`, `createWaveCurve`, `createWaveLeaf` e
+`createWaveBifoliation`. A fachada `core/types/mathTypes.js` preserva os aliases
+antigos `toVec3*` e `makeWave*`.

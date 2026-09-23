@@ -5,11 +5,51 @@
 - `src/entities/`: definições e construções matemáticas por domínio.
 - `src/geometry/`: geração, projeção, interseção e tratamento de geometrias.
 - `src/components/`: apresentação das curvas, superfícies, painéis e vistas.
+- `src/components/objects/`: desenhos agrupados pelo objeto matemático, incluindo suas curvas, superfícies e saturações.
 - `src/app/`: estado e coordenação dos fluxos da interface.
+- `src/hooks/`: hooks compartilhados de cálculo e carregamento de geometrias.
 - `src/workers/`: cálculos de curvas executados fora da thread principal.
 - `tests/`: testes das entidades, métodos numéricos e pipelines de solução.
 
 O princípio arquitetural é manter o cálculo independente de React e Three.js sempre que possível. Componentes visuais consomem pontos, segmentos e malhas já construídos pelas camadas matemáticas.
+
+### Convenções de nomes
+
+Pastas representam responsabilidades ou domínios; os painéis visuais ficam em
+`components/panels/` e sua coordenação em `app/panels/`. Componentes React usam
+PascalCase, funções e propriedades usam camelCase, e hooks usam o prefixo `use`.
+As pastas `core/` e `math/` conservam entradas de compatibilidade; novas
+implementações matemáticas pertencem a `entities/`.
+
+Em `components/objects/`, cada pasta identifica o objeto desenhado:
+`hugoniot`, `rarefaction`, `composite`, `characteristic`, `sonic`, `coincidence`,
+`hysteresis`, `bifurcation`, `inflection`, `doubleSonic` e `hopf`.
+`solution` reúne desenhos que combinam famílias, e `shared` reúne primitivas
+visuais reutilizáveis. A saturação fica junto da curva que a gera:
+`HysteresisSaturationSurface`, `CoincidenceSaturationSurface` e
+`RarefactionSaturationSurfaces`. Esta última é usada para construir as compostas,
+mas a superfície desenhada é a saturação da rarefação.
+
+Nos nomes dos desenhos, `Minus/Plus` correspondem aos sinais da notação:
+`SonicMinusSurface` representa a sônica esquerda e `SonicPlusSurface` a direita.
+Os identificadores internos dos registros de desenho e das tarefas dos workers
+mantêm seus valores existentes; não são nomes de arquivos nem de objetos matemáticos.
+
+`WavePoint` representa um ponto da variedade, com coordenadas físicas
+`{ t, Y, z }` e a tripla auxiliar `coords`. O campo `t` e os limites `tMin/tMax`
+continuam representando τ no contrato numérico existente. A escala é chamada
+`tauScale`, com atualizador `setTauScale`, na interface e nos cálculos de distância.
+A compactificação de z ocorre na camada visual.
+
+`normalizeWavePoint`, `normalizeWaveSegment` e `normalizeWaveSegments` validam
+e normalizam pontos. `createWaveCurve`, `createWaveLeaf` e
+`createWaveBifoliation` constroem os objetos de domínio. `slow/fast` identificam
+famílias características; `minus/plus` identificam direções e projeções, portanto
+essas designações não são intercambiáveis.
+
+As fábricas passadas a `useWorkerTask` devem ter identidade estável, por exemplo
+declaradas no escopo do módulo. O cache usa essa identidade e os parâmetros
+serializados, sem depender do nome da função ou dos nomes gerados pelo minificador.
 
 ## Métodos numéricos
 

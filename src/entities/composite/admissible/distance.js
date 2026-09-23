@@ -8,11 +8,11 @@ function scaleFor(view, axis) {
 
 export function normalizedDistance3(a, b, view) {
   if (!Array.isArray(a) || !Array.isArray(b)) return Number.POSITIVE_INFINITY
-  const tScale = scaleFor(view, 't')
+  const tauScale = scaleFor(view, 't')
   const yScale = scaleFor(view, 'y')
   const zScale = scaleFor(view, 'z')
   return Math.hypot(
-    ((a[0] ?? 0) - (b[0] ?? 0)) / tScale,
+    ((a[0] ?? 0) - (b[0] ?? 0)) / tauScale,
     ((a[1] ?? 0) - (b[1] ?? 0)) / yScale,
     ((a[2] ?? 0) - (b[2] ?? 0)) / zScale,
   )
@@ -20,12 +20,12 @@ export function normalizedDistance3(a, b, view) {
 
 export function closestPointOnSegment(a, b, target, view) {
   if (!Array.isArray(a) || !Array.isArray(b) || !Array.isArray(target)) return null
-  const tScale = scaleFor(view, 't')
+  const tauScale = scaleFor(view, 't')
   const yScale = scaleFor(view, 'y')
   const zScale = scaleFor(view, 'z')
-  const na = [a[0] / tScale, a[1] / yScale, a[2] / zScale]
-  const nb = [b[0] / tScale, b[1] / yScale, b[2] / zScale]
-  const nt = [target[0] / tScale, target[1] / yScale, target[2] / zScale]
+  const na = [a[0] / tauScale, a[1] / yScale, a[2] / zScale]
+  const nb = [b[0] / tauScale, b[1] / yScale, b[2] / zScale]
+  const nt = [target[0] / tauScale, target[1] / yScale, target[2] / zScale]
   const vx = nb[0] - na[0]
   const vy = nb[1] - na[1]
   const vz = nb[2] - na[2]
@@ -39,10 +39,10 @@ export function closestPointOnSegment(a, b, target, view) {
 
 export function normalizedDistanceToTzLine(point, linePoint, view) {
   if (!Array.isArray(point) || !Array.isArray(linePoint)) return Number.POSITIVE_INFINITY
-  const tScale = scaleFor(view, 't')
+  const tauScale = scaleFor(view, 't')
   const zScale = scaleFor(view, 'z')
   return Math.hypot(
-    ((point[0] ?? 0) - (linePoint[0] ?? 0)) / tScale,
+    ((point[0] ?? 0) - (linePoint[0] ?? 0)) / tauScale,
     ((point[2] ?? 0) - (linePoint[2] ?? 0)) / zScale,
   )
 }
@@ -72,7 +72,7 @@ export function minDistanceToSegmentCollection(point, segments, view) {
 
 export function scaledSegmentLength(segment, view) {
   if (!Array.isArray(segment) || segment.length < 2) return 0
-  const tScale = scaleFor(view, 't')
+  const tauScale = scaleFor(view, 't')
   const yScale = scaleFor(view, 'y')
   const zScale = scaleFor(view, 'z')
   let total = 0
@@ -80,7 +80,7 @@ export function scaledSegmentLength(segment, view) {
     const a = segment[i - 1]
     const b = segment[i]
     total += Math.hypot(
-      ((b?.[0] ?? 0) - (a?.[0] ?? 0)) / tScale,
+      ((b?.[0] ?? 0) - (a?.[0] ?? 0)) / tauScale,
       ((b?.[1] ?? 0) - (a?.[1] ?? 0)) / yScale,
       ((b?.[2] ?? 0) - (a?.[2] ?? 0)) / zScale,
     )

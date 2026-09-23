@@ -135,7 +135,7 @@ function WaveSceneViewport({
   resolution,
   opacity,
   yScale,
-  tScale,
+  tauScale,
   zScale,
   showWireframe,
   controlsEnabled,
@@ -174,7 +174,7 @@ function WaveSceneViewport({
   beginOrbiting3D,
   finishOrbiting3D,
 }) {
-  const markerScale = useMemo(() => [1 / tScale, 1 / yScale, 1 / zScale], [tScale, yScale, zScale])
+  const markerScale = useMemo(() => [1 / tauScale, 1 / yScale, 1 / zScale], [tauScale, yScale, zScale])
   const [navigationMode, setNavigationMode] = useState('rotate')
   const setCameraView = (direction) => {
     const controls = orbitControlsRef.current
@@ -189,7 +189,7 @@ function WaveSceneViewport({
     camera.lookAt(controls.target)
     controls.update()
   }
-  const sceneScale = useMemo(() => [tScale, yScale, zScale], [tScale, yScale, zScale])
+  const sceneScale = useMemo(() => [tauScale, yScale, zScale], [tauScale, yScale, zScale])
   const selectedCharacteristicPoints = useMemo(
     () => Object.values(displayedSelectedByBranch).filter(Boolean),
     [displayedSelectedByBranch],

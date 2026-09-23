@@ -1,4 +1,4 @@
-import { computeCompositeSlowInflectionPoint } from '../../../../components/curves/compositeInflectionUtils.js'
+import { computeCompositeSlowInflectionPoint } from '../../../../components/objects/composite/compositeInflectionUtils.js'
 import { SPEED_DECREASES } from '../../../waves/orientation.js'
 import { FORWARD_HUGONIOT, BACKWARD_HUGONIOT } from '../../../hugoniot/directions.js'
 import { computeRightStateFromWavePoint, solveDoubleSonicSegments } from '../../../surfaceImplicit/index.js'
@@ -47,10 +47,10 @@ function normalizedPointDistance(a, b, view) {
   const ca = coordsOf(a)
   const cb = coordsOf(b)
   if (!ca || !cb) return Number.POSITIVE_INFINITY
-  const tScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
+  const tauScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
   const yScale = Math.max(1e-6, Math.abs((view?.yMax ?? 1) - (view?.yMin ?? 0)))
   const zScale = Math.max(1e-6, Math.abs((view?.zMax ?? 1) - (view?.zMin ?? 0)))
-  return Math.hypot((ca[0] - cb[0]) / tScale, (ca[1] - cb[1]) / yScale, (ca[2] - cb[2]) / zScale)
+  return Math.hypot((ca[0] - cb[0]) / tauScale, (ca[1] - cb[1]) / yScale, (ca[2] - cb[2]) / zScale)
 }
 
 function pointsCoincideForPipeline(a, b, view, tolerance = 0.035) {
@@ -135,9 +135,9 @@ function doubleSonicLineData(params, view) {
 function normalizedDistanceToDoubleSonicLine(point, line, view) {
   const p = coordsOf(point)
   if (!p || !line) return Number.POSITIVE_INFINITY
-  const tScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
+  const tauScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
   const zScale = Math.max(1e-6, Math.abs((view?.zMax ?? 1) - (view?.zMin ?? 0)))
-  return Math.hypot((p[0] - line.t) / tScale, (p[2] - line.z) / zScale)
+  return Math.hypot((p[0] - line.t) / tauScale, (p[2] - line.z) / zScale)
 }
 
 function interpolateCoords(a, b, alpha) {

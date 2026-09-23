@@ -1,5 +1,5 @@
 import { BACKWARD_HUGONIOT, FORWARD_HUGONIOT, normalizeHugoniotDirection } from '../../hugoniot/directions.js'
-import { makeWaveBifoliation, makeWaveCurve, makeWaveLeaf } from '../../shared/types/mathTypes.js'
+import { createWaveBifoliation, createWaveCurve, createWaveLeaf } from '../../shared/types/mathTypes.js'
 import { finite, compositeBaseRarefactionSampleCount, buildCompositeBaseRarefaction } from './sampling.js'
 import { buildHugoniotBifoliation, buildRarefactionBifoliation } from '../../waves/basicBifoliations.js'
 import { orientationFromDirection } from '../../waves/orientation.js'
@@ -152,7 +152,7 @@ export function buildCompositeBifoliationLeaf({ fixedState, params, view, sample
   const name = branch === 'plus' ? 'K_+' : 'K_-'
   const orientation = orientationFromDirection({ family: 'hugoniot', direction: branch })
   const { segments, inflectionPoint, metadata } = buildCompositeSegments(fixedState, params, view, samples, resolution, inflectionBranch, direction, sonicTarget)
-  const curve = makeWaveCurve({
+  const curve = createWaveCurve({
     name,
     family: 'composite',
     direction: branch,
@@ -167,13 +167,13 @@ export function buildCompositeBifoliationLeaf({ fixedState, params, view, sample
       ...metadata,
     },
   })
-  return makeWaveLeaf({ name, family: 'composite', direction: branch, orientation, basePoint: fixedState, curve, metadata: curve.metadata })
+  return createWaveLeaf({ name, family: 'composite', direction: branch, orientation, basePoint: fixedState, curve, metadata: curve.metadata })
 }
 
 export function buildCompositeBifoliation({ fixedState, params, view, samples = 650, resolution = 40 }) {
   const minus = buildCompositeBifoliationLeaf({ fixedState, params, view, samples, resolution, direction: FORWARD_HUGONIOT, inflectionBranch: 'slow', sonicTarget: 'left' })
   const plus = buildCompositeBifoliationLeaf({ fixedState, params, view, samples, resolution, direction: BACKWARD_HUGONIOT, inflectionBranch: 'fast', sonicTarget: 'right' })
-  return makeWaveBifoliation({
+  return createWaveBifoliation({
     name: 'Composite bifoliation',
     family: 'composite',
     minus,

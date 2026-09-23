@@ -44,11 +44,11 @@ export function normalizedDistance3(a, b, view) {
   const ca = coordsOf(a)
   const cb = coordsOf(b)
   if (!ca || !cb) return Number.POSITIVE_INFINITY
-  const tScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
+  const tauScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
   const yScale = Math.max(1e-6, Math.abs((view?.yMax ?? 1) - (view?.yMin ?? 0)))
   const zScale = Math.max(1e-6, Math.abs((view?.zMax ?? 1) - (view?.zMin ?? 0)))
   return Math.hypot(
-    (ca[0] - cb[0]) / tScale,
+    (ca[0] - cb[0]) / tauScale,
     (ca[1] - cb[1]) / yScale,
     (ca[2] - cb[2]) / zScale,
   )
@@ -126,10 +126,10 @@ export function sampleSaturatedByHPlusPoints(arcSegments, params, view, resoluti
 export function normalizedCoords(point, view) {
   const coords = coordsOf(point)
   if (!coords) return null
-  const tScale = Math.max(1e-6, view.tMax - view.tMin)
+  const tauScale = Math.max(1e-6, view.tMax - view.tMin)
   const yScale = Math.max(1e-6, view.yMax - view.yMin)
   const zScale = Math.max(1e-6, view.zMax - view.zMin)
-  return [coords[0] / tScale, coords[1] / yScale, coords[2] / zScale]
+  return [coords[0] / tauScale, coords[1] / yScale, coords[2] / zScale]
 }
 
 export function vectorSub(a, b) {

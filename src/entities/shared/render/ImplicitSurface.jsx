@@ -1,22 +1,22 @@
 import React from 'react'
-import HopfSurface from '../../../components/surfaces/HopfSurface.jsx'
+import HopfSurface from '../../../components/objects/hopf/HopfSurface.jsx'
 
-import CharacteristicSurface from '../../../components/surfaces/CharacteristicSurface.jsx'
-import SonicRightSurface from '../../../components/surfaces/SonicRightSurface.jsx'
-import SonicLeftSurface from '../../../components/surfaces/SonicLeftSurface.jsx'
-import SaturatedSurface from '../../../components/surfaces/SaturatedSurface.jsx'
-import SaturatedCoincidenceSurface from '../../../components/surfaces/SaturatedCoincidenceSurface.jsx'
-import { CompositeSaturatedSlowSurface, CompositeSaturatedFastSurface } from '../../../components/surfaces/CompositeSaturatedSurface.jsx'
+import CharacteristicSurface from '../../../components/objects/characteristic/CharacteristicSurface.jsx'
+import SonicPlusSurface from '../../../components/objects/sonic/SonicPlusSurface.jsx'
+import SonicMinusSurface from '../../../components/objects/sonic/SonicMinusSurface.jsx'
+import HysteresisSaturationSurface from '../../../components/objects/hysteresis/HysteresisSaturationSurface.jsx'
+import CoincidenceSaturationSurface from '../../../components/objects/coincidence/CoincidenceSaturationSurface.jsx'
+import { RarefactionSaturationSlowSurface, RarefactionSaturationFastSurface } from '../../../components/objects/rarefaction/RarefactionSaturationSurfaces.jsx'
 
 const surfaceRegistry = {
   hopf: HopfSurface,
   characteristic: CharacteristicSurface,
-  'sonic-right': SonicRightSurface,
-  'sonic-left': SonicLeftSurface,
-  saturated: SaturatedSurface,
-  'saturated-coincidence': SaturatedCoincidenceSurface,
-  'composite-saturated-slow': CompositeSaturatedSlowSurface,
-  'composite-saturated-fast': CompositeSaturatedFastSurface,
+  'sonic-right': SonicPlusSurface,
+  'sonic-left': SonicMinusSurface,
+  saturated: HysteresisSaturationSurface,
+  'saturated-coincidence': CoincidenceSaturationSurface,
+  'composite-saturated-slow': RarefactionSaturationSlowSurface,
+  'composite-saturated-fast': RarefactionSaturationFastSurface,
 }
 
 export default function ImplicitSurface({ type, ...props }) {

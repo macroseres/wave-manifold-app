@@ -1,18 +1,19 @@
-import HysteresisSelfIntersectionCurve from '../../../components/curves/HysteresisSelfIntersectionCurve.jsx'
+import HysteresisSaturationSelfIntersectionCurve from '../../../components/objects/hysteresis/HysteresisSaturationSelfIntersectionCurve.jsx'
 import React from 'react'
 
-import CoincidenceCurve from '../../../components/curves/CoincidenceCurve.jsx'
-import { HysteresisLeftCurve, HysteresisRightCurve } from '../../../components/curves/HysteresisCurve.jsx'
-import HugoniotCurve from '../../../components/curves/HugoniotCurve.jsx'
-import RarefactionCurve from '../../../components/curves/RarefactionCurve.jsx'
-import { CompositeSlowCurve, CompositeFastCurve } from '../../../components/curves/CompositeCurve.jsx'
-import SecondaryLeftBifurcationCurve from '../../../components/curves/SecondaryLeftBifurcationCurve.jsx'
-import SecondaryRightBifurcationCurve from '../../../components/curves/SecondaryRightBifurcationCurve.jsx'
-import { DoubleSonicCurve, InflectionFastCurve, InflectionSlowCurve } from '../../../components/curves/SonicIntersectionCurves.jsx'
-import { ExtensionCoincidenceMinusCurve, ExtensionCoincidencePlusCurve } from '../../../components/curves/SonicExtensionCurve.jsx'
+import CoincidenceCurve from '../../../components/objects/coincidence/CoincidenceCurve.jsx'
+import { HysteresisLeftCurve, HysteresisRightCurve } from '../../../components/objects/hysteresis/HysteresisCurves.jsx'
+import HugoniotCurve from '../../../components/objects/hugoniot/HugoniotCurve.jsx'
+import RarefactionCurve from '../../../components/objects/rarefaction/RarefactionCurve.jsx'
+import { CompositeSlowCurve, CompositeFastCurve } from '../../../components/objects/composite/CompositeCurves.jsx'
+import SecondaryMinusBifurcationCurve from '../../../components/objects/bifurcation/SecondaryMinusBifurcationCurve.jsx'
+import SecondaryPlusBifurcationCurve from '../../../components/objects/bifurcation/SecondaryPlusBifurcationCurve.jsx'
+import DoubleSonicCurve from '../../../components/objects/doubleSonic/DoubleSonicCurve.jsx'
+import { InflectionFastCurve, InflectionSlowCurve } from '../../../components/objects/inflection/InflectionCurves.jsx'
+import { ExtensionCoincidenceMinusCurve, ExtensionCoincidencePlusCurve } from '../../../components/objects/coincidence/CoincidenceExtensionCurves.jsx'
 
 const curveRegistry = {
-  'hysteresis-self-intersection': HysteresisSelfIntersectionCurve,
+  'hysteresis-self-intersection': HysteresisSaturationSelfIntersectionCurve,
   coincidence: CoincidenceCurve,
   'hysteresis-left': HysteresisLeftCurve,
   'hysteresis-right': HysteresisRightCurve,
@@ -20,8 +21,8 @@ const curveRegistry = {
   rarefaction: RarefactionCurve,
   'composite-slow': CompositeSlowCurve,
   'composite-fast': CompositeFastCurve,
-  'secondary-left-bifurcation': SecondaryLeftBifurcationCurve,
-  'secondary-right-bifurcation': SecondaryRightBifurcationCurve,
+  'secondary-left-bifurcation': SecondaryMinusBifurcationCurve,
+  'secondary-right-bifurcation': SecondaryPlusBifurcationCurve,
   'inflection-slow': InflectionSlowCurve,
   'inflection-fast': InflectionFastCurve,
   'double-sonic': DoubleSonicCurve,

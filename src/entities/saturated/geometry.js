@@ -1,2 +1,2 @@
-export { buildSaturatedGeometry } from '../../geometry/saturatedSurfaceGeometry.js'
-export { buildSaturatedCoincidenceGeometry } from '../../geometry/saturatedCoincidenceSurfaceGeometry.js'
+export { buildHysteresisSaturationGeometry } from '../../geometry/hysteresisSaturationGeometry.js'
+export { buildSaturatedCoincidenceGeometry } from '../../geometry/coincidenceSaturationGeometry.js'

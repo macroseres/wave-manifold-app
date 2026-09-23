@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { saturatedHysteresisImplicit, buildSaturatedGeometry } from '../src/geometry/saturatedSurfaceGeometry.js'
+import { saturatedHysteresisImplicit, buildHysteresisSaturationGeometry } from '../src/geometry/hysteresisSaturationGeometry.js'
 import { solveRightHysteresisPoint, computeLeftStateFromWavePoint } from '../src/entities/surfaceImplicit/index.js'
 import { solveHugoniotPointForFixedState } from '../src/entities/waves/index.js'
 import { defaultParams, defaultView } from '../src/config/viewDefaults.js'
@@ -32,7 +32,7 @@ test('the transverse double point retains alternating signs around its crossing'
 })
 
 test('sheet mesh clips to the display box without capping compactified z', () => {
-  const geometry = buildSaturatedGeometry(defaultParams, defaultView, 40)
+  const geometry = buildHysteresisSaturationGeometry(defaultParams, defaultView, 40)
   const position = geometry.getAttribute('position')
   assert.ok(geometry.getIndex().count > 0)
   let min = Infinity, max = -Infinity

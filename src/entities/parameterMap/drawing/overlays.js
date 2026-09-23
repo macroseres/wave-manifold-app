@@ -1,4 +1,4 @@
-import { parameterPalette } from '../../../components/panel/schaefferShearerConfig.js'
+import { parameterPalette } from '../../../components/panels/schaefferShearerConfig.js'
 
 function clipSegmentToRect(rect, x0, y0, x1, y1) {
   const bounds = [

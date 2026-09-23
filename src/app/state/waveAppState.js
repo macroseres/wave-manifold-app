@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useReducer } from 'react'
 
 import { defaultParams, defaultView } from '../../config/viewDefaults'
+import { readCaseDrawings } from '../../components/panels/schaefferCaseStorage.js'
 
 export const initialSolutionCurveVisibility = {
   slow: {
@@ -63,7 +64,7 @@ export const initialWaveAppState = {
   params: defaultParams,
   view: defaultView,
   yScale: 0.8,
-  tScale: 3.0,
+  tauScale: 3.0,
   zScale: 4.0,
   resolution: 40,
   opacity: 0.75,
@@ -196,7 +197,15 @@ function waveAppReducer(state, action) {
 }
 
 export function useWaveAppState() {
-  const [state, dispatch] = useReducer(waveAppReducer, initialWaveAppState)
+  const [state, dispatch] = useReducer(waveAppReducer, initialWaveAppState, (initialState) => {
+    const saved = readCaseDrawings().iv
+    return saved ? {
+      ...initialState,
+      ...saved.scales,
+      resolution: saved.resolution,
+      view: saved.view,
+    } : initialState
+  })
 
   const setField = useCallback((key) => (value) => {
     dispatch({ type: 'set', key, value })

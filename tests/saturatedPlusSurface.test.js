@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { saturatedHysteresisImplicit } from '../src/geometry/saturatedSurfaceGeometry.js'
+import { saturatedHysteresisImplicit } from '../src/geometry/hysteresisSaturationGeometry.js'
 import { generateSurfaceBuffers } from '../src/geometry/surfaceGeneration.js'
 import { solveRightHysteresisPoint, computeRightStateFromWavePoint, solveBackwardHugoniotPointForFixedRightState } from '../src/entities/surfaceImplicit/index.js'
 import { defaultParams, defaultView } from '../src/config/viewDefaults.js'

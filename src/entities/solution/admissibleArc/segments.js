@@ -124,11 +124,11 @@ function distanceToAnchor(coords, anchor, view) {
   if (!coords || !anchor) return Number.POSITIVE_INFINITY
   const anchorCoords = coordsOf(anchor)
   if (!anchorCoords) return Number.POSITIVE_INFINITY
-  const tScale = Math.max(1, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
+  const tauScale = Math.max(1, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
   const yScale = Math.max(1, Math.abs((view?.yMax ?? 1) - (view?.yMin ?? 0)))
   const zScale = Math.max(1, Math.abs((view?.zMax ?? 1) - (view?.zMin ?? 0)))
   return Math.hypot(
-    (coords[0] - anchorCoords[0]) / tScale,
+    (coords[0] - anchorCoords[0]) / tauScale,
     (coords[1] - anchorCoords[1]) / yScale,
     (coords[2] - anchorCoords[2]) / zScale,
   )
@@ -183,7 +183,7 @@ function orientSegmentBySpeed(segment, speedFn, orientation) {
 
 function scaledSegmentLength(segment, view) {
   if (!Array.isArray(segment) || segment.length < 2) return 0
-  const tScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
+  const tauScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
   const yScale = Math.max(1e-6, Math.abs((view?.yMax ?? 1) - (view?.yMin ?? 0)))
   const zScale = Math.max(1e-6, Math.abs((view?.zMax ?? 1) - (view?.zMin ?? 0)))
   let total = 0
@@ -191,7 +191,7 @@ function scaledSegmentLength(segment, view) {
     const a = segment[i - 1]
     const b = segment[i]
     total += Math.hypot(
-      ((b?.[0] ?? 0) - (a?.[0] ?? 0)) / tScale,
+      ((b?.[0] ?? 0) - (a?.[0] ?? 0)) / tauScale,
       ((b?.[1] ?? 0) - (a?.[1] ?? 0)) / yScale,
       ((b?.[2] ?? 0) - (a?.[2] ?? 0)) / zScale,
     )

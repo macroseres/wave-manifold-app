@@ -3428,3 +3428,162 @@ button, input, select, textarea {
   border-radius: 7px;
   background: rgba(2, 9, 18, 0.52);
 }
+
+/* Parameter editors with compact controls beside the editable value. */
+.params-view {
+  --parameter-font-size: 12px;
+  --wm-font-aux: var(--parameter-font-size);
+  --wm-font-control: var(--parameter-font-size);
+  --wm-font-body: var(--parameter-font-size);
+  --wm-font-title: var(--parameter-font-size);
+  overflow: auto;
+  container-type: inline-size;
+  font-size: var(--parameter-font-size);
+  line-height: 1.35;
+}
+/* Keep all parameter copy on one scale; top navigation keeps its larger titles. */
+.params-view .parameter-value-input,
+.params-view .parameter-range-actions button,
+.params-view .parameter-range-limits,
+.params-view .parameter-card-description,
+.params-view .stage-label,
+.params-view .mathjax-label {
+  font-size: var(--parameter-font-size);
+}
+.params-view .stage-param-window-controls .window-card-title,
+.params-view .stage-param-model-card .model-card-title,
+.params-view .stage-param-case-card .curve-card-title,
+.params-view .stage-param-curve-card .curve-card-title {
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.params-view .schaeffer-case-option,
+.params-view .curve-region-row,
+.params-view .parameter-range-heading label {
+  font-weight: 500;
+}
+.params-view .mathjax-label mjx-container {
+  font-size: 100% !important;
+}
+.params-view .stage-param-plot {
+  position: relative;
+  inset: auto;
+  min-height: 100%;
+}
+.params-view .stage-param-bottom {
+  grid-template-columns: minmax(290px, 1fr) minmax(280px, 1fr) minmax(320px, 1.15fr);
+  align-items: start;
+  gap: 8px;
+}
+.params-view .stage-param-window-controls,
+.params-view .stage-param-model-card {
+  padding: 10px;
+  gap: 8px;
+  border-radius: 8px;
+  background: linear-gradient(150deg, #102337, #061321);
+}
+.parameter-card-description {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #a9bed2;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.params-view .stage-param-model-card .schaeffer-case-selector {
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(max-content, 1fr));
+  gap: 8px;
+  overflow-x: auto;
+}
+.params-view .schaeffer-case-option { white-space: nowrap; }
+.params-view .stage-param-case-card {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 10px;
+}
+.params-view .stage-param-case-card .curve-card-title { flex: 0 0 auto; }
+.params-view .stage-param-case-card .curve-region-row {
+  display: flex;
+  flex: 1 0 auto;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 5px 8px;
+}
+.parameter-range-control {
+  min-width: 0;
+  padding: 7px 8px;
+  border: 1px solid #20384b;
+  border-radius: 6px;
+  background: #071726;
+}
+.parameter-range-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; }
+.parameter-range-heading label { color: #e1efff; font-weight: 700; }
+.parameter-value-editor {
+  display: flex;
+  align-items: stretch;
+  margin-left: auto;
+  border: 1px solid #3c6689;
+  border-radius: 5px;
+  background: #10283b;
+}
+.parameter-value-input {
+  width: 62px;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 0;
+  border-radius: 5px 0 0 5px;
+  background: transparent;
+  color: #e5f5ff;
+  text-align: right;
+  font: inherit;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.parameter-range-slider {
+  display: block;
+  width: 100%;
+  margin: 5px 0 1px;
+  accent-color: #38bdf8;
+  cursor: pointer;
+}
+.parameter-range-limits { display: flex; justify-content: space-between; color: #94abc0; font-size: 11px; font-variant-numeric: tabular-nums; }
+.parameter-range-actions { display: grid; grid-template-rows: repeat(2, 1fr); border-left: 1px solid #34526c; }
+.parameter-range-actions button {
+  width: 24px;
+  min-height: 17px;
+  padding: 0;
+  border: 0;
+  border-radius: 0 4px 0 0;
+  background: #163047;
+  color: #dcefff;
+  font-size: 14px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.parameter-range-actions button + button { border-top: 1px solid #34526c; border-radius: 0 0 4px 0; }
+.parameter-value-editor:focus-within { border-color: #7dd3fc; }
+.params-view .stage-param-model-card .schaeffer-case-option { padding: 4px 6px; }
+@container (max-width: 360px) {
+  .params-view .stage-param-window-controls,
+  .params-view .stage-param-model-card { grid-template-columns: minmax(0, 1fr); }
+}
+.parameter-range-actions button:hover:not(:disabled) { background: #245170; border-color: #38bdf8; }
+.parameter-range-actions button:disabled { opacity: 0.35; cursor: default; }
+.parameter-range-control :focus-visible { outline: 2px solid #7dd3fc; outline-offset: 3px; }
+@container (max-width: 1200px) {
+  .params-view .stage-param-bottom { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .params-view .stage-param-model-card { grid-column: 2; grid-row: 2; }
+  .params-view .stage-param-legend-column { grid-column: 1 / -1; }
+}
+@container (max-width: 720px) {
+  .params-view .stage-param-bottom { grid-template-columns: minmax(0, 1fr); }
+  .params-view .stage-param-model-card { grid-column: 1; grid-row: 2; }
+  .params-view .stage-param-window-controls { grid-column: 1; }
+}

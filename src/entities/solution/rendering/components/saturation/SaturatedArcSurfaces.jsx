@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import * as THREE from 'three'
 import { FORWARD_HUGONIOT, normalizeHugoniotDirection } from '../../../../hugoniot/directions.js'
-import { buildGeometryForRarefactionSaturationSegment } from '../../../../../geometry/compositeSaturatedSurfaceGeometry.js'
+import { buildGeometryForRarefactionSaturationSegment } from '../../../../../geometry/rarefactionSaturationGeometry.js'
 import { toPointObjectSegments } from '../../solutionModeGeometry.js'
 import { ZCompactifiedMesh } from '../../../../../app/scene/ZCompactification.jsx'
 

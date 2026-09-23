@@ -9,10 +9,10 @@ function normalizedDistance3(a, b, view) {
   const ca = coordsOf(a)
   const cb = coordsOf(b)
   if (!ca || !cb) return Number.POSITIVE_INFINITY
-  const tScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
+  const tauScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
   const yScale = Math.max(1e-6, Math.abs((view?.yMax ?? 1) - (view?.yMin ?? 0)))
   const zScale = Math.max(1e-6, Math.abs((view?.zMax ?? 1) - (view?.zMin ?? 0)))
-  return Math.hypot((ca[0] - cb[0]) / tScale, (ca[1] - cb[1]) / yScale, (ca[2] - cb[2]) / zScale)
+  return Math.hypot((ca[0] - cb[0]) / tauScale, (ca[1] - cb[1]) / yScale, (ca[2] - cb[2]) / zScale)
 }
 
 function closestPointOnSegmentToPoint(a, b, target, view) {

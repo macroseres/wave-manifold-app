@@ -3,7 +3,7 @@ import { RAREFACTION, clampResolutionSamples } from '../../../config/numerics.js
 import { buildCompositeArcRestrictedSegments } from '../../waves/index.js'
 import { SPEED_DECREASES, SPEED_INCREASES } from '../../waves/orientation.js'
 import { buildDrawableCompositeSegments } from '../../../geometry/compositeCurveGeometry.js'
-import { computeCompositeSlowInflectionPoint } from '../../../components/curves/compositeInflectionUtils.js'
+import { computeCompositeSlowInflectionPoint } from '../../../components/objects/composite/compositeInflectionUtils.js'
 import { normalizeSegment } from './primitives.js'
 import { buildStopGeometry } from './stopping.js'
 import {

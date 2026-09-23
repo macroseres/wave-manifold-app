@@ -1,6 +1,6 @@
 import { FORWARD_HUGONIOT, normalizeHugoniotDirection } from '../hugoniot/directions.js'
 import { rarefactionDerivativeDtDz, waveSpeed, sonicImplicitF, sonicLeftImplicitF } from '../surfaceImplicit/index.js'
-import { makeWaveCurve, makeWaveLeaf } from '../shared/types/mathTypes.js'
+import { createWaveCurve, createWaveLeaf } from '../shared/types/mathTypes.js'
 import { annotateSpeedsAndAdmissibility, orientSegmentsBySpeed, orientationFromDirection, splitSegmentsAtLargeJumps } from './orientation.js'
 import { VISUAL_Z_MAX, VISUAL_Z_MIN, physicalZToVisual, visualZToPhysical } from '../../geometry/zCompactification.js'
 
@@ -256,8 +256,8 @@ export function buildRarefactionLeaf({ fixedState, params, view, samples = 500, 
   const name = waveDirection === 'plus' ? 'R_+' : 'R_-'
 
   if (!fixedState || !Number.isFinite(fixedState.z) || !Number.isFinite(fixedState.t)) {
-    const curve = makeWaveCurve({ name, family: 'rarefaction', direction: waveDirection, orientation })
-    return makeWaveLeaf({ name, family: 'rarefaction', direction: waveDirection, orientation, curve })
+    const curve = createWaveCurve({ name, family: 'rarefaction', direction: waveDirection, orientation })
+    return createWaveLeaf({ name, family: 'rarefaction', direction: waveDirection, orientation, curve })
   }
 
   // Separacao essencial:
@@ -334,7 +334,7 @@ export function buildRarefactionLeaf({ fixedState, params, view, samples = 500, 
 
   const validRawPoints = raw.filter(Boolean)
 
-  const curve = makeWaveCurve({
+  const curve = createWaveCurve({
     name,
     family: 'rarefaction',
     direction: waveDirection,
@@ -350,7 +350,7 @@ export function buildRarefactionLeaf({ fixedState, params, view, samples = 500, 
     },
   })
 
-  return makeWaveLeaf({
+  return createWaveLeaf({
     name,
     family: 'rarefaction',
     direction: waveDirection,

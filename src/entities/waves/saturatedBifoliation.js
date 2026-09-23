@@ -1,6 +1,6 @@
 import { BACKWARD_HUGONIOT, normalizeHugoniotDirection } from '../hugoniot/directions.js'
 import { computeStateFromCharacteristicPoint, waveSpeed } from '../surfaceImplicit/index.js'
-import { makeWaveBifoliation } from '../shared/types/mathTypes.js'
+import { createWaveBifoliation } from '../shared/types/mathTypes.js'
 import { orientationFromDirection } from './orientation.js'
 import {
   solveHugoniotPointForFixedState,
@@ -110,7 +110,7 @@ export function makeSaturatedHugoniotBifoliation({
 }
 
 export function buildSaturatedHugoniotBifoliation({ fixedState, minus = null, plus = null, metadata = {} } = {}) {
-  return makeWaveBifoliation({
+  return createWaveBifoliation({
     name: 'Saturated Hugoniot bifoliation',
     family: 'saturated-hugoniot',
     minus,

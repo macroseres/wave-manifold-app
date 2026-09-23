@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Html } from '@react-three/drei'
 import { ZCompactifiedLine as Line } from '../../../../app/scene/ZCompactification'
-import MathLabel from '../../../../components/panel/MathLabel.jsx'
+import MathLabel from '../../../../components/panels/MathLabel.jsx'
 import { solutionColors } from '../solutionColors.js'
 import HoverableSolutionPoint from './HoverableSolutionPoint.jsx'
 import {
@@ -15,7 +15,7 @@ import {
 } from '../solutionModeGeometry.js'
 
 import SaturatedArcSurfaces from './saturation/SaturatedArcSurfaces.jsx'
-import { CompositeSaturatedSlowSurface } from '../../../../components/surfaces/CompositeSaturatedSurface.jsx'
+import { RarefactionSaturationSlowSurface } from '../../../../components/objects/rarefaction/RarefactionSaturationSurfaces.jsx'
 import { computeFastReflectionSlowSaturationIntersections } from '../../intersections/fastReflectionSlowSaturation.js'
 export function SlowAdmissibleSaturations({ entry, params, view, resolution, visibility = {}, pipelineBranch = null }) {
   const branchVisibility = visibility?.slow ?? {}
@@ -76,7 +76,7 @@ export function SlowAdmissibleSaturations({ entry, params, view, resolution, vis
         visible={branchVisibility.satRarefactionLocal !== false}
         color={solutionColors.satSlowRLocal}
       />
-      <CompositeSaturatedSlowSurface
+      <RarefactionSaturationSlowSurface
         fixedState={segments.nonlocalRarefactionReferencePoint}
         params={params}
         view={view}

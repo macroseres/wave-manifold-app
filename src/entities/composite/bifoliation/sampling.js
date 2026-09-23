@@ -60,11 +60,11 @@ export function normalizePoint(point) {
 
 export function normalizedPointDistance(a, b, view) {
   if (!a || !b) return Number.POSITIVE_INFINITY
-  const tScale = Math.max(1, Math.abs(view.tMax - view.tMin))
+  const tauScale = Math.max(1, Math.abs(view.tMax - view.tMin))
   const yScale = Math.max(1, Math.abs(view.yMax - view.yMin))
   const zScale = Math.max(1, Math.abs(view.zMax - view.zMin))
   return Math.hypot(
-    ((a.t ?? 0) - (b.t ?? 0)) / tScale,
+    ((a.t ?? 0) - (b.t ?? 0)) / tauScale,
     ((a.Y ?? 0) - (b.Y ?? 0)) / yScale,
     ((a.z ?? 0) - (b.z ?? 0)) / zScale,
   )
@@ -182,11 +182,11 @@ export function refineCompositeBaseRarefaction(points, options = {}) {
   const clean = cleanCompositeBaseRarefactionPoints(points, view, minDistance)
   if (clean.length < 2) return clean
 
-  const tScale = Math.max(1, Math.abs(view.tMax - view.tMin))
+  const tauScale = Math.max(1, Math.abs(view.tMax - view.tMin))
   const zScale = Math.max(1, Math.abs(view.zMax - view.zMin))
   const s = [0]
   for (let i = 1; i < clean.length; i += 1) {
-    const ds = Math.hypot((clean[i].t - clean[i - 1].t) / tScale, (clean[i].z - clean[i - 1].z) / zScale)
+    const ds = Math.hypot((clean[i].t - clean[i - 1].t) / tauScale, (clean[i].z - clean[i - 1].z) / zScale)
     s.push(s[i - 1] + Math.max(ds, 1e-12))
   }
 

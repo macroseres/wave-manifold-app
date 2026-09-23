@@ -1,6 +1,6 @@
 import { waveSpeed } from '../../surfaceImplicit/index.js'
 import { SPEED_DECREASES, SPEED_INCREASES } from '../../waves/orientation.js'
-import { computeCompositeSlowInflectionPoint } from '../../../components/curves/compositeInflectionUtils.js'
+import { computeCompositeSlowInflectionPoint } from '../../../components/objects/composite/compositeInflectionUtils.js'
 import { coordsOf, finite, normalizeSegment } from './primitives.js'
 import { minDistanceToSegmentCollection, normalizedDistance3, scaledSegmentLength } from './distance.js'
 import { isStopEvent, refineStopPointOnStep } from './stopping.js'
@@ -75,9 +75,9 @@ function nearestAnchorOnComposite(segments, anchors, view, params) {
 
 function sideVector(point, origin, view) {
   if (!Array.isArray(point) || !Array.isArray(origin)) return null
-  const tScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
+  const tauScale = Math.max(1e-6, Math.abs((view?.tMax ?? 1) - (view?.tMin ?? 0)))
   const zScale = Math.max(1e-6, Math.abs((view?.zMax ?? 1) - (view?.zMin ?? 0)))
-  return [(point[0] - origin[0]) / tScale, (point[2] - origin[2]) / zScale]
+  return [(point[0] - origin[0]) / tauScale, (point[2] - origin[2]) / zScale]
 }
 
 function sideDot(a, b) {

@@ -1,5 +1,5 @@
 import { BACKWARD_HUGONIOT, FORWARD_HUGONIOT } from '../hugoniot/directions.js'
-import { makeWaveBifoliation } from '../shared/types/mathTypes.js'
+import { createWaveBifoliation } from '../shared/types/mathTypes.js'
 import { buildHugoniotLeaf } from './hugoniotLeaf.js'
 import { buildRarefactionContinuationLeaf } from './rarefactionLeaf.js'
 
@@ -16,7 +16,7 @@ export function buildHugoniotBifoliation({ fixedState, params, view, samples = 5
   const minus = buildHugoniotLeaf({ fixedState, params, view, samples, direction: FORWARD_HUGONIOT, zExtensionMargin, compactifiedZ })
   const plus = buildHugoniotLeaf({ fixedState, params, view, samples, direction: BACKWARD_HUGONIOT, zExtensionMargin, compactifiedZ })
 
-  return makeWaveBifoliation({
+  return createWaveBifoliation({
     name: 'mathcal H_pm',
     family: 'hugoniot',
     minus,
@@ -52,7 +52,7 @@ export function buildRarefactionBifoliation({ fixedState, params, view, samples 
     compactifiedZ,
   })
 
-  return makeWaveBifoliation({
+  return createWaveBifoliation({
     name: 'mathcal R_pm',
     family: 'rarefaction',
     minus,
