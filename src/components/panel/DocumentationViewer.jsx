@@ -97,8 +97,8 @@ function renderMarkdown(source) {
   return nodes
 }
 
-export default function DocumentationViewer({ open, onClose }) {
-  const [chapterIndex, setChapterIndex] = useState(0)
+export default function DocumentationViewer({ open, onClose, initialChapter = 'introducao' }) {
+  const [chapterIndex, setChapterIndex] = useState(() => Math.max(0, chapters.findIndex(chapter => chapter.id === initialChapter)))
   const chapter = chapters[chapterIndex]
   const content = useMemo(() => renderMarkdown(chapter.source), [chapter])
 

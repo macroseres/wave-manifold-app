@@ -14,6 +14,12 @@ export default function CoincidenceCurve({ view, visible = true }) {
           points={points}
           color={waveColors.coincidence ?? '#525252'}
           lineWidth={1.35}
+          // Coincidence lies on both the z axis and the characteristic plane.
+          // Draw it as an overlay to avoid competing at identical depth.
+          transparent
+          opacity={1}
+          depthTest={false}
+          depthWrite={false}
           renderOrder={8}
         />
       ))}

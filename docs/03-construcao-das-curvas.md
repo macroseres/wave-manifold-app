@@ -34,7 +34,7 @@ Uma curva composta liga um arco de rarefação a uma família de Hugoniot. O app
 
 - \(\mathcal E\): curva de coincidência.
 - \(\mathcal J\): curvas de inflexão lenta e rápida.
-- \(\mathcal{DS}\): conjunto de dupla sonicidade.
+- \(\mathcal{DS}\): conjunto de dupla condição sônica.
 - \(\operatorname{Hys}^-\) e \(\operatorname{Hys}^+\): curvas de histerese.
 - \(\mathcal B^-\) e \(\mathcal B^+\): bifurcações secundárias esquerda e direita.
 - \(\operatorname{ext}_\pm(\mathcal E)\): interseções das saturações da coincidência com as superfícies sônicas.

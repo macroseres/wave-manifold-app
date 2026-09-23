@@ -1,5 +1,6 @@
 import React from 'react'
 import MathLabel from './MathLabel'
+import LayerHelp from './LayerHelp'
 import { formatNumber } from '../../ui/display'
 
 export function characteristicTexFromPoint(point) {
@@ -63,14 +64,21 @@ export function PlainParam({ children }) {
   return <span className="plain-param">{children}</span>
 }
 
-export function Toggle({ checked, onChange, label, color }) {
-  return (
+/**
+ * Keep editable copy beside each Toggle at its call site.
+ * label: compact panel content (JSX).
+ * helper: { title: JSX, description: JSX, documentation: string }.
+ * Hover content is mounted only when opened; this component does not infer copy.
+ */
+export function Toggle({ checked, onChange, label, color, helper }) {
+  const row = (
     <label className="toggle-row">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
       <span className="toggle-dot" style={{ background: color ?? '#64748b' }} />
       <span>{label}</span>
     </label>
   )
+  return helper ? <LayerHelp helper={helper}>{row}</LayerHelp> : row
 }
 
 export function LegendItem({ color, label }) {

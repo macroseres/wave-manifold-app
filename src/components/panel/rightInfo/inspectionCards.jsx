@@ -110,13 +110,13 @@ export function InspectionModeSummary({ activeView = '3d', probeCount = 0 }) {
       <div className="inspection-mode-actions">
         {inStateSpace ? (
           <>
-            <div><span>Criar</span><strong>clique próximo de <MathLabel tex={"C_s"} /> ou <MathLabel tex={"C_f"} /></strong></div>
+            <div><span>Criar</span><strong>clique próximo de <MathLabel tex="C_s" /> ou <MathLabel tex="C_f" /></strong></div>
             <div><span>Mover</span><strong>arraste o marcador da sonda</strong></div>
             <div><span>Sincroniza</span><strong>Variedade e Estados</strong></div>
           </>
         ) : (
           <>
-            <div><span>Criar</span><strong>clique em <MathLabel tex={"\\mathcal C_s"} /> ou <MathLabel tex={"\\mathcal C_f"} /></strong></div>
+            <div><span>Criar</span><strong>clique em <MathLabel tex="\mathcal{C_s}" /> ou <MathLabel tex="\mathcal{C_f}" /></strong></div>
             <div><span>Prender</span><strong>Ctrl + arrastar em H, R, K ou J</strong></div>
             <div><span>Soltar</span><strong>arrastar sem Ctrl</strong></div>
           </>

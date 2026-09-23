@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import MathLabel from './MathLabel'
 import { MathVar, RangeControl } from './PanelPrimitives'
 import ParameterCanvas from './ParameterCanvas'
@@ -34,6 +34,17 @@ export default function ParameterMapView({
   updateParam,
   resetParams,
 }) {
+  const previousNonSymmetricB2 = useRef(params.b2 !== 0 ? params.b2 : 0.2)
+  const symmetric = params.b2 === 0
+  const selectSymmetry = (nextSymmetric) => {
+    if (nextSymmetric) {
+      if (params.b2 !== 0) previousNonSymmetricB2.current = params.b2
+      updateParam('b2', 0)
+    } else {
+      updateParam('b2', previousNonSymmetricB2.current)
+    }
+  }
+
   return (
     <div className="wm-stage-content params-view">
       <div className="stage-param-plot">
@@ -95,6 +106,16 @@ export default function ParameterMapView({
           </div>
           <div className="stage-param-model-card">
             <div className="model-card-title">Parâmetros do Fluxo</div>
+            <div className="schaeffer-case-selector" role="radiogroup" aria-label="Simetria do fluxo">
+              <label className={`schaeffer-case-option ${symmetric ? 'active' : ''}`}>
+                <input type="radio" name="flow-symmetry" checked={symmetric} onChange={() => selectSymmetry(true)} />
+                <span>Caso simétrico (<MathLabel tex="b_2=0" />)</span>
+              </label>
+              <label className={`schaeffer-case-option ${!symmetric ? 'active' : ''}`}>
+                <input type="radio" name="flow-symmetry" checked={!symmetric} onChange={() => selectSymmetry(false)} />
+                <span>Caso não simétrico (<MathLabel tex="b_2\ne 0" />)</span>
+              </label>
+            </div>
             <RangeControl label={<MathLabel tex="b_1" />} min={parameterWindow.b1Min} max={parameterWindow.b1Max} step={0.1} value={params.b1} onChange={(v) => updateParam('b1', v)} />
             <RangeControl label={<MathLabel tex="b_2" />} min={parameterWindow.b2Min} max={parameterWindow.b2Max} step={0.1} value={params.b2} onChange={(v) => updateParam('b2', v)} />
             <RangeControl label={<MathLabel tex="c" />} min={-4} max={4} step={0.1} value={params.c} onChange={(v) => updateParam('c', v)} />
