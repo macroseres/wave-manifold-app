@@ -8,11 +8,11 @@ import { compositeContinuationView, makeRarefactionParam, makeCompositeLevelFunc
 import { traceLevelSet } from './continuation.js'
 import { extractGlobalCompositeLevelSet } from './marchingSquares.js'
 
-function buildCompositeFromRarefactionSegment(segment, params, calcView, renderView, direction, sonicTarget, fixedState, desiredSonicBranch = 'all', mathcalR = null, mathcalH = null) {
+function buildCompositeFromRarefactionSegment(segment, params, calcView, renderView, direction, sonicTarget, fixedState, desiredSonicBranch = 'all', mathcalR = null, mathcalH = null, options = {}) {
   const rareParam = makeRarefactionParam(segment, calcView)
   if (!rareParam) return null
   const anchors = findRarefactionSonicAnchors(rareParam, params, sonicTarget, fixedState, calcView, desiredSonicBranch)
-  if (!anchors.length) return null
+  if (!anchors.length && !options.globalPortrait) return null
 
   const etaSpan = Math.max(1e-9, calcView.zMax - calcView.zMin)
   // A composta desenhada continua limitada no eixo z pelo calcView,
@@ -47,9 +47,9 @@ function buildCompositeFromRarefactionSegment(segment, params, calcView, renderV
   // desconexas, laços e ramos que não contêm a inflexão. A continuação local
   // por pseudo-arclength fica apenas como fallback caso a malha não detecte
   // nenhum segmento.
-  let allSegments = extractGlobalCompositeLevelSet(level, renderView, params)
+  let allSegments = extractGlobalCompositeLevelSet(level, renderView, params, options)
 
-  if (!allSegments.length) {
+  if (!allSegments.length && !options.globalPortrait) {
     const localSegments = []
     for (const anchor of anchors) {
       const seedW = level.wFromEta(anchor.eta)
@@ -82,8 +82,8 @@ function buildCompositeFromRarefactionSegment(segment, params, calcView, renderV
   }
 }
 
-export function buildCompositeSegmentsFromRarefaction(rare, params, calcView, view, _inflectionBranch = 'all', direction = FORWARD_HUGONIOT, sonicTarget = 'left', fixedState = null) {
-  const result = buildCompositeFromRarefactionSegment(rare, params, calcView, view, direction, sonicTarget, fixedState, _inflectionBranch)
+export function buildCompositeSegmentsFromRarefaction(rare, params, calcView, view, _inflectionBranch = 'all', direction = FORWARD_HUGONIOT, sonicTarget = 'left', fixedState = null, options = {}) {
+  const result = buildCompositeFromRarefactionSegment(rare, params, calcView, view, direction, sonicTarget, fixedState, _inflectionBranch, null, null, options)
   return result ?? { segments: [], inflectionPoint: null }
 }
 

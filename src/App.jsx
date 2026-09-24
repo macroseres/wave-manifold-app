@@ -7,6 +7,7 @@ import { useWaveAppState } from './app/state/waveAppState'
 import { useCharacteristicSelection } from './app/selection/useCharacteristicSelection'
 import { useInspectionController } from './app/inspection/useInspectionController'
 import WaveSceneViewport from './app/scene/WaveSceneViewport'
+import PhasePortraitProvider from './app/inspection/PhasePortraitProvider.jsx'
 
 export default function App() {
   const [waveState, waveActions] = useWaveAppState()
@@ -267,7 +268,7 @@ export default function App() {
   }, [hoveredInspectionPoint, inspection])
 
   return (
-    <>
+    <PhasePortraitProvider state={waveState} selection={selection}>
       <WaveOverlayPanel
         state={waveState}
         calculationView={calcView}
@@ -335,7 +336,7 @@ export default function App() {
         beginOrbiting3D={beginOrbiting3D}
         finishOrbiting3D={finishOrbiting3D}
       />
-    </>
+    </PhasePortraitProvider>
   )
 }
 

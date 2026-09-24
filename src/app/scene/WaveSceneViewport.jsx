@@ -5,6 +5,7 @@ import { OrbitControls } from '@react-three/drei'
 
 import Axes from '../../components/scene/Axes'
 import InspectionProbes from '../../components/scene/InspectionProbes'
+import RarefactionPhasePortrait from '../../components/scene/RarefactionPhasePortrait.jsx'
 import SolutionModeCurves from '../../components/scene/SolutionModeCurves'
 import ImplicitSurface from '../../entities/shared/render/ImplicitSurface'
 import WaveCurve from '../../entities/shared/render/WaveCurve'
@@ -224,6 +225,7 @@ function WaveSceneViewport({
         <directionalLight position={[-4, -5, -6]} intensity={0.35} />
 
         <AutoRotateGroup autoRotate={activeView === '3d' && autoRotate3D} scale={sceneScale}>
+          <RarefactionPhasePortrait view={calcView} resolution={resolution} markerScale={markerScale} />
           {showAxes && <Axes view={view} />}
 
           {showCharacteristic && (

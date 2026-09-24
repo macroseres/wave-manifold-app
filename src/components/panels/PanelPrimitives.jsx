@@ -26,10 +26,10 @@ export function RangeControl({ label, min, max, step, value, onChange }) {
  * helper: { title: JSX, description: JSX, documentation: string }.
  * Hover content is mounted only when opened; this component does not infer copy.
  */
-export function Toggle({ checked, onChange, label, color, helper }) {
+export function Toggle({ checked, onChange, label, color, helper, disabled = false }) {
   const row = (
     <label className="toggle-row">
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+      <input type="checkbox" checked={checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} />
       <span className="toggle-dot" style={{ background: color ?? '#64748b' }} />
       <span>{label}</span>
     </label>

@@ -1,4 +1,7 @@
 import { findHysteresisDoubleStates } from '../../geometry/hysteresisSelfIntersection.js'
+import { usePhasePortrait } from '../../app/inspection/PhasePortraitContext.js'
+import { useViscousPortrait } from '../../hooks/useViscousPortrait.js'
+import { flux, viscousField } from '../../entities/phasePortrait/flow.js'
 import { buildDoubleSonicStateProjection } from '../../geometry/doubleSonicStateProjection.js'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import MathLabel from './MathLabel'
@@ -89,15 +92,18 @@ function StateSpaceCanvas({
   resolution = 40,
 }) {
   const canvasRef = useRef(null)
+  const phase = usePhasePortrait()
   const showCoincidence = showCoincidenceMinusProjection || showCoincidencePlusProjection
   const draggingBranchRef = useRef(null)
   const draggingProbeBranchRef = useRef(null)
+  const draggingPhaseRightRef = useRef(false)
   const pendingDragSampleRef = useRef(null)
   const pendingProbeSampleRef = useRef(null)
   const dragFrameRef = useRef(null)
   const probeFrameRef = useRef(null)
   const [hoverBranch, setHoverBranch] = useState(null)
   const [dragPreview, setDragPreview] = useState(null)
+  const [phaseRightOverride, setPhaseRightOverride] = useState(null)
 
   const samples = useMemo(() => {
     const slow = buildCharacteristicProjectionSamples(view, params, 'slow')
@@ -215,6 +221,21 @@ function StateSpaceCanvas({
   }, [samples])
   const navigation = useStateViewport(baseBounds)
   const bounds = navigation.bounds
+  const phaseActive = phase?.enabled && phase.activeView === 'state'
+  const phaseSelection = phase?.viscous
+  const phaseSelectionKey = phaseSelection ? JSON.stringify([phaseSelection.left, phaseSelection.right, phaseSelection.speed]) : 'none'
+  useEffect(() => { setPhaseRightOverride(null) }, [phaseSelectionKey])
+  const phaseAdjustedSelection = useMemo(() => {
+    if (!phaseSelection) return null
+    const right = phaseRightOverride ?? phaseSelection.right
+    const residual = Math.hypot(...viscousField(phaseSelection.left, phaseSelection.speed, params)(right))
+    const scale = 1 + Math.hypot(...flux(phaseSelection.left, params)) + Math.hypot(...flux(right, params))
+    return { ...phaseSelection, right, originalRight: phaseSelection.right, residual,
+      rightIsEquilibrium: residual <= 1e-8 * scale, adjustedRight: Boolean(phaseRightOverride) }
+  }, [phaseSelection, phaseRightOverride, params])
+  const { portrait: phasePortrait, loading: phaseLoading, error: phaseError } = useViscousPortrait(
+    phaseAdjustedSelection, params, bounds, phase?.viscousOptions, phaseActive)
+  const phaseEquilibria = phasePortrait?.equilibriumPoints ?? []
 
   const hysMinusSegments = useMemo(() => (
     (showHysPlusMinusProjection || showHysMinusPlusProjection) ? buildImplicitHysPlusMinusStateSegments(bounds, params, 420) : []
@@ -343,6 +364,33 @@ function StateSpaceCanvas({
     return Math.hypot(pointer.x - screen.x, pointer.y - screen.y)
   }
 
+  const phaseRightScreenDistance = (event) => {
+    const pointer = fromEvent(event)
+    const right = phaseAdjustedSelection?.right
+    if (!phaseActive || !pointer || !right) return Number.POSITIVE_INFINITY
+    const screen = toScreen({ u: right[0], v: right[1] }, pointer.rect)
+    return Math.hypot(pointer.x - screen.x, pointer.y - screen.y)
+  }
+
+  const phaseRightFromEvent = (event) => {
+    const pointer = fromEvent(event)
+    if (!pointer) return null
+    // Magnetic snap: once U_R comes close to a visible equilibrium, place it
+    // exactly at that zero of the viscous field.  U_L itself is excluded as a
+    // target so an accidental drag does not collapse the two states.
+    let nearest = null
+    let nearestDistance = Number.POSITIVE_INFINITY
+    for (const equilibrium of phaseEquilibria) {
+      if (phaseSelection && Math.hypot(equilibrium[0] - phaseSelection.left[0], equilibrium[1] - phaseSelection.left[1]) < 1e-7) continue
+      const q = toScreen({ u: equilibrium[0], v: equilibrium[1] }, pointer.rect)
+      const distance = Math.hypot(pointer.x - q.x, pointer.y - q.y)
+      if (distance < nearestDistance) { nearestDistance = distance; nearest = equilibrium }
+    }
+    if (nearest && nearestDistance <= 24) return [...nearest]
+    const state = stateFromScreenPoint(pointer, bounds)
+    return [state.u, state.v]
+  }
+
   const probeScreenDistance = (branch, event) => {
     const pointer = fromEvent(event)
     const point = probeProjection?.[branch]?.point
@@ -423,6 +471,13 @@ function StateSpaceCanvas({
 
   const handlePointerDown = (event) => {
     if (navigation.down(event)) return
+    if (!inspectionModeEnabled && phaseActive && phaseRightScreenDistance(event) <= 18) {
+      event.preventDefault()
+      event.stopPropagation()
+      draggingPhaseRightRef.current = true
+      event.currentTarget.setPointerCapture?.(event.pointerId)
+      return
+    }
     if (inspectionModeEnabled) {
       const candidates = ['slow', 'fast']
         .map((branch) => ({ branch, distance: probeScreenDistance(branch, event) }))
@@ -472,6 +527,12 @@ function StateSpaceCanvas({
   const handlePointerMove = (event) => {
     if (navigation.move(event)) return
     if (navigation.mode !== 'select') return
+    if (draggingPhaseRightRef.current) {
+      event.preventDefault()
+      const right = phaseRightFromEvent(event)
+      if (right) setPhaseRightOverride(right)
+      return
+    }
     if (inspectionModeEnabled) {
       const branch = draggingProbeBranchRef.current
       if (branch) {
@@ -500,6 +561,10 @@ function StateSpaceCanvas({
       updateBranchFromEvent(draggingBranchRef.current, event)
       return
     }
+    if (phaseActive && phaseRightScreenDistance(event) <= 18) {
+      setHoverBranch('phase-right')
+      return
+    }
     const candidates = ['slow', 'fast']
       .map((branch) => ({ branch, distance: selectedScreenDistance(branch, event) }))
       .sort((a, b) => a.distance - b.distance)
@@ -508,6 +573,13 @@ function StateSpaceCanvas({
 
   const handlePointerUp = (event) => {
     if (navigation.up(event)) return
+    if (draggingPhaseRightRef.current) {
+      const right = event.type !== 'pointercancel' ? phaseRightFromEvent(event) : null
+      if (right) setPhaseRightOverride(right)
+      draggingPhaseRightRef.current = false
+      event.currentTarget.releasePointerCapture?.(event.pointerId)
+      return
+    }
     if (inspectionModeEnabled) {
       const branch = draggingProbeBranchRef.current
       if (probeFrameRef.current) cancelAnimationFrame(probeFrameRef.current)
@@ -538,6 +610,7 @@ function StateSpaceCanvas({
     if (!canvas) return undefined
 
     const draw = () => drawStateSpaceCanvas(canvas, {
+      phasePortrait,
       bounds,
       selectedMap: displayMap,
       hoverBranch: inspectionModeEnabled ? null : hoverBranch,
@@ -571,9 +644,9 @@ function StateSpaceCanvas({
     const observer = new ResizeObserver(draw)
     observer.observe(canvas)
     return () => observer.disconnect()
-  }, [rarefactionFastSegments, fastCompositeProjectionSegments, implicitHugoniotPlusSegments, showHugoniotPlusPlusProjection, displayMap, showHugoniotMinusMinusProjection, selfIntersectionProjection, bounds, selectedMap, hoverBranch, inspectionModeEnabled, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, sonicRightSeparatorMinusSegments, sonicRightSeparatorPlusSegments, sonicLeftSeparatorPlusSegments, sonicLeftSeparatorMinusSegments, doubleSonicMinusSegments, doubleSonicPlusSegments, hysPlusProjectionSegments, rarefactionSlowSegments, compositeProjectionSegments, probeProjection])
+  }, [phasePortrait, rarefactionFastSegments, fastCompositeProjectionSegments, implicitHugoniotPlusSegments, showHugoniotPlusPlusProjection, displayMap, showHugoniotMinusMinusProjection, selfIntersectionProjection, bounds, selectedMap, hoverBranch, inspectionModeEnabled, view, params, toScreen, implicitInflectionSegments, implicitCoincidenceSegments, showCoincidence, implicitHugoniotMinusSegments, sonicRightSeparatorMinusSegments, sonicRightSeparatorPlusSegments, sonicLeftSeparatorPlusSegments, sonicLeftSeparatorMinusSegments, doubleSonicMinusSegments, doubleSonicPlusSegments, hysPlusProjectionSegments, rarefactionSlowSegments, compositeProjectionSegments, probeProjection])
 
-  const cursor = draggingBranchRef.current || draggingProbeBranchRef.current ? 'grabbing' : hoverBranch ? 'grab' : 'default'
+  const cursor = draggingBranchRef.current || draggingProbeBranchRef.current || draggingPhaseRightRef.current ? 'grabbing' : hoverBranch ? 'grab' : 'default'
   const slowLabelPosition = selectedLabelPosition('slow')
   const fastLabelPosition = selectedLabelPosition('fast')
   const probeLabelPositions = Object.fromEntries(['slow', 'fast'].map((branch) => {
@@ -627,6 +700,7 @@ function StateSpaceCanvas({
         <button type="button" onClick={() => navigation.zoom(1 / .75)} aria-label="Reduzir espaço de estados">−</button>
         <button type="button" disabled={!navigation.canUndo} onClick={navigation.undo}>Voltar zoom</button>
         <button type="button" onClick={navigation.reset}>Restaurar vista</button>
+        {phaseActive && phaseRightOverride && <button type="button" onClick={() => setPhaseRightOverride(null)}>Restaurar U_R</button>}
         <button type="button" aria-pressed={navigation.showLabels} onClick={() => navigation.setShowLabels(value => !value)}>Rótulos</button>
       </div>
       {(dragPreview || compositeLoading || rarefactionLoading || compositeError || rarefactionError || fastCompositeLoading || fastRarefactionLoading || fastCompositeError || fastRarefactionError) && (
@@ -636,6 +710,10 @@ function StateSpaceCanvas({
               : `Calculando e desenhando: ${[compositeLoading && 'composta lenta', rarefactionLoading && 'rarefação lenta', fastCompositeLoading && 'composta rápida', fastRarefactionLoading && 'rarefação rápida'].filter(Boolean).join(', ')}…`}
         </div>
       )}
+      {phaseActive && phaseAdjustedSelection && <div role="status" aria-live="polite" style={{ position: 'absolute', left: 12, bottom: 12, zIndex: 5, padding: '7px 11px', borderRadius: 7, background: '#0f172a', color: '#e2e8f0', pointerEvents: 'none', fontSize: 12 }}>
+        {phaseLoading ? 'Calculando retrato… ' : phaseError ? `${phaseError} ` : ''}
+        {`Resíduo em U_R${phaseAdjustedSelection.adjustedRight ? '*' : ''}: ${phaseAdjustedSelection.residual.toExponential(3)} — ${phaseAdjustedSelection.rightIsEquilibrium ? 'equilíbrio' : 'arraste U_R; ele encaixa automaticamente ao se aproximar de um equilíbrio verde'}`}
+      </div>}
       <canvas
         className="stage-2d-canvas"
         ref={canvasRef}
@@ -698,9 +776,6 @@ function SolutionCanvas() {
 
 export { SolutionCanvas }
 export default StateSpaceCanvas
-
-
-
 
 
 

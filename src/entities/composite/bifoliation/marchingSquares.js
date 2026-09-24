@@ -2,7 +2,7 @@ import { COMPOSITE } from '../../../config/numerics.js'
 import { finite, uniqueSortedUnit, makeClusteredUnitGrid } from './sampling.js'
 import { splitSegmentsByZWindow, compositeBounds, doubleSonicZValues, collectDoubleSonicUvFocuses } from './continuation.js'
 
-function contourEdgePoint(corners, edge) {
+function contourEdgePoint(corners, edge, level = null) {
   const edgeCorners = [
     [0, 1], // bottom: (u0,w0) -> (u1,w0)
     [1, 2], // right:  (u1,w0) -> (u1,w1)
@@ -15,6 +15,22 @@ function contourEdgePoint(corners, edge) {
   const b = corners[pair[1]]
   if (!a || !b || !finite(a.value) || !finite(b.value)) return null
   const denom = a.value - b.value
+  if (level) {
+    let lo = 0, hi = 1, flo = a.value
+    let best = null
+    for (let k = 0; k < 48; k++) {
+      const fraction = (lo + hi) / 2
+      const u = a.u + fraction * (b.u - a.u), w = a.w + fraction * (b.w - a.w)
+      const sample = level.evalAt(u, w)
+      if (!sample || !finite(sample.value)) return null
+      best = { u, w }
+      if (Math.abs(sample.value) < 1e-11) return best
+      if (flo * sample.value <= 0) hi = fraction
+      else { lo = fraction; flo = sample.value }
+    }
+    // Reject sign changes across poles rather than joining separate branches.
+    return Math.abs(level.evalAt(best.u, best.w)?.value) < 1e-7 ? best : null
+  }
   let alpha = Math.abs(denom) > 1e-14 ? a.value / denom : 0.5
   if (!finite(alpha)) alpha = 0.5
   alpha = Math.max(0, Math.min(1, alpha))
@@ -114,14 +130,22 @@ function buildPolylinesFromUvEdges(uvEdges, level) {
   }
 
   const polylines = []
+  const appendTrace = keys => {
+    let segment = []
+    for (const key of keys) {
+      const point = pointForKey(key)
+      if (point) segment.push(point)
+      else { if (segment.length >= 2) polylines.push(segment); segment = [] }
+    }
+    if (segment.length >= 2) polylines.push(segment)
+  }
   const starts = [...nodes.keys()].filter((key) => (adjacency.get(key)?.size ?? 0) !== 2)
   for (const start of starts) {
     for (const next of adjacency.get(start) ?? []) {
       const ek = edgeKey(start, next)
       if (visited.has(ek)) continue
       const keys = traceFrom(start, next)
-      const segment = keys.map(pointForKey).filter(Boolean)
-      if (segment.length >= 2) polylines.push(segment)
+      appendTrace(keys)
     }
   }
 
@@ -129,17 +153,16 @@ function buildPolylinesFromUvEdges(uvEdges, level) {
     if (visited.has(ek)) continue
     const [start, next] = ek.split('|')
     const keys = traceFrom(start, next)
-    const segment = keys.map(pointForKey).filter(Boolean)
-    if (segment.length >= 2) polylines.push(segment)
+    appendTrace(keys)
   }
 
   return polylines
 }
 
-export function extractGlobalCompositeLevelSet(level, renderView, params) {
-  const bounds = { ...compositeBounds(), ...(level.compactifiedZ ? { wMin: 0, wMax: 1 } : {}) }
-  const baseUSamples = Math.max(20, Math.floor(COMPOSITE.GLOBAL_LEVELSET_U_SAMPLES ?? 150))
-  const baseWSamples = Math.max(20, Math.floor(COMPOSITE.GLOBAL_LEVELSET_W_SAMPLES ?? 220))
+export function extractGlobalCompositeLevelSet(level, renderView, params, options = {}) {
+  const bounds = { ...compositeBounds(), ...(level.compactifiedZ ? { wMin: 0, wMax: 1 } : {}), ...(options.globalPortrait ? { uMin: 0, uMax: 1 } : {}) }
+  const baseUSamples = Math.max(20, Math.floor(options.uSamples ?? COMPOSITE.GLOBAL_LEVELSET_U_SAMPLES ?? 150))
+  const baseWSamples = Math.max(20, Math.floor(options.wSamples ?? COMPOSITE.GLOBAL_LEVELSET_W_SAMPLES ?? 220))
   const valueCap = Math.max(1, COMPOSITE.GLOBAL_LEVELSET_VALUE_CAP ?? 1e8)
   const uSpan = bounds.uMax - bounds.uMin
   const wSpan = bounds.wMax - bounds.wMin
@@ -189,9 +212,17 @@ export function extractGlobalCompositeLevelSet(level, renderView, params) {
       if (c10.value >= 0) mask |= 2
       if (c11.value >= 0) mask |= 4
       if (c01.value >= 0) mask |= 8
-      for (const [edgeA, edgeB] of marchingSquarePairs(mask)) {
-        const a = contourEdgePoint(corners, edgeA)
-        const b = contourEdgePoint(corners, edgeB)
+      let pairs = marchingSquarePairs(mask)
+      if (options.globalPortrait && (mask === 5 || mask === 10)) {
+        const center = level.evalAt((c00.u + c11.u) / 2, (c00.w + c11.w) / 2)
+        if (!center || !finite(center.value)) continue
+        // Resolve the ambiguous cell with the actual level function, not
+        // a fixed connection which may join two disconnected branches.
+        if (center.value < 0) pairs = mask === 5 ? [[3, 0], [1, 2]] : [[0, 1], [2, 3]]
+      }
+      for (const [edgeA, edgeB] of pairs) {
+        const a = contourEdgePoint(corners, edgeA, options.globalPortrait ? level : null)
+        const b = contourEdgePoint(corners, edgeB, options.globalPortrait ? level : null)
         if (a && b && finite(a.u) && finite(a.w) && finite(b.u) && finite(b.w)) uvEdges.push([a, b])
       }
     }

@@ -1,5 +1,6 @@
 import { projectMinus, projectPlus } from '../geometry/stateProjections.js'
 import { waveSpeed } from '../surfaceImplicit/state.js'
+import { viscousJacobian } from '../phasePortrait/flow.js'
 
 export const HOPF_EPS = 1e-9
 
@@ -24,13 +25,9 @@ export function hopfSpectrum(direction, t, Y, z, params) {
   const state = direction === 'plus' ? projectPlus(t, Y, z, params) : projectMinus(t, Y, z, params)
   if (!state) return { trace: NaN, determinant: NaN, discriminant: NaN }
   const { u, v } = state
-  const { a = 0, b1, b2, c } = params
   const s = waveSpeed(t, z, params)
   // M = DF(U±) - sI, with the same flux Jacobian as inspection/diagnostics.
-  const m11 = (b1 + 1) * u + a - s
-  const m12 = v
-  const m21 = v + c
-  const m22 = u - b2 * v + a - s
+  const [[m11, m12], [m21, m22]] = viscousJacobian([u, v], s, params)
   const trace = m11 + m22
   const determinant = m11 * m22 - m12 * m21
   return { trace, determinant, discriminant: trace * trace - 4 * determinant }

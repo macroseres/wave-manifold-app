@@ -37,6 +37,20 @@ export function rarefactionDerivativeDtDz(z, t, params) {
   return Number.isFinite(dtDz) ? dtDz : Number.NaN
 }
 
+// Same foliation as dt/dz: cancel its removable A factor and multiply by P.
+// This chart also represents vertical leaves at P=0 without division by zero.
+export function rarefactionRegularizedField([t, z], { b1, b2, c }) {
+  const p = P(z, b1, b2)
+  return [((2 - b1) * z - b2) * t - 2 * c * p / (b1 * (1 + z * z) ** 2), p]
+}
+
+// Canonical second chart from stateProjections: x=1/z, T=-z²t.
+// Push forward the finite field and multiply by x to extend across x=0.
+export function rarefactionInfinityField([T, x], { b1, b2, c }) {
+  const h = b1 - 1 + b2 * x + x * x
+  return [(b1 + b2 * x + 2 * x * x) * T + 2 * c * x * h / (b1 * (1 + x * x) ** 2), -x * h]
+}
+
 export function barU(t, z, params) {
   return centerState(t, z, params).u
 }

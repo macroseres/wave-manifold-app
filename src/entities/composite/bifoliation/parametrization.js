@@ -1,5 +1,6 @@
 import { makeSaturatedHugoniotBifoliation } from '../../waves/saturatedBifoliation.js'
 import { finite, normalizePoint, normalizedPointDistance, sonicValue, sonicBranchIndicator, sonicBranchMatches, sonicValueOnRarefaction } from './sampling.js'
+import { physicalZToVisual } from '../../../geometry/zCompactification.js'
 
 export function compositeContinuationView(fixedState, view) {
   // A janela recebida já é o domínio padronizado de desenho/cálculo.
@@ -16,7 +17,13 @@ export function makeRarefactionParam(segment, view) {
   const zScale = Math.max(1, view.zMax - view.zMin)
   const s = [0]
   for (let i = 1; i < clean.length; i += 1) {
-    const ds = Math.hypot((clean[i].t - clean[i - 1].t) / tauScale, (clean[i].z - clean[i - 1].z) / zScale)
+    const dz = view.compactifiedZ
+      ? (physicalZToVisual(clean[i].z) - physicalZToVisual(clean[i - 1].z)) / 2
+      : (clean[i].z - clean[i - 1].z) / zScale
+    const dt = view.compactifiedZ
+      ? (Math.atan(clean[i].t / tauScale) - Math.atan(clean[i - 1].t / tauScale)) / Math.PI
+      : (clean[i].t - clean[i - 1].t) / tauScale
+    const ds = Math.hypot(dt, dz)
     s.push(s[i - 1] + Math.max(ds, 1e-12))
   }
   const total = s[s.length - 1]

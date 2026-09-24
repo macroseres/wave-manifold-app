@@ -1,4 +1,5 @@
 import { waveColors } from '../../config/waveColors.js'
+import { drawViscousPortrait } from '../phasePortrait/drawing.js'
 import {
   branchCharacteristicWindow,
   characteristicBoundaryZAtFraction,
@@ -317,6 +318,7 @@ export function drawStateSpaceCanvas(canvas, options) {
     }
   }
   drawProbeMarkers(ctx, { probeProjection, toScreen, rect })
+  drawViscousPortrait(ctx, options.phasePortrait, toScreen, rect)
 }
 
 export function drawSolutionCanvas(canvas) {

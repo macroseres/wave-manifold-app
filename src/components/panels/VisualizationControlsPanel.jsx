@@ -1,4 +1,5 @@
 import MathLabel from './MathLabel'
+import PhasePortraitControl from './PhasePortraitControl.jsx'
 import { Section, Toggle } from './PanelPrimitives'
 
 export default function VisualizationControlsPanel({
@@ -135,6 +136,7 @@ export default function VisualizationControlsPanel({
 
       <div className="wm-panel-kicker">{activeView === 'state' ? 'Projeções' : 'Camadas da cena'}</div>
       <div className="wm-panel-intro">{activeView === 'state' ? 'Escolha as projeções para visualizar no espaço de estados.' : 'Escolha as superfícies e curvas da variedade de ondas.'}</div>
+      <PhasePortraitControl />
       {activeView === 'state' && (
       <>
       <Section title="Referências geométricas" defaultOpen={true} accent="#38bdf8">
@@ -588,14 +590,23 @@ export default function VisualizationControlsPanel({
               title: <><MathLabel tex="\mathcal{E}" /><span> — Coincidência</span></>,
               description: (
                 <>
-                  <p>Como <MathLabel tex="\mathcal{C} = \{Y=0\}" /> e, neste modelo, a coincidência corresponde a <MathLabel tex="\tau=0" />, temos:</p>
-                  <div className="tooltip-equation"><MathLabel tex="\mathcal{E} = \{(\tau, Y, z)\in\mathcal{W} : Y=0, \tau = 0\}" />.</div>
-                  <p>Se <MathLabel tex="P\in\mathcal{C}" />, as duas projeções representam o mesmo estado:</p>
-                  <div className="tooltip-equation"><MathLabel tex="\pi_-(P) = \pi_+(P) = U" />.</div>
-                  <p>A coincidência reúne os pontos em que as velocidades características lenta e rápida desse estado são iguais:</p>
-                  <div className="tooltip-equation"><MathLabel tex="\mathcal{E} = \{P\in\mathcal{C} : \lambda_s(\pi(P)) = \lambda_f(\pi(P))\}" />.</div>
-                  <p>Na superfície característica, usamos a projeção comum:</p>
-                  <div className="tooltip-equation"><MathLabel tex="\pi = \pi_-|_{\mathcal{C}} = \pi_+|_{\mathcal{C}}" />.</div>
+                  <p>A curva de coincidência <MathLabel tex="\mathcal{E}" /> é o conjunto dos pontos da característica <MathLabel tex="\mathcal{C}" /> nos quais as velocidades características lenta e rápida coincidem:</p>
+                  
+                  <div className="tooltip-equation"><MathLabel tex="\mathcal{E}=\{P\in\mathcal{C}:\lambda_s(\pi(P))=\lambda_f(\pi(P))\}" />.</div>
+                  
+                  <p>Na característica, as projeções esquerda e direita coincidem:</p>
+                  
+                  <div className="tooltip-equation"><MathLabel tex="\pi=\pi_-|_{\mathcal{C}}=\pi_+|_{\mathcal{C}}" />.</div>
+                  
+                  <p>Assim, para <MathLabel tex="P\in\mathcal{E}" />, o estado comum <MathLabel tex="U=\pi(P)" /> satisfaz</p>
+                  
+                  <div className="tooltip-equation"><MathLabel tex="\lambda_s(U)=\lambda_f(U)" />.</div>
+                  
+                  <p>A curva <MathLabel tex="\mathcal{E}" /> separa a folha característica lenta <MathLabel tex="\mathcal{C}_s" /> da folha característica rápida <MathLabel tex="\mathcal{C}_f" />.</p>
+                  
+                  <p>Nas coordenadas <MathLabel tex="(\tau,Y,z)" />, a coincidência é dada por</p>
+                  
+                  <div className="tooltip-equation"><MathLabel tex="\mathcal{E}=\{P\in\mathcal{W}:Y=0,\ \tau=0\}" />.</div>
                 </>
               ),
               documentation: "curvas",
@@ -607,10 +618,38 @@ export default function VisualizationControlsPanel({
             color={waveColors.characteristicFast}
             label={<><MathLabel tex="\mathcal{C}" /><span> : Características</span></>}
             helper={{
-              title: <><MathLabel tex="\mathcal{C}=\mathcal{C}_s\cup\mathcal{E}\cup\mathcal{C}_f" /><span> — Características</span></>,
+              title: <><MathLabel tex="\mathcal{C}" /><span> — Característica</span></>,
               description: (
-                <><p>Plano característico <MathLabel tex="Y=0" /> em <MathLabel tex="(\tau,Y,\hat{z})" />, dividido nas folhas lenta <MathLabel tex="\mathcal{C}_s" /> e rápida <MathLabel tex="\mathcal{C}_f" />.</p></>
-              ),
+              <>
+                <p>Seja <MathLabel tex="P=(\tau,Y,z)\in\mathcal{W}" />. A característica é o conjunto dos pontos da variedade de ondas nos quais os estados esquerdo e direito coincidem:</p>
+                
+                <div className="tooltip-equation"><MathLabel tex="\mathcal{C}=\{P\in\mathcal{W}:\pi_-(P)=\pi_+(P)=U\}" />.</div>
+                
+                <p>Nas coordenadas <MathLabel tex="(\tau,Y,z)" />, a característica é dada por</p>
+                
+                <div className="tooltip-equation"><MathLabel tex="\mathcal{C}=\{P\in\mathcal{W}:Y=0\}" />.</div>
+                
+                <p>A característica decompõe-se na folha lenta, na curva de coincidência e na folha rápida:</p>
+                
+                <div className="tooltip-equation"><MathLabel tex="\mathcal{C}=\mathcal{C}_s\cup\mathcal{E}\cup\mathcal{C}_f" />.</div>
+                
+                <p>Na folha lenta <MathLabel tex="\mathcal{C}_s" />,</p>
+                
+                <div className="tooltip-equation"><MathLabel tex="s(P)=\lambda_s(U)" />.</div>
+                
+                <p>Na folha rápida <MathLabel tex="\mathcal{C}_f" />,</p>
+                
+                <div className="tooltip-equation"><MathLabel tex="s(P)=\lambda_f(U)" />.</div>
+                
+                <p>As duas velocidades características coincidem em <MathLabel tex="\mathcal{E}" />:</p>
+                
+                <div className="tooltip-equation"><MathLabel tex="\lambda_s(U)=\lambda_f(U)" />.</div>
+                
+                <p>Nas coordenadas <MathLabel tex="(\tau,Y,z)" />, a curva de coincidência é</p>
+                
+                <div className="tooltip-equation"><MathLabel tex="\mathcal{E}=\{P\in\mathcal{W}:Y=0,\ \tau=0\}" />.</div>
+              </>
+),
               documentation: "curvas",
             }}
           />
@@ -622,26 +661,36 @@ export default function VisualizationControlsPanel({
             checked={showSonicLeft}
             onChange={setShowSonicLeft}
             color={waveColors.sonicLeftSlow}
-            label={<><MathLabel tex={String.raw`\mathcal{S}^-`} /><span> : Sônica Esquerda</span></>}
+            label={<><MathLabel tex="\mathcal{S}^-" /><span> : Sônica Esquerda </span></>}
             helper={{
-              title: <><MathLabel tex={String.raw`\mathcal{S}^-`} /><span> — Sônica Esquerda</span></>,
+              title: <><MathLabel tex="\mathcal{S}^-" /><span> — Sônica Esquerda </span>(<MathLabel tex="\mathcal{Son}'" />)</>,
               description: (
-                <><p>{"Superfície sônica: a velocidade de choque coincide com uma velocidade característica do estado indicado."}</p>
-                <div className="layer-help-definition"><MathLabel tex={String.raw`\mathcal{S}^- = \mathcal{S}^-_s\cup\mathcal{BT}^-
-          \cup\mathcal{S}^-_f`} /></div>
-                <>
-                  <section className="layer-help-section">
-                    <strong>Definição</strong>
-                    <div><MathLabel tex={String.raw`\sigma(U_-,U_+)=\lambda_i(U_-),\quad i\in\{s,f\}`} /></div>
-                    <p>{"A velocidade do choque é igual à velocidade característica do estado "}{"esquerdo"}{"."}</p>
-                  </section>
-                  <section className="layer-help-section">
-                    <strong>Estacionariedade na Hugoniot</strong>
-                    <div><MathLabel tex={String.raw`\left.\frac{d}{d\xi}\sigma(\gamma(\xi))\right|_{\xi=\xi_*}=0,\quad \gamma(\xi)\in\mathcal H^{back}(U_+)`} /></div>
-                    <p>{"Ao longo dessa folha de Hugoniot, a velocidade do choque é estacionária no ponto sônico. O parâmetro ξ percorre a folha, mantendo o estado "}{"direito"}{" fixo."}</p>
-                  </section>
-                </></>
-              ),
+              <>
+                <p>A superfície sônica esquerda <MathLabel tex="\mathcal{S}^-" /> é o conjunto dos pontos <MathLabel tex="P\in\mathcal{W}" /> nos quais a velocidade <MathLabel tex="s" /> é crítica ao longo da curva de Hugoniot backward, mantendo fixo o estado direito <MathLabel tex="U_+" />:</p>
+                
+                <div className="tooltip-equation"><MathLabel tex="\mathcal{S}^-=\{P\in\mathcal{W}:ds|_{\mathcal{H}^{\mathrm{back}}(U_+)}(P)=0\}" />.</div>
+                
+                <p>Pela condição de Bethe–Wendroff, em <MathLabel tex="\mathcal{S}^-" /> a velocidade do choque coincide com uma velocidade característica do estado esquerdo <MathLabel tex="U_-=\pi_-(P)" />:</p>
+                
+                <div className="tooltip-equation"><MathLabel tex="s(P)=\lambda_s(U_-)\quad\text{ou}\quad s(P)=\lambda_f(U_-)" />.</div>
+                
+                <p>A superfície sônica esquerda decompõe-se na parte lenta, na curva de Bogdanov-Takens e na parte rápida:</p>
+                
+                <div className="tooltip-equation"><MathLabel tex="\mathcal{S}^-=\mathcal{S}^-_s\cup \mathcal{BT}^-\cup\mathcal{S}^-_f" />.</div>
+                
+                <p>Na parte lenta <MathLabel tex="\mathcal{S}^-_s" />,</p>
+                
+                <div className="tooltip-equation"><MathLabel tex="s(P)=\lambda_s(U_-)" />.</div>
+                
+                <p>Na parte rápida <MathLabel tex="\mathcal{S}^-_f" />,</p>
+                
+                <div className="tooltip-equation"><MathLabel tex="s(P)=\lambda_f(U_-)" />.</div>
+                
+                <p>A curva <MathLabel tex="\mathcal{BT}^-" /> separa as partes lenta e rápida de <MathLabel tex="\mathcal{S}^-" /> e é a extensão esquerda da curva de coincidência <MathLabel tex="\mathcal{E}" />:</p>
+                
+                <div className="tooltip-equation"><MathLabel tex="BT^-=\operatorname{ext}_-(\mathcal{E})=\mathcal{S}^-\cap\operatorname{sat}_{\mathrm{forw}}(\mathcal{E})" />.</div>
+              </>
+),
               documentation: "superficies",
             }}
           />
@@ -649,25 +698,35 @@ export default function VisualizationControlsPanel({
             checked={showSonicRight}
             onChange={setShowSonicRight}
             color={waveColors.sonicRightFast}
-            label={<><MathLabel tex={String.raw`\mathcal{S}^+`} /><span> : Sônica Direita</span></>}
+            label={<><MathLabel tex={String.raw`\mathcal{S}^+`} /><span> : Sônica Direita </span></>}
             helper={{
-              title: <><MathLabel tex={String.raw`\mathcal{S}^+`} /><span> — Sônica Direita</span></>,
+              title: <><MathLabel tex="\mathcal{S}^+" /><span> — Sônica Direita </span>(<MathLabel tex="\mathcal{Son}" />)</>,
               description: (
-                <><p>{"Superfície sônica: a velocidade de choque coincide com uma velocidade característica do estado indicado."}</p>
-                <div className="layer-help-definition"><MathLabel tex={String.raw`\mathcal{S}^+ = \mathcal{S}^+_s\cup\mathcal{BT}^+
-          \cup\mathcal{S}^+_f`} /></div>
                 <>
-                  <section className="layer-help-section">
-                    <strong>Definição</strong>
-                    <div><MathLabel tex={String.raw`\sigma(U_-,U_+)=\lambda_i(U_+),\quad i\in\{s,f\}`} /></div>
-                    <p>{"A velocidade do choque é igual à velocidade característica do estado "}{"direito"}{"."}</p>
-                  </section>
-                  <section className="layer-help-section">
-                    <strong>Estacionariedade na Hugoniot</strong>
-                    <div><MathLabel tex={String.raw`\left.\frac{d}{d\xi}\sigma(\gamma(\xi))\right|_{\xi=\xi_*}=0,\quad \gamma(\xi)\in\mathcal H^{forw}(U_-)`} /></div>
-                    <p>{"Ao longo dessa folha de Hugoniot, a velocidade do choque é estacionária no ponto sônico. O parâmetro ξ percorre a folha, mantendo o estado "}{"esquerdo"}{" fixo."}</p>
-                  </section>
-                </></>
+                  <p>A superfície sônica direita <MathLabel tex="\mathcal{S}^+" /> é o conjunto dos pontos <MathLabel tex="P\in\mathcal{W}" /> nos quais a velocidade <MathLabel tex="s" /> é crítica ao longo da curva de Hugoniot forward, mantendo fixo o estado esquerdo <MathLabel tex="U_-" />:</p>
+                  
+                  <div className="tooltip-equation"><MathLabel tex="\mathcal{S}^+=\{P\in\mathcal{W}:ds|_{\mathcal{H}^{\mathrm{forw}}(U_-)}(P)=0\}" />.</div>
+                  
+                  <p>Pela condição de Bethe–Wendroff, em <MathLabel tex="\mathcal{S}^+" /> a velocidade do choque coincide com uma velocidade característica do estado direito <MathLabel tex="U_+=\pi_+(P)" />:</p>
+                  
+                  <div className="tooltip-equation"><MathLabel tex="s(P)=\lambda_s(U_+)\quad\text{ou}\quad s(P)=\lambda_f(U_+)" />.</div>
+                  
+                  <p>A superfície sônica direita decompõe-se na parte lenta, na curva de Bogdanov-Takens e na parte rápida:</p>
+                  
+                  <div className="tooltip-equation"><MathLabel tex="\mathcal{S}^+=\mathcal{S}^+_s\cup \mathcal{BT}^+\cup\mathcal{S}^+_f" />.</div>
+                  
+                  <p>Na parte lenta <MathLabel tex="\mathcal{S}^+_s" />,</p>
+                  
+                  <div className="tooltip-equation"><MathLabel tex="s(P)=\lambda_s(U_+)" />.</div>
+                  
+                  <p>Na parte rápida <MathLabel tex="\mathcal{S}^+_f" />,</p>
+                  
+                  <div className="tooltip-equation"><MathLabel tex="s(P)=\lambda_f(U_+)" />.</div>
+                  
+                  <p>A curva <MathLabel tex="\mathcal{BT}^+" /> separa as partes lenta e rápida de <MathLabel tex="\mathcal{S}^+" /> e é a extensão direita da curva de coincidência <MathLabel tex="\mathcal{E}" />:</p>
+                  
+                  <div className="tooltip-equation"><MathLabel tex="BT^+=\operatorname{ext}_+(\mathcal{E})=\mathcal{S}^+\cap\operatorname{sat}_{\mathrm{back}}(\mathcal{E})" />.</div>
+                </>
               ),
               documentation: "superficies",
             }}
@@ -676,11 +735,28 @@ export default function VisualizationControlsPanel({
             checked={showHopfMinus}
             onChange={setShowHopfMinus}
             color={waveColors.hopfMinus}
-            label={<><MathLabel tex={String.raw`\mathcal{Hopf}^-`} /><span> : Hopf esquerda</span></>}
+            label={<><MathLabel tex="\mathcal{Hopf}^-" /><span> : Hopf esquerda</span></>}
             helper={{
-              title: <><MathLabel tex={String.raw`\mathcal{Hopf}^-`} /><span> — Hopf esquerda</span></>,
+              title: <><MathLabel tex="\mathcal{Hopf}^-" /><span> — Hopf Esquerda</span></>,
               description: (
-                <><p>{"Superfície de Hopf: traço nulo da matriz correspondente, restrito à região elíptica."}</p></>
+                <>
+                  <p>A superfície de Hopf esquerda <MathLabel tex="\mathcal{Hopf}^-" /> é o conjunto dos pontos <MathLabel tex="P\in\mathcal{W}" /> nos quais a matriz</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="M_-(P) = DF(U_-)-s(P)I" />.</div>
+
+                  <p>possui traço nulo e determinante não negativo:</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="\operatorname{tr}M_-(P) = 0,\qquad \det M_-(P)\geq 0" />.</div>
+
+                  <p>Portanto,</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="\mathcal{Hopf}^- =\{P\in\mathcal{W}:\operatorname{tr}M_-(P) = 0,\ \det M_-(P)\geq 0\}" />.</div>
+
+                  <p>Nessas condições, os autovalores de <MathLabel tex="M_-(P)" /> são imaginários puros ou nulos.
+                  </p>
+
+                  <p>A superfície <MathLabel tex="\mathcal{Hopf}^-" /> é limitada pela curva de coincidência <MathLabel tex="\mathcal{E}" /> e pela curva de Bogdanov-Takens <MathLabel tex="\mathcal{BT}^-" />.</p>
+                </>
               ),
               documentation: "superficies",
             }}
@@ -691,9 +767,25 @@ export default function VisualizationControlsPanel({
             color={waveColors.hopfPlus}
             label={<><MathLabel tex={String.raw`\mathcal{Hopf}^+`} /><span> : Hopf direita</span></>}
             helper={{
-              title: <><MathLabel tex={String.raw`\mathcal{Hopf}^+`} /><span> — Hopf direita</span></>,
+              title: <><MathLabel tex="\mathcal{Hopf}^+" /><span> — Hopf Direita</span></>,
               description: (
-                <><p>{"Superfície de Hopf: traço nulo da matriz correspondente, restrito à região elíptica."}</p></>
+                <>
+                  <p>A superfície de Hopf direita <MathLabel tex="\mathcal{Hopf}^+" /> é o conjunto dos pontos <MathLabel tex="P\in\mathcal{W}" /> nos quais a matriz</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="M_+(P) = DF(U_+)-s(P)I" />.</div>
+
+                  <p>possui traço nulo e determinante não negativo:</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="\operatorname{tr}M_+(P) = 0,\qquad \det M_+(P)\geq 0" />.</div>
+
+                  <p>Portanto,</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="\mathcal{Hopf}^+=\{P\in\mathcal{W}:\operatorname{tr}M_+(P) = 0,\ \det M_+(P)\geq 0\}" />.</div>
+
+                  <p>Nessas condições, os autovalores de <MathLabel tex="M_+(P)" /> são imaginários puros ou nulos.</p>
+
+                  <p>A superfície <MathLabel tex="\mathcal{Hopf}^+" /> é limitada pela curva de coincidência <MathLabel tex="\mathcal{E}" /> e pela curva de Bogdanov-Takens <MathLabel tex="\mathcal{BT}^+" />.</p>
+                </>
               ),
               documentation: "superficies",
             }}
@@ -703,27 +795,67 @@ export default function VisualizationControlsPanel({
       <Section title="Curvas especiais" defaultOpen={true} accent="#facc15">
         <div className="toggle-grid">
           <Toggle
-            checked={showDoubleSonic}
-            onChange={setShowDoubleSonic}
-            color={waveColors.doubleSonic}
-            label={<><MathLabel tex={String.raw`\mathcal{DS}`} /><span> : Dupla Sônica</span></>}
+            checked={showInflectionSlow || showInflectionFast}
+            onChange={(checked) => { setShowInflectionSlow(checked); setShowInflectionFast(checked) }}
+            color={waveColors.inflection ?? waveColors.inflectionSlow}
+            label={<><MathLabel tex="\mathcal{J}" /><span> : Inflexões</span></>}
             helper={{
-              title: <><MathLabel tex={String.raw`\mathcal{DS}`} /><span> — Dupla Sônica</span></>,
+              title: <><MathLabel tex="\mathcal{J}" /><span> — Curva de Inflexão</span></>,
+              title: <><MathLabel tex="\mathcal{J}" /><span> — Curva de Inflexão</span></>,
               description: (
-                <><p>{"Dupla sônica: a velocidade de choque é característica nos dois estados."}</p></>
+                <>
+                  <p>A curva de inflexão <MathLabel tex="\mathcal{J}" /> é o conjunto dos pontos da característica <MathLabel tex="\mathcal{C}" /> nos quais a velocidade característica é crítica ao longo da rarefação da respectiva família.</p>
+
+                  <p>Na folha característica lenta <MathLabel tex="\mathcal{C}_s" />, a criticidade ocorre ao longo da rarefação lenta <MathLabel tex="\mathcal{R}_s" />:</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="ds|_{\mathcal{R}_s}(P)=0" />.</div>
+
+                  <p>Na folha característica rápida <MathLabel tex="\mathcal{C}_f" />, a criticidade ocorre ao longo da rarefação rápida <MathLabel tex="\mathcal{R}_f" />:</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="ds|_{\mathcal{R}_f}(P)=0" />. </div>
+
+                  <p>Como <MathLabel tex="\mathcal{J}\subset\mathcal{C}" />, os estados esquerdo e direito coincidem:</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="\pi_-(P)=\pi_+(P)=U" />.</div>
+
+                  <p>A curva de inflexão pertence simultaneamente às superfícies sônicas esquerda <MathLabel tex="\mathcal{S}^-" /> e direita <MathLabel tex="\mathcal{S}^+" />:</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="\mathcal{J}\subset\mathcal{S}^-\cap\mathcal{S}^+" />.</div>
+
+                  <p>A interseção das duas superfícies sônicas decompõe-se em</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="\mathcal{S}^-\cap\mathcal{S}^+=\mathcal{J}\cup\mathcal{DS}" />.</div>
+                </>
               ),
               documentation: "curvas",
             }}
           />
           <Toggle
-            checked={showInflectionSlow || showInflectionFast}
-            onChange={(checked) => { setShowInflectionSlow(checked); setShowInflectionFast(checked) }}
-            color={waveColors.inflection ?? waveColors.inflectionSlow}
-            label={<><MathLabel tex={String.raw`\mathcal{J}`} /><span> : Inflexões</span></>}
+            checked={showDoubleSonic}
+            onChange={setShowDoubleSonic}
+            color={waveColors.doubleSonic}
+            label={<><MathLabel tex={String.raw`\mathcal{DS}`} /><span> : Dupla Sônica</span></>}
             helper={{
-              title: <><MathLabel tex={String.raw`\mathcal{J}`} /><span> — Inflexões</span></>,
+              title: <><MathLabel tex="\mathcal{DS}" /><span> — Dupla Sônica</span></>,
               description: (
-                <><p>{"Inflexão: lugar onde a velocidade característica é estacionária ao longo da rarefação."}</p></>
+                <>
+                  <p>
+                    O conjunto dupla sônica <MathLabel tex="\mathcal{DS}" /> é formado pelos pontos <MathLabel tex="P\in\mathcal{W}" /> que pertencem simultaneamente às superfícies sônicas esquerda <MathLabel tex="\mathcal{S}^-" /> e direita <MathLabel tex="\mathcal{S}^+" />, excluindo a curva de inflexão <MathLabel tex="\mathcal{J}" />.</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="\mathcal{S}^-\cap\mathcal{S}^+=\mathcal{J}\cup\mathcal{DS}" />.</div>
+
+                  <p>Portanto,</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="\mathcal{DS}=(\mathcal{S}^-\cap\mathcal{S}^+)\setminus\mathcal{J}" />.</div>
+
+                  <p>Para <MathLabel tex="P\in\mathcal{DS}" />, a velocidade <MathLabel tex="s(P)" /> é simultaneamente crítica ao longo das curvas de Hugoniot forward e backward:</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="ds|_{\mathcal{H}^{\mathrm{forw}}(U_-)}(P)=0,\qquad ds|_{\mathcal{H}^{\mathrm{back}}(U_+)}(P)=0" />.</div>
+
+                  <p>Equivalentemente, pela condição de Bethe-Wendroff, a velocidade do choque é simultaneamente uma velocidade característica dos estados esquerdo e direito:</p>
+
+                  <div className="tooltip-equation"><MathLabel tex="s(P)\in\{\lambda_s(U_-),\lambda_f(U_-)\}\cap\{\lambda_s(U_+),\lambda_f(U_+)\}" />.</div>
+                </>
               ),
               documentation: "curvas",
             }}
@@ -732,7 +864,7 @@ export default function VisualizationControlsPanel({
             checked={showHysteresisLeft ?? showHysteresis}
             onChange={setShowHysteresisLeft ?? setShowHysteresis}
             color={waveColors.hysteresisLeft ?? '#64748b'}
-            label={<><MathLabel tex={String.raw`\mathcal{Hys}^-`} /><span> : Histerese Esquerda</span></>}
+            label={<><MathLabel tex="\mathcal{Hys}^-" /><span> : Histerese Esquerda</span></>}
             helper={{
               title: <><MathLabel tex={String.raw`\mathcal{Hys}^-`} /><span> — Histerese Esquerda</span></>,
               description: (
@@ -938,9 +1070,9 @@ export default function VisualizationControlsPanel({
             checked={showHugoniotMinus}
             onChange={setShowHugoniotMinus}
             color={waveColors.hugoniotMinus ?? '#0f172a'}
-            label={<><MathLabel tex={String.raw`\mathcal{H}^{forw}(U_-)`} /><span> : Hugoniot Forward</span></>}
+            label={<><MathLabel tex={String.raw`\mathcal{H}^{forw}(U_L)`} /><span> : Hugoniot Forward</span></>}
             helper={{
-              title: <><MathLabel tex={String.raw`\mathcal{H}^{forw}(U_-)`} /><span> — Hugoniot Forward</span></>,
+              title: <><MathLabel tex={String.raw`\mathcal{H}^{forw}(U_L)`} /><span> — Hugoniot Forward</span></>,
               description: (
                 <><p>{"Folha de Hugoniot: estados ligados pela condição de Rankine–Hugoniot, com um dos estados fixo."}</p></>
               ),
@@ -951,9 +1083,9 @@ export default function VisualizationControlsPanel({
             checked={showRarefactionSlow}
             onChange={setShowRarefactionSlow}
             color={waveColors.rarefactionSlow}
-            label={<><MathLabel tex={String.raw`\mathcal{R}_s(U_-)`} /><span> : Rarefação Lenta</span></>}
+            label={<><MathLabel tex={String.raw`\mathcal{R}_s(U_L)`} /><span> : Rarefação Lenta</span></>}
             helper={{
-              title: <><MathLabel tex={String.raw`\mathcal{R}_s(U_-)`} /><span> — Rarefação Lenta</span></>,
+              title: <><MathLabel tex={String.raw`\mathcal{R}_s(U_L)`} /><span> — Rarefação Lenta</span></>,
               description: (
                 <><p>{"Curva integral do campo característico da família indicada, a partir do estado selecionado."}</p></>
               ),
@@ -996,11 +1128,11 @@ export default function VisualizationControlsPanel({
             checked={showHugoniotPlus}
             onChange={setShowHugoniotPlus}
             color={waveColors.hugoniotPlus ?? '#0f172a'}
-            label={<><MathLabel tex={String.raw`\mathcal{H}^{back}(U_+)`} /><span> : Hugoniot Backward</span></>}
+            label={<><MathLabel tex={String.raw`\mathcal{H}^{back}(U_R)`} /><span> : Hugoniot Backward</span></>}
             helper={{
-              title: <><MathLabel tex={String.raw`\mathcal{H}^{back}(U_+)`} /><span> — Hugoniot Backward</span></>,
+              title: <><MathLabel tex={String.raw`\mathcal{H}^{back}(U_R)`} /><span> — Hugoniot Backward</span></>,
               description: (
-                <><p>{"Folha de Hugoniot: estados ligados pela condição de Rankine–Hugoniot, com um dos estados fixo."}</p></>
+                <><p>{"Folha de Hugoniot: estados ligados pela condição de Rankine-Hugoniot, com um dos estados fixo."}</p></>
               ),
               documentation: "curvas",
             }}
@@ -1009,9 +1141,9 @@ export default function VisualizationControlsPanel({
             checked={showRarefactionFast}
             onChange={setShowRarefactionFast}
             color={waveColors.rarefactionFast}
-            label={<><MathLabel tex={String.raw`\mathcal{R}_f(U_+)`} /><span> : Rarefação Rápida</span></>}
+            label={<><MathLabel tex={String.raw`\mathcal{R}_f(U_R)`} /><span> : Rarefação Rápida</span></>}
             helper={{
-              title: <><MathLabel tex={String.raw`\mathcal{R}_f(U_+)`} /><span> — Rarefação Rápida</span></>,
+              title: <><MathLabel tex={String.raw`\mathcal{R}_f(U_R)`} /><span> — Rarefação Rápida</span></>,
               description: (
                 <><p>{"Curva integral do campo característico da família indicada, a partir do estado selecionado."}</p></>
               ),
