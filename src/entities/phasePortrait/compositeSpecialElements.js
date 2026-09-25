@@ -124,6 +124,9 @@ export function compositeRefinementLeaves(singularities, existingLeaves, params,
   const occupied = existingLeaves.flatMap(l => l.segments.flatMap(seg => seg.filter((_, i) => i % 4 === 0).map(visual)))
   for (const s of singularities) {
     let accepted = 0
+    // Elliptic neighbourhoods use certified local loops below. Their source
+    // rarefactions can end inside this chart and yield only partial contours.
+    if (s.type === 'centro linear' || s.type === 'foco') continue
     for (const angle of [0.4, 2, 3.5, 5.1]) {
       if (accepted >= 2) break
       const seed = [s.origin[0] + 0.025 * Math.cos(angle), s.origin[1] + 0.035 * Math.sin(angle)]
@@ -154,47 +157,51 @@ export function compositeLocalComponents(singularities, params, view) {
     if (!inside(s, view)) continue
     const span = s.chart === 'Y' ? view.yMax - view.yMin : view.tMax - view.tMin
     for (const [index, fraction] of [0.025, 0.05, 0.085, 0.125].entries()) {
-      const radius = fraction * span
-      const seed = [s.origin[0] + radius, s.origin[1]]
-      const field = p => {
-        const f = compositeField(p, params, s.chart, s.row)
-        return f.map(v => v / Math.max(1, Math.hypot(...f)))
-      }
-      let previous = seed, angle = 0
-      const limit = Math.max(2, 5 * radius)
-      const orbit = integrateOrbit(field, seed, { uMin: s.origin[0] - limit, uMax: s.origin[0] + limit,
-        vMin: s.origin[1] - 1, vMax: s.origin[1] + 1 }, 1, {
-        maxTime: 500, maxPoints: 4000, maxAttempts: 20000, tolerance: 1e-10, chordTolerance: 2e-6,
-        stopWhen: p => {
-          const a = previous.map((x, k) => x - s.origin[k]), b = p.map((x, k) => x - s.origin[k])
-          angle += Math.atan2(a[0] * b[1] - a[1] * b[0], a[0] * b[0] + a[1] * b[1])
-          previous = p
-          return Math.abs(angle) >= 2 * Math.PI || !inside(compositeChart(p, params, s.chart).point, view)
-        },
-      })
-      // First-return section, not an assumed nonlinear centre: only close
-      // when the numerical return actually agrees with the initial point.
-      if (Math.abs(angle) >= 2 * Math.PI && orbit.length > 2) {
-        const a = orbit.at(-2), b = orbit.at(-1)
-        const fraction = (seed[1] - a[1]) / (b[1] - a[1])
-        const q = a[0] + fraction * (b[0] - a[0])
-        if (fraction >= 0 && fraction <= 1) orbit[orbit.length - 1] = [q, seed[1]]
-        if (Math.abs(q - seed[0]) < 2e-5 * Math.max(1, radius)) orbit[orbit.length - 1] = seed
-      }
-      let points = [], part = 0
-      const push = () => {
-        if (points.length > 2) components.push({ componentId: `${s.id}-local-${index}-${part++}`,
+      for (let attempt = 0; attempt < 4; attempt++) {
+        const radius = fraction * span * 0.8 ** attempt
+        const seed = [s.origin[0] + radius, s.origin[1]]
+        const field = p => {
+          const f = compositeField(p, params, s.chart, s.row)
+          return f.map(v => v / Math.max(1, Math.hypot(...f)))
+        }
+        let previous = seed, angle = 0
+        const limit = Math.max(2, 5 * radius)
+        const orbit = integrateOrbit(field, seed, { uMin: s.origin[0] - limit, uMax: s.origin[0] + limit,
+          vMin: s.origin[1] - 6, vMax: s.origin[1] + 6 }, 1, {
+          maxTime: 500, maxPoints: 4000, maxAttempts: 20000, tolerance: 1e-10, chordTolerance: 2e-6,
+          stopWhen: p => {
+            const a = previous.map((x, k) => x - s.origin[k]), b = p.map((x, k) => x - s.origin[k])
+            angle += Math.atan2(a[0] * b[1] - a[1] * b[0], a[0] * b[0] + a[1] * b[1])
+            previous = p
+            return Math.abs(angle) >= 2 * Math.PI || !inside(compositeChart(p, params, s.chart).point, view)
+          },
+        })
+        // First-return section, not an assumed nonlinear centre: only close
+        // when the numerical return actually agrees with the initial point.
+        if (Math.abs(angle) >= 2 * Math.PI && orbit.length > 2) {
+          const a = orbit.at(-2), b = orbit.at(-1)
+          const fraction = (seed[1] - a[1]) / (b[1] - a[1])
+          const q = a[0] + fraction * (b[0] - a[0])
+          if (fraction >= 0 && fraction <= 1) orbit[orbit.length - 1] = [q, seed[1]]
+          if (fraction >= 0 && fraction <= 1 && Math.abs(q - seed[0]) < 2e-5 * Math.max(1, radius)) orbit[orbit.length - 1] = seed
+        }
+        // These are supplemental loops around elliptic points. A partial
+        // local orbit is not a completed loop: retry closer to the centre.
+        // Open global components remain the saturation contour's responsibility.
+        if (orbit.length < 3 || orbit.at(-1) !== seed) continue
+        const points = []
+        for (const coordinates of orbit) {
+          const surface = compositeChart(coordinates, params, s.chart)
+          const generatorPoint = solveCharacteristicHugoniotIntersections({ uMinus: surface.state[0], vMinus: surface.state[1] }, params)
+            .find(p => Math.abs(waveSpeed(p.t, p.z, params) - surface.speed) < 1e-7 * Math.max(1, Math.abs(surface.speed)))
+          if (!generatorPoint || !surface.point.coords.every(Number.isFinite) || !inside(surface.point, view)) break
+          points.push({ ...surface.point, generatorPoint })
+        }
+        if (points.length !== orbit.length) continue
+        components.push({ componentId: `${s.id}-local-${index}-0`,
           singularityId: s.id, points, orientation: 'decrease', localContinuation: true })
-        points = []
+        break
       }
-      for (const coordinates of orbit) {
-        const surface = compositeChart(coordinates, params, s.chart)
-        const generatorPoint = solveCharacteristicHugoniotIntersections({ uMinus: surface.state[0], vMinus: surface.state[1] }, params)
-          .find(p => Math.abs(waveSpeed(p.t, p.z, params) - surface.speed) < 1e-7 * Math.max(1, Math.abs(surface.speed)))
-        if (!generatorPoint || !surface.point.coords.every(Number.isFinite) || !inside(surface.point, view)) { push(); continue }
-        points.push({ ...surface.point, generatorPoint })
-      }
-      push()
     }
   }
   return components

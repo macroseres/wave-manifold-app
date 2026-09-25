@@ -135,13 +135,12 @@ export default function VisualizationControlsPanel({
       <aside className="wm-left wm-panel">
 
       <div className="wm-panel-kicker">{activeView === 'state' ? 'Projeções' : 'Camadas da cena'}</div>
-      <div className="wm-panel-intro">{activeView === 'state' ? 'Escolha as projeções para visualizar no espaço de estados.' : 'Escolha as superfícies e curvas da variedade de ondas.'}</div>
+      <div className="wm-panel-intro">{activeView === 'state' ? <>A projeção <MathLabel tex="\pi_-"/> associa cada ponto <MathLabel tex="P\in\mathcal{W}"/> ao estado esquerdo <MathLabel tex="U_-" /> e a projeção <MathLabel tex="\pi_+" /> associa cada ponto <MathLabel tex="P\in\mathcal{W}"/> ao estado direito <MathLabel tex="U_+" />.</> : 'Escolha as superfícies e curvas da variedade de ondas.'}</div>
       
       {activeView === 'state' && (
       <>
       <Section title="Referências geométricas" defaultOpen={true} accent="#38bdf8">
         <div className="state-projection-group" role="group" aria-label="Projeção no estado esquerdo">
-          <div className="state-projection-heading"><MathLabel tex="\pi_-" />: estado esquerdo <MathLabel tex="U_-" /></div>
           <div className="toggle-grid">
             <Toggle
               checked={showCoincidenceMinusProjection}
@@ -159,7 +158,6 @@ export default function VisualizationControlsPanel({
           </div>
         </div>
         <div className="state-projection-group" role="group" aria-label="Projeção no estado direito">
-          <div className="state-projection-heading"><MathLabel tex="\pi_+" />: estado direito <MathLabel tex="U_+" /></div>
           <div className="toggle-grid">
             <Toggle
               checked={showCoincidencePlusProjection}
@@ -179,15 +177,14 @@ export default function VisualizationControlsPanel({
       </Section>
       <Section title="Curvas especiais" defaultOpen={true} accent="#facc15">
         <div className="state-projection-group" role="group" aria-label="Projeção no estado esquerdo">
-          <div className="state-projection-heading"><MathLabel tex="\pi_-" />: estado esquerdo <MathLabel tex="U_-" /></div>
           <div className="toggle-grid">
             <Toggle
               checked={showDoubleSonicMinusProjection}
               onChange={setShowDoubleSonicMinusProjection}
               color={waveColors.doubleSonic}
-              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{DS})`} /><span> : Dupla sônica</span></>}
+              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{DS})`} /><span> : Dupla Sônica</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{DS})`} /><span> — Dupla sônica</span></>,
+                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{DS})`} /><span> — Dupla Sônica</span></>,
                 description: (
                   <><p>{"Dupla sônica: a velocidade de choque é característica nos dois estados. A projeção π₋ associa cada ponto ao estado esquerdo U₋."}</p></>
                 ),
@@ -211,9 +208,9 @@ export default function VisualizationControlsPanel({
               checked={showHysMinusMinusProjection}
               onChange={setShowHysMinusMinusProjection}
               color={waveColors.hysMinusMinusProjection}
-              label={<><MathLabel tex={String.raw`\pi_-(\operatorname{Hys}^-)`} /><span> : Histerese esquerda</span></>}
+              label={<><MathLabel tex={String.raw`\pi_-(\operatorname{Hys}^-)`} /><span> : Histerese Esquerda</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_-(\operatorname{Hys}^-)`} /><span> — Histerese esquerda</span></>,
+                title: <><MathLabel tex={String.raw`\pi_-(\operatorname{Hys}^-)`} /><span> — Histerese Esquerda</span></>,
                 description: (
                   <><p>{"Curva de histerese na superfície sônica, associada à extensão da curva de inflexão. A projeção π₋ associa cada ponto ao estado esquerdo U₋."}</p></>
                 ),
@@ -224,9 +221,9 @@ export default function VisualizationControlsPanel({
               checked={showHysPlusMinusProjection}
               onChange={setShowHysPlusMinusProjection}
               color={waveColors.hysPlusMinusProjection}
-              label={<><MathLabel tex={String.raw`\pi_-(\operatorname{Hys}^+)`} /><span> : Histerese direita</span></>}
+              label={<><MathLabel tex={String.raw`\pi_-(\operatorname{Hys}^+)`} /><span> : Histerese Direita</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_-(\operatorname{Hys}^+)`} /><span> — Histerese direita</span></>,
+                title: <><MathLabel tex={String.raw`\pi_-(\operatorname{Hys}^+)`} /><span> — Histerese Direita</span></>,
                 description: (
                   <><p>{"Curva de histerese na superfície sônica, associada à extensão da curva de inflexão. A projeção π₋ associa cada ponto ao estado esquerdo U₋."}</p></>
                 ),
@@ -236,15 +233,14 @@ export default function VisualizationControlsPanel({
           </div>
         </div>
         <div className="state-projection-group" role="group" aria-label="Projeção no estado direito">
-          <div className="state-projection-heading"><MathLabel tex="\pi_+" />: estado direito <MathLabel tex="U_+" /></div>
           <div className="toggle-grid">
             <Toggle
               checked={showDoubleSonicPlusProjection}
               onChange={setShowDoubleSonicPlusProjection}
               color={waveColors.doubleSonic}
-              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{DS})`} /><span> : Dupla sônica</span></>}
+              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{DS})`} /><span> : Dupla Sônica</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{DS})`} /><span> — Dupla sônica</span></>,
+                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{DS})`} /><span> — Dupla Sônica</span></>,
                 description: (
                   <><p>{"Dupla sônica: a velocidade de choque é característica nos dois estados. A projeção π₊ associa cada ponto ao estado direito U₊."}</p></>
                 ),
@@ -268,9 +264,9 @@ export default function VisualizationControlsPanel({
               checked={showHysMinusPlusProjection}
               onChange={setShowHysMinusPlusProjection}
               color={waveColors.hysMinusPlusProjection}
-              label={<><MathLabel tex={String.raw`\pi_+(\operatorname{Hys}^-)`} /><span> : Histerese esquerda</span></>}
+              label={<><MathLabel tex={String.raw`\pi_+(\operatorname{Hys}^-)`} /><span> : Histerese Esquerda</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_+(\operatorname{Hys}^-)`} /><span> — Histerese esquerda</span></>,
+                title: <><MathLabel tex={String.raw`\pi_+(\operatorname{Hys}^-)`} /><span> — Histerese Esquerda</span></>,
                 description: (
                   <><p>{"Curva de histerese na superfície sônica, associada à extensão da curva de inflexão. A projeção π₊ associa cada ponto ao estado direito U₊."}</p></>
                 ),
@@ -281,9 +277,9 @@ export default function VisualizationControlsPanel({
               checked={showHysPlusPlusProjection}
               onChange={setShowHysPlusPlusProjection}
               color={waveColors.hysPlusPlusProjection}
-              label={<><MathLabel tex={String.raw`\pi_+(\operatorname{Hys}^+)`} /><span> : Histerese direita</span></>}
+              label={<><MathLabel tex={String.raw`\pi_+(\operatorname{Hys}^+)`} /><span> : Histerese Direita</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_+(\operatorname{Hys}^+)`} /><span> — Histerese direita</span></>,
+                title: <><MathLabel tex={String.raw`\pi_+(\operatorname{Hys}^+)`} /><span> — Histerese Direita</span></>,
                 description: (
                   <><p>{"Curva de histerese na superfície sônica, associada à extensão da curva de inflexão. A projeção π₊ associa cada ponto ao estado direito U₊."}</p></>
                 ),
@@ -295,15 +291,14 @@ export default function VisualizationControlsPanel({
       </Section>
       <Section title="Extensões da coincidência" defaultOpen={true} accent="#22d3ee">
         <div className="state-projection-group" role="group" aria-label="Projeção no estado esquerdo">
-          <div className="state-projection-heading"><MathLabel tex="\pi_-" />: estado esquerdo <MathLabel tex="U_-" /></div>
           <div className="toggle-grid">
             <Toggle
               checked={showExtensionMinusMinusProjection}
               onChange={setShowExtensionMinusMinusProjection}
               color={waveColors.extensionCoincidenceMinus}
-              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{BT}^-)`} /><span> : Sonic Fold esquerdo</span></>}
+              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{BT}^-)`} /><span> : Sonic Fold Esquerdo</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{BT}^-)`} /><span> — Sonic Fold esquerdo</span></>,
+                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{BT}^-)`} /><span> — Sonic Fold Esquerdo</span></>,
                 description: (
                   <><p>{"Extensão da coincidência: interseção da superfície sônica com a saturação da coincidência na direção indicada. A projeção π₋ associa cada ponto ao estado esquerdo U₋."}</p></>
                 ),
@@ -314,9 +309,9 @@ export default function VisualizationControlsPanel({
               checked={showExtensionPlusMinusProjection}
               onChange={setShowExtensionPlusMinusProjection}
               color={waveColors.extensionCoincidencePlus}
-              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{BT}^+)`} /><span> : Sonic Fold direito</span></>}
+              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{BT}^+)`} /><span> : Sonic Fold Direito</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{BT}^+)`} /><span> — Sonic Fold direito</span></>,
+                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{BT}^+)`} /><span> — Sonic Fold Direito</span></>,
                 description: (
                   <><p>{"Extensão da coincidência: interseção da superfície sônica com a saturação da coincidência na direção indicada. A projeção π₋ associa cada ponto ao estado esquerdo U₋."}</p></>
                 ),
@@ -326,15 +321,14 @@ export default function VisualizationControlsPanel({
           </div>
         </div>
         <div className="state-projection-group" role="group" aria-label="Projeção no estado direito">
-          <div className="state-projection-heading"><MathLabel tex="\pi_+" />: estado direito <MathLabel tex="U_+" /></div>
           <div className="toggle-grid">
             <Toggle
               checked={showExtensionMinusPlusProjection}
               onChange={setShowExtensionMinusPlusProjection}
               color={waveColors.extensionCoincidenceMinus}
-              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{BT}^-)`} /><span> : Sonic Fold esquerdo</span></>}
+              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{BT}^-)`} /><span> : Sonic Fold Esquerdo</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{BT}^-)`} /><span> — Sonic Fold esquerdo</span></>,
+                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{BT}^-)`} /><span> — Sonic Fold Esquerdo</span></>,
                 description: (
                   <><p>{"Extensão da coincidência: interseção da superfície sônica com a saturação da coincidência na direção indicada. A projeção π₊ associa cada ponto ao estado direito U₊."}</p></>
                 ),
@@ -345,9 +339,9 @@ export default function VisualizationControlsPanel({
               checked={showExtensionPlusPlusProjection}
               onChange={setShowExtensionPlusPlusProjection}
               color={waveColors.extensionCoincidencePlus}
-              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{BT}^+)`} /><span> : Sonic Fold direito</span></>}
+              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{BT}^+)`} /><span> : Sonic Fold Direito</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{BT}^+)`} /><span> — Sonic Fold direito</span></>,
+                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{BT}^+)`} /><span> — Sonic Fold Direito</span></>,
                 description: (
                   <><p>{"Extensão da coincidência: interseção da superfície sônica com a saturação da coincidência na direção indicada. A projeção π₊ associa cada ponto ao estado direito U₊."}</p></>
                 ),
@@ -359,7 +353,6 @@ export default function VisualizationControlsPanel({
       </Section>
       <Section title="Curvas de autointerseção" defaultOpen={true} accent="#f0abfc">
         <div className="state-projection-group" role="group" aria-label="Projeção no estado esquerdo">
-          <div className="state-projection-heading"><MathLabel tex="\pi_-" />: estado esquerdo <MathLabel tex="U_-" /></div>
           <div className="toggle-grid">
             <Toggle
               checked={showHysteresisSelfIntersectionMinusProjection}
@@ -377,7 +370,6 @@ export default function VisualizationControlsPanel({
           </div>
         </div>
         <div className="state-projection-group" role="group" aria-label="Projeção no estado direito">
-          <div className="state-projection-heading"><MathLabel tex="\pi_+" />: estado direito <MathLabel tex="U_+" /></div>
           <div className="toggle-grid">
             <Toggle
               checked={showHysteresisSelfIntersectionPlusProjection}
@@ -397,7 +389,6 @@ export default function VisualizationControlsPanel({
       </Section>
       <Section title="Ondas da família lenta" defaultOpen={true} accent="#22c55e">
         <div className="state-projection-group" role="group" aria-label="Projeção no estado esquerdo">
-          <div className="state-projection-heading"><MathLabel tex="\pi_-" />: estado esquerdo <MathLabel tex="U_-" /></div>
           <div className="toggle-grid">
             <Toggle
               checked={showHugoniotMinusMinusProjection}
@@ -416,9 +407,9 @@ export default function VisualizationControlsPanel({
               checked={showRarefactionSlowMinusProjection}
               onChange={setShowRarefactionSlowMinusProjection}
               color={waveColors.rarefactionSlow}
-              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{R}_s(U_-))`} /><span> : Rarefação lenta</span></>}
+              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{R}_s(U_-))`} /><span> : Rarefação Lenta</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{R}_s(U_-))`} /><span> — Rarefação lenta</span></>,
+                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{R}_s(U_-))`} /><span> — Rarefação Lenta</span></>,
                 description: (
                   <><p>{"Curva integral do campo característico da família indicada, a partir do estado selecionado. A projeção π₋ associa cada ponto ao estado esquerdo U₋."}</p></>
                 ),
@@ -429,9 +420,9 @@ export default function VisualizationControlsPanel({
               checked={showCompositeSlowMinusProjection}
               onChange={setShowCompositeSlowMinusProjection}
               color={waveColors.compositeSlow}
-              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{K}_s(U_-))`} /><span> : Composta lenta</span></>}
+              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{K}_s(U_-))`} /><span> : Composta Lenta</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{K}_s(U_-))`} /><span> — Composta lenta</span></>,
+                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{K}_s(U_-))`} /><span> — Composta Lenta</span></>,
                 description: (
                   <><p>{"Curva composta construída pela extensão sônica da rarefação da família indicada. A projeção π₋ associa cada ponto ao estado esquerdo U₋."}</p></>
                 ),
@@ -441,7 +432,6 @@ export default function VisualizationControlsPanel({
           </div>
         </div>
         <div className="state-projection-group" role="group" aria-label="Projeção no estado direito">
-          <div className="state-projection-heading"><MathLabel tex="\pi_+" />: estado direito <MathLabel tex="U_+" /></div>
           <div className="toggle-grid">
             <Toggle
               checked={showHugoniotMinusPlusProjection}
@@ -460,9 +450,9 @@ export default function VisualizationControlsPanel({
               checked={showRarefactionSlowPlusProjection}
               onChange={setShowRarefactionSlowPlusProjection}
               color={waveColors.rarefactionSlow}
-              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{R}_s(U_-))`} /><span> : Rarefação lenta</span></>}
+              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{R}_s(U_-))`} /><span> : Rarefação Lenta</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{R}_s(U_-))`} /><span> — Rarefação lenta</span></>,
+                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{R}_s(U_-))`} /><span> — Rarefação Lenta</span></>,
                 description: (
                   <><p>{"Curva integral do campo característico da família indicada, a partir do estado selecionado. A projeção π₊ associa cada ponto ao estado direito U₊."}</p></>
                 ),
@@ -473,9 +463,9 @@ export default function VisualizationControlsPanel({
               checked={showCompositeSlowPlusProjection}
               onChange={setShowCompositeSlowPlusProjection}
               color={waveColors.compositeSlow}
-              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{K}_s(U_-))`} /><span> : Composta lenta</span></>}
+              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{K}_s(U_-))`} /><span> : Composta Lenta</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{K}_s(U_-))`} /><span> — Composta lenta</span></>,
+                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{K}_s(U_-))`} /><span> — Composta Lenta</span></>,
                 description: (
                   <><p>{"Curva composta construída pela extensão sônica da rarefação da família indicada. A projeção π₊ associa cada ponto ao estado direito U₊."}</p></>
                 ),
@@ -487,7 +477,6 @@ export default function VisualizationControlsPanel({
       </Section>
       <Section title="Ondas da família rápida" defaultOpen={true} accent="#a78bfa">
         <div className="state-projection-group" role="group" aria-label="Projeção no estado esquerdo">
-          <div className="state-projection-heading"><MathLabel tex="\pi_-" />: estado esquerdo <MathLabel tex="U_-" /></div>
           <div className="toggle-grid">
             <Toggle
               checked={showHugoniotPlusMinusProjection}
@@ -506,9 +495,9 @@ export default function VisualizationControlsPanel({
               checked={showRarefactionFastMinusProjection}
               onChange={setShowRarefactionFastMinusProjection}
               color={waveColors.rarefactionFast}
-              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{R}_f(U_+))`} /><span> : Rarefação rápida</span></>}
+              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{R}_f(U_+))`} /><span> : Rarefação Rápida</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{R}_f(U_+))`} /><span> — Rarefação rápida</span></>,
+                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{R}_f(U_+))`} /><span> — Rarefação Rápida</span></>,
                 description: (
                   <><p>{"Curva integral do campo característico da família indicada, a partir do estado selecionado. A projeção π₋ associa cada ponto ao estado esquerdo U₋."}</p></>
                 ),
@@ -519,9 +508,9 @@ export default function VisualizationControlsPanel({
               checked={showCompositeFastMinusProjection}
               onChange={setShowCompositeFastMinusProjection}
               color={waveColors.compositeFast}
-              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{K}_f(U_+))`} /><span> : Composta rápida</span></>}
+              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{K}_f(U_+))`} /><span> : Composta Rápida</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{K}_f(U_+))`} /><span> — Composta rápida</span></>,
+                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{K}_f(U_+))`} /><span> — Composta Rápida</span></>,
                 description: (
                   <><p>{"Curva composta construída pela extensão sônica da rarefação da família indicada. A projeção π₋ associa cada ponto ao estado esquerdo U₋."}</p></>
                 ),
@@ -531,7 +520,6 @@ export default function VisualizationControlsPanel({
           </div>
         </div>
         <div className="state-projection-group" role="group" aria-label="Projeção no estado direito">
-          <div className="state-projection-heading"><MathLabel tex="\pi_+" />: estado direito <MathLabel tex="U_+" /></div>
           <div className="toggle-grid">
             <Toggle
               checked={showHugoniotPlusPlusProjection}
@@ -550,9 +538,9 @@ export default function VisualizationControlsPanel({
               checked={showRarefactionFastPlusProjection}
               onChange={setShowRarefactionFastPlusProjection}
               color={waveColors.rarefactionFast}
-              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{R}_f(U_+))`} /><span> : Rarefação rápida</span></>}
+              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{R}_f(U_+))`} /><span> : Rarefação Rápida</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{R}_f(U_+))`} /><span> — Rarefação rápida</span></>,
+                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{R}_f(U_+))`} /><span> — Rarefação Rápida</span></>,
                 description: (
                   <><p>{"Curva integral do campo característico da família indicada, a partir do estado selecionado. A projeção π₊ associa cada ponto ao estado direito U₊."}</p></>
                 ),
@@ -563,9 +551,9 @@ export default function VisualizationControlsPanel({
               checked={showCompositeFastPlusProjection}
               onChange={setShowCompositeFastPlusProjection}
               color={waveColors.compositeFast}
-              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{K}_f(U_+))`} /><span> : Composta rápida</span></>}
+              label={<><MathLabel tex={String.raw`\pi_+(\mathcal{K}_f(U_+))`} /><span> : Composta Rápida</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{K}_f(U_+))`} /><span> — Composta rápida</span></>,
+                title: <><MathLabel tex={String.raw`\pi_+(\mathcal{K}_f(U_+))`} /><span> — Composta Rápida</span></>,
                 description: (
                   <><p>{"Curva composta construída pela extensão sônica da rarefação da família indicada. A projeção π₊ associa cada ponto ao estado direito U₊."}</p></>
                 ),

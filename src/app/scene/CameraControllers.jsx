@@ -41,7 +41,7 @@ export function AutoRotateGroup({ autoRotate, speed = 0.003, scale, children }) 
 
   useFrame((_, delta) => {
     if (!autoRotate || !groupRef.current) return
-    groupRef.current.rotation.y += speed * delta * 60
+    groupRef.current.rotation.y -= speed * delta * 60
   })
 
   return (

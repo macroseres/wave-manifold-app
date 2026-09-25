@@ -100,3 +100,17 @@ test('family filtering never bridges an excluded portion of a component', () => 
   const other = { t: 20, z: 0.3, generatorPoint }
   assert.deepEqual(splitCompositeByGeneratorFamily([good, good, other, good, good], defaultParams), [[good, good], [good, good]])
 })
+
+test('case IV composite loop stays connected across sonic-sheet crossings', () => {
+  const leaf = buildGlobalRarefactionPortrait(defaultParams, defaultView, 40).find(l => l.id === 'R-34')
+  assert.ok(leaf)
+  const components = buildCompositePortrait([leaf], defaultParams, defaultView, 40)
+  assert.equal(components.length, 1, 'the closed orbit must not be split into three fragments')
+  const points = components[0].points
+  assert.ok(points.length > 100)
+  assert.deepEqual(points[0].coords, points.at(-1).coords)
+  for (const p of points) {
+    assert.ok(compositeMatchesGenerator(p, defaultParams))
+    assert.ok(Math.abs(sonicLeftImplicitF(p.Y, p.t, p.z, defaultParams) / (1 + p.z * p.z) ** 2.5) < 1e-7)
+  }
+})

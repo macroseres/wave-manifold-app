@@ -3167,7 +3167,8 @@ body {
   font-weight: 800;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .scene-hover-tooltip-row {
@@ -3196,7 +3197,8 @@ body {
   font-variant-numeric: tabular-nums;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .state-space-canvas-wrap { overflow: hidden; }
@@ -3621,3 +3623,10 @@ button, input, select, textarea {
 .rarefaction-singularity-infinity small { color: #b8b2cf; font-size: 10px; }
 .rarefaction-singularity-tooltip { position: absolute; white-space: nowrap; padding: 8px 10px; border: 1px solid; border-radius: 7px; background: #0b182ef5; color: #f1f5f9; box-shadow: 0 4px 14px #0005; font: 12px/1.5 system-ui, sans-serif; pointer-events: none; }
 .rarefaction-singularity-tooltip small { color: #cbd5e1; font-size: 10px; }
+
+.scene-hover-tooltip-context {
+  padding: 6px 11px;
+  color: #a5b7cb;
+  font-size: var(--wm-font-aux);
+  line-height: 1.4;
+}

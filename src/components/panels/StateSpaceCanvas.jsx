@@ -5,6 +5,7 @@ import { flux, viscousField } from '../../entities/phasePortrait/flow.js'
 import { buildDoubleSonicStateProjection } from '../../geometry/doubleSonicStateProjection.js'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import MathLabel from './MathLabel'
+import SceneHoverTooltip from '../../app/diagnostics/SceneHoverTooltip.jsx'
 import CompositeSegmentsWorker from '../../workers/compositeSegments.worker?worker'
 import { RAREFACTION, clampResolutionSamples } from '../../config/numerics'
 import { computeCompositeSlowInflectionPoint } from '../objects/composite/compositeInflectionUtils'
@@ -102,6 +103,7 @@ function StateSpaceCanvas({
   const dragFrameRef = useRef(null)
   const probeFrameRef = useRef(null)
   const [hoverBranch, setHoverBranch] = useState(null)
+  const [hoverInfo, setHoverInfo] = useState(null)
   const [dragPreview, setDragPreview] = useState(null)
   const [phaseRightOverride, setPhaseRightOverride] = useState(null)
 
@@ -525,6 +527,8 @@ function StateSpaceCanvas({
   }
 
   const handlePointerMove = (event) => {
+    setHoverInfo(null)
+    const showHover = point => setHoverInfo({ point, position: { x: event.clientX, y: event.clientY } })
     if (navigation.move(event)) return
     if (navigation.mode !== 'select') return
     if (draggingPhaseRightRef.current) {
@@ -546,6 +550,7 @@ function StateSpaceCanvas({
         .sort((a, b) => a.distance - b.distance)
       if (candidates[0]?.distance <= 20) {
         setHoverBranch(candidates[0].branch)
+        showHover({ ...probeProjection[candidates[0].branch].point, hoverLabel: candidates[0].branch === 'slow' ? 'Sonda · família lenta' : 'Sonda · família rápida', hint: 'Projeção π₋ · Arraste para mover a sonda.' })
         return
       }
       const characteristicCandidates = ['slow', 'fast']
@@ -554,6 +559,7 @@ function StateSpaceCanvas({
         .sort((a, b) => a.sample.screenDistance - b.sample.screenDistance)
       const nearest = characteristicCandidates[0]
       setHoverBranch(nearest?.sample.screenDistance <= 20 ? nearest.branch : null)
+      if (nearest?.sample.screenDistance <= 20) showHover({ ...nearest.sample.manifold, ...nearest.sample.state, hoverLabel: nearest.branch === 'slow' ? 'Característica · família lenta' : 'Característica · família rápida' })
       return
     }
     if (draggingBranchRef.current) {
@@ -563,12 +569,16 @@ function StateSpaceCanvas({
     }
     if (phaseActive && phaseRightScreenDistance(event) <= 18) {
       setHoverBranch('phase-right')
+      showHover({ u: phaseAdjustedSelection.right[0], v: phaseAdjustedSelection.right[1], s: phaseAdjustedSelection.speed, residual: phaseAdjustedSelection.residual,
+        hoverLabel: 'U_R · retrato viscoso', hint: phaseAdjustedSelection.rightIsEquilibrium ? 'Equilíbrio para a velocidade indicada.' : 'Não é equilíbrio para esta velocidade. Arraste para ajustar.' })
       return
     }
     const candidates = ['slow', 'fast']
       .map((branch) => ({ branch, distance: selectedScreenDistance(branch, event) }))
       .sort((a, b) => a.distance - b.distance)
     setHoverBranch(candidates[0]?.distance <= 16 ? candidates[0].branch : null)
+    if (candidates[0]?.distance <= 16) showHover({ ...displayMap[candidates[0].branch]?.selectedState,
+      hoverLabel: candidates[0].branch === 'slow' ? 'U_L · família lenta' : 'U_R · família rápida', hint: 'Arraste para mover o estado e atualizar as curvas.' })
   }
 
   const handlePointerUp = (event) => {
@@ -718,12 +728,13 @@ function StateSpaceCanvas({
         className="stage-2d-canvas"
         ref={canvasRef}
         style={{ cursor: navigation.mode === 'box' ? 'crosshair' : navigation.mode === 'pan' ? 'grab' : cursor, pointerEvents: 'auto', touchAction: 'none', transform: navigation.transform }}
-        onPointerDown={handlePointerDown}
+        onPointerDown={event => { setHoverInfo(null); handlePointerDown(event) }}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        onPointerLeave={() => { if (!draggingBranchRef.current && !draggingProbeBranchRef.current) setHoverBranch(null) }}
+        onPointerLeave={() => { setHoverInfo(null); if (!draggingBranchRef.current && !draggingProbeBranchRef.current) setHoverBranch(null) }}
       />
+      {navigation.mode === 'select' && <SceneHoverTooltip point={hoverInfo?.point} position={hoverInfo?.position} params={params} stateSpace />}
       {navigation.preview?.mode === 'box' && <div className="state-zoom-rectangle" style={{
         left: Math.min(navigation.preview.start.x, navigation.preview.end.x),
         top: Math.min(navigation.preview.start.y, navigation.preview.end.y),
@@ -776,7 +787,6 @@ function SolutionCanvas() {
 
 export { SolutionCanvas }
 export default StateSpaceCanvas
-
 
 
 

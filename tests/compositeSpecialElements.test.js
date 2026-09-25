@@ -10,6 +10,23 @@ import { projectMinus } from '../src/entities/geometry/stateProjections.js'
 import { waveSpeed } from '../src/entities/surfaceImplicit/state.js'
 
 const relative = (a, b) => Math.abs(a - b) / Math.max(1, Math.abs(a), Math.abs(b))
+
+test('case IV supplemental curves are complete certified loops, including the outer seeds', () => {
+  const singularities = compositeSingularities(defaultParams)
+  const components = compositeLocalComponents(singularities, defaultParams, defaultView)
+  assert.equal(components.length, 8)
+  for (const component of components) {
+    assert.ok(component.points.length > 100)
+    assert.deepEqual(component.points[0].coords, component.points.at(-1).coords)
+    assert.ok(component.points.every(p => compositeMatchesGenerator(p, defaultParams)))
+    for (const p of component.points) {
+      assert.ok(Math.abs(sonicLeftImplicitF(p.Y, p.t, p.z, defaultParams)) / (1 + Math.abs(p.z)) ** 5 < 1e-8)
+    }
+  }
+  const leaves = buildGlobalRarefactionPortrait(defaultParams, defaultView, 40)
+  const extra = compositeRefinementLeaves(singularities, leaves, defaultParams, defaultView, 40)
+  assert.ok(extra.every(l => !['centro linear', 'foco'].includes(singularities.find(s => s.id === l.singularityId).type)))
+})
 test('case IV resolves small closed components around both previously empty critical points', () => {
   const singularities = compositeSingularities(defaultParams)
   const components = compositeLocalComponents(singularities, defaultParams, defaultView)

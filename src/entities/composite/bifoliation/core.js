@@ -7,6 +7,7 @@ import { COMPOSITE, HUGONIOT, clampResolutionSamples } from '../../../config/num
 import { compositeContinuationView, makeRarefactionParam, makeCompositeLevelFunction, findRarefactionSonicAnchors } from './parametrization.js'
 import { traceLevelSet } from './continuation.js'
 import { extractGlobalCompositeLevelSet } from './marchingSquares.js'
+import { waveSpeed } from '../../surfaceImplicit/state.js'
 
 function buildCompositeFromRarefactionSegment(segment, params, calcView, renderView, direction, sonicTarget, fixedState, desiredSonicBranch = 'all', mathcalR = null, mathcalH = null, options = {}) {
   const rareParam = makeRarefactionParam(segment, calcView)
@@ -47,7 +48,32 @@ function buildCompositeFromRarefactionSegment(segment, params, calcView, renderV
   // desconexas, laços e ramos que não contêm a inflexão. A continuação local
   // por pseudo-arclength fica apenas como fallback caso a malha não detecte
   // nenhum segmento.
-  let allSegments = extractGlobalCompositeLevelSet(level, renderView, params, options)
+  // Extract the generating eigenvalue sheet before tracing its connectivity.
+  // Tracing both sheets and filtering afterward breaks curves at crossings.
+  const contourLevel = options.matchGeneratorSpeed ? {
+    ...level,
+    evalAt: (u, w) => {
+      const sample = level.evalAt(u, w)
+      if (!sample) return null
+      const deflated = probe => {
+        const speed = waveSpeed(probe.point.t, probe.point.z, params)
+        const generatorSpeed = waveSpeed(probe.generator.t, probe.generator.z, params)
+        return (speed - generatorSpeed) / (probe.point.z - probe.generator.z)
+      }
+      // The zero-jump characteristic point is always a speed root, but is
+      // sonic only at inflection. Remove that factor before contouring.
+      const delta = sample.point.z - sample.generator.z
+      let value
+      if (Math.abs(delta) > 1e-6 * Math.max(1, Math.abs(sample.point.z))) value = deflated(sample)
+      else {
+        const a = level.evalAt(u, w - 1e-6), b = level.evalAt(u, w + 1e-6)
+        if (!a || !b) return null
+        value = (deflated(a) + deflated(b)) / 2
+      }
+      return { ...sample, value }
+    },
+  } : level
+  let allSegments = extractGlobalCompositeLevelSet(contourLevel, renderView, params, options)
 
   if (!allSegments.length && !options.globalPortrait) {
     const localSegments = []

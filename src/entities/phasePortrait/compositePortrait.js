@@ -43,7 +43,7 @@ export function buildCompositePortrait(leaves, params, view, resolution = 40) {
     for (const [sourceSegmentIndex, segment] of leaf.segments.entries()) {
       const result = buildCompositeSegmentsFromRarefaction(segment, params, renderView, renderView,
         'all', FORWARD_HUGONIOT, 'left', leaf.seed, {
-          globalPortrait: true,
+          globalPortrait: true, matchGeneratorSpeed: true,
           uSamples: Math.max(40, resolution * 2), wSamples: Math.max(60, resolution * 3),
         })
       for (const points of result.segments.flatMap(points => splitCompositeByGeneratorFamily(points, params))) {

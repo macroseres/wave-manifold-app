@@ -24,7 +24,9 @@ function contourEdgePoint(corners, edge, level = null) {
       const sample = level.evalAt(u, w)
       if (!sample || !finite(sample.value)) return null
       best = { u, w }
-      if (Math.abs(sample.value) < 1e-11) return best
+      // Compactification can make the residual tiny far from the root.
+      // Refine its position too, or the sonic-family filter cuts valid curves.
+      if (sample.value === 0 || hi - lo < 1e-13) return best
       if (flo * sample.value <= 0) hi = fraction
       else { lo = fraction; flo = sample.value }
     }

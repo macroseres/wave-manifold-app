@@ -54,6 +54,12 @@ cache; mover a câmera ou alternar elementos visuais não modifica as integrais.
 
 ## Elementos da composta em S⁻
 
+Na extração do retrato, a igualdade entre a velocidade da composta e a da
+rarefação geradora seleciona a folha sônica antes de montar as curvas.
+O fator correspondente ao salto nulo é removido dessa equação. Assim, o
+cruzamento com a outra folha não fragmenta um laço em trechos desconectados;
+a pertença à família geradora continua sendo verificada nos pontos extraídos.
+
 O painel da composta tem controles independentes para singularidades,
 separatrizes e autodireções. Os marcadores usam esfera e anel; os detalhes da
 linearização aparecem no hover somente no modo inspeção, que pode ser ativado
