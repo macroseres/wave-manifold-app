@@ -27,14 +27,13 @@ export function RangeControl({ label, min, max, step, value, onChange }) {
  * Hover content is mounted only when opened; this component does not infer copy.
  */
 export function Toggle({ checked, onChange, label, color, helper, disabled = false }) {
-  const row = (
+  return (
     <label className="toggle-row">
       <input type="checkbox" checked={checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} />
-      <span className="toggle-dot" style={{ background: color ?? '#64748b' }} />
-      <span>{label}</span>
+      <span className="toggle-dot" aria-hidden="true" style={{ background: color ?? '#64748b' }} />
+      {helper ? <LayerHelp helper={helper}>{label}</LayerHelp> : <span>{label}</span>}
     </label>
   )
-  return helper ? <LayerHelp helper={helper}>{row}</LayerHelp> : row
 }
 
 export function Section({ title, children, defaultOpen = true, accent = '#64748b' }) {

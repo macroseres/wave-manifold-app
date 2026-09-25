@@ -129,7 +129,8 @@ export default function App() {
 
   const hasSlowInitialState = Boolean(selectedByBranch?.slow)
   const hasFastInitialState = Boolean(selectedByBranch?.fast)
-  const canEnableInspectionMode = hasSlowInitialState || hasFastInitialState
+  // Global phase portraits have inspectable singularities without U_L/U_R.
+  const canEnableInspectionMode = activeView === '3d' || hasSlowInitialState || hasFastInitialState
   const canEnableSolutionMode = hasSlowInitialState && hasFastInitialState
 
   const setInspectionModeEnabledBase = waveActions.setInspectionModeEnabled

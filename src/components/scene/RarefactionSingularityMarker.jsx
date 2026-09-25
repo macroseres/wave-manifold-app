@@ -7,7 +7,7 @@ import {
   CHARACTERISTIC_SELECTED_RING_TUBE,
 } from '../../entities/characteristic/planeGeometry.js'
 
-export default function RarefactionSingularityMarker({ position, markerScale, inspection, type, z, infinity = false, details }) {
+export default function RarefactionSingularityMarker({ position, markerScale, inspection, type, z, infinity = false, details, family }) {
   const [hovered, setHovered] = useState(false)
   const tooltipRef = useRef(null)
   const projectedPosition = useRef(new Vector3())
@@ -24,7 +24,7 @@ export default function RarefactionSingularityMarker({ position, markerScale, in
   }, [])
   const highlighted = inspection && hovered
   const color = infinity ? '#c4b5fd' : '#fde68a'
-  const label = type === 'sela' ? 'Sela' : type === 'nó' ? 'Nó' : 'Degenerada'
+  const label = type ? type[0].toUpperCase() + type.slice(1) : 'Degenerada'
   return <group position={position}>
     <group scale={markerScale.map(value => value * 0.78)}
       onPointerOver={inspection ? event => { event.stopPropagation(); setHovered(true) } : undefined}
@@ -41,9 +41,10 @@ export default function RarefactionSingularityMarker({ position, markerScale, in
     {highlighted && <Html calculatePosition={positionTooltip} zIndexRange={[8, 0]} style={{ pointerEvents: 'none' }}>
       <div ref={tooltipRef} className="rarefaction-singularity-tooltip" role="tooltip"
         style={{ borderColor: color }}>
+        {family && <><strong>{family}</strong><br /></>}
         {infinity ? `∞ · ${label}` : `${label} · z=${z.toPrecision(3)}`}
         {infinity && <><br /><small>−∞ ≡ +∞ · mesmo ponto</small></>}
-        {details && <><br /><small>Carta {details.chart} · λ = {details.eigenvalues.map(x => x.toPrecision(3)).join(', ')}</small>
+        {details && <><br /><small>Carta {details.chart} · λ = {details.eigenvalues.map(x => x.toPrecision(3)).join(', ')}{details.imaginaryPart > 0 ? ` ± ${details.imaginaryPart.toPrecision(3)}i` : ''}</small>
           <br /><small>J = {details.matrix.map(row => `[${row.map(x => x.toPrecision(3)).join(', ')}]`).join(' ')}</small></>}
       </div>
     </Html>}

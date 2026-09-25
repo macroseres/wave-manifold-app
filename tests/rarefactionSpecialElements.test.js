@@ -6,6 +6,19 @@ import { buildRarefactionSpecialElements } from '../src/entities/phasePortrait/r
 import { defaultView } from '../src/components/panels/schaefferShearerConfig.js'
 
 const params = { a: 0, b1: 4, b2: 4, c: 1 }
+test('case III-C separatrices continue through both chart boundaries toward infinity', () => {
+  const data = buildRarefactionSpecialElements([], { a: 0, b1: 0.5, b2: 1, c: 1 }, defaultView)
+  const continuations = data.separatrices.filter(s => s.id.endsWith('-continuation'))
+  assert.equal(continuations.length, 2)
+  for (const continuation of continuations) {
+    const original = data.separatrices.find(s => `${s.id}-continuation` === continuation.id)
+    const distance = (a, b) => Math.hypot(a.t - b.t, a.z - b.z)
+    assert.ok(Math.min(...[original.points[0], original.points.at(-1)].flatMap(a =>
+      [continuation.points[0], continuation.points.at(-1)].map(b => distance(a, b)))) < 1e-10)
+    assert.ok(continuation.points.some(p => Math.abs(p.z) > 1e5))
+    assert.ok(continuation.points.every(p => p.coords.every(Number.isFinite)))
+  }
+})
 test('finite and infinity Jacobians and eigendirections are those of the same rarefaction foliation', () => {
   for (const p of [...rarefactionSingularities(params), rarefactionInfinitySingularity(params)]) {
     const infinity = p.chart === '(T,Z)'

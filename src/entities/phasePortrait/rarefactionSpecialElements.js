@@ -42,6 +42,35 @@ export function buildRarefactionSpecialElements(leaves, params, view) {
         const points = orbit.map(physical).filter(Boolean)
         if (points.length > 1) separatrices.push({ id: `${singularity.id}-${index}-${sign}`,
           singularityId: singularity.id, chart: singularity.chart, stability, points, chartPoints: orbit })
+        // The boundary of a coordinate chart is not an endpoint of an orbit.
+        // Continue from exactly the last accepted point in the overlapping chart.
+        const travelDirection = Math.sign(direction.value)
+        const endpoint = travelDirection < 0 ? orbit[0] : orbit.at(-1)
+        const needsContinuation = endpoint && (atInfinity
+          ? Math.abs(endpoint[1]) > 0.70
+          : Math.abs(endpoint[1]) > 0.95 * radius)
+        if (!needsContinuation) continue
+        const [u, v] = endpoint
+        // This coordinate transition is its own inverse.
+        const nextSeed = [-u * v * v, 1 / v]
+        const nextDirection = travelDirection * Math.sign(v)
+        const nextField = point => (atInfinity ? rarefactionRegularizedField : rarefactionInfinityField)(point, params)
+        const nextBounds = atInfinity
+          ? { uMin: view.tMin, uMax: view.tMax, vMin: -radius, vMax: radius }
+          : { uMin: -Math.max(20, 2 * Math.abs(nextSeed[0])), uMax: Math.max(20, 2 * Math.abs(nextSeed[0])), vMin: -0.75, vMax: 0.75 }
+        const toPhysical = ([a, b]) => atInfinity
+          ? { t: a, Y: 0, z: b, coords: [a, 0, b] }
+          : { t: -a * b * b, Y: 0, z: 1 / b, coords: [-a * b * b, 0, 1 / b] }
+        const continued = integrateOrbit(nextField, nextSeed, nextBounds, nextDirection, {
+          maxTime: 400, maxPoints: 8000, maxAttempts: 20000, tolerance: 1e-10, chordTolerance: 1e-5,
+          stopWhen: point => {
+            const p = toPhysical(point)
+            return (!atInfinity && Math.abs(point[1]) < 1e-6) || p.t < view.tMin || p.t > view.tMax
+          },
+        })
+        if (continued.length > 1) separatrices.push({ id: `${singularity.id}-${index}-${sign}-continuation`,
+          singularityId: singularity.id, chart: atInfinity ? '(τ,z)' : '(T,Z)',
+          stability, points: continued.map(toPhysical), chartPoints: continued })
       }
     }
   }

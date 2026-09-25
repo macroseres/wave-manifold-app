@@ -120,7 +120,7 @@ export const initialWaveAppState = {
   showHugoniotMinusMinusProjection: false,
   showHugoniotPlusMinusProjection: false,
   showHysMinusPlusProjection: false,
-  showCoincidence: true,
+  showCoincidence: false,
   showBifurcationLeft: false,
   showSaturatedLeftMinus: false,
   showSaturatedLeftPlus: false,

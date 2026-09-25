@@ -5,6 +5,7 @@ import curves from '../../../docs/03-construcao-das-curvas.md?raw'
 import surfaces from '../../../docs/04-construcao-das-superficies.md?raw'
 import inspectionSolution from '../../../docs/05-inspecao-e-solucao.md?raw'
 import computationDevelopment from '../../../docs/06-metodos-e-desenvolvimento.md?raw'
+import phasePortraits from '../../../docs/07-retratos-de-fase.md?raw'
 import { ensureMathJaxLoaded, typesetMathJax } from './mathJaxTypeset'
 
 const chapters = [
@@ -14,6 +15,7 @@ const chapters = [
   { id: 'superficies', title: 'Construção das superfícies', source: surfaces },
   { id: 'solucao', title: 'Inspeção e construção da solução', source: inspectionSolution },
   { id: 'metodos', title: 'Métodos computacionais e desenvolvimento', source: computationDevelopment },
+  { id: 'retratos', title: 'Retratos de fase', source: phasePortraits },
 ]
 
 function inlineMarkdown(text) {

@@ -7,7 +7,7 @@
   --wm-font-control: 13px;
   --wm-font-body: 14px;
   --wm-font-title: 16px;
-  --wm-side-width: clamp(280px, 21vw, 350px);
+  --wm-side-width: clamp(240px, 18vw, 300px);
   --wm-stage-gap: 8px;
 }
 
@@ -241,6 +241,9 @@ body {
 
 .toggle-row input {
   margin: 0;
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
 }
 
 .visualization-clear-button {
@@ -249,9 +252,12 @@ body {
 }
 
 .toggle-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
+  width: 6.5px;
+  height: 13px;
+  flex-shrink: 0;
+  margin-left: -4px;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
   display: inline-block;
 }
 
@@ -1944,7 +1950,6 @@ body {
   color: #ffffff;
 }
 
-.toggle-dot,
 .legend-dot {
   box-shadow: 0 0 10px currentColor;
 }
@@ -3588,7 +3593,7 @@ button, input, select, textarea {
   .params-view .stage-param-window-controls { grid-column: 1; }
 }
 
-.phase-controls { margin: 14px 0; padding: 14px; border: 1px solid #24516a; border-radius: 12px; background: #0b1b29; }
+.phase-controls { min-width: 0; }
 .phase-controls-summary { margin: 8px 0 12px; color: #b8cbd9; font-size: 12px; line-height: 1.5; }
 .phase-view-switch { display: grid; gap: 6px; grid-template-columns: 1fr; margin-bottom: 14px; }
 .phase-view-switch button { padding: 9px 10px; border: 1px solid #344b61; border-radius: 7px; background: #101f30; color: #cbd5e1; font: inherit; font-size: 12px; cursor: pointer; }

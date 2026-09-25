@@ -23,7 +23,7 @@ export default function LayerHelp({ children, helper }) {
     const rect = anchor.current.getBoundingClientRect()
     const width = Math.min(400, window.innerWidth - 24)
     const maxHeight = Math.min(420, window.innerHeight - 24)
-    // Mouse hover starts beside the pointer; keyboard focus uses the row.
+    // Mouse hover starts beside the pointer; keyboard focus uses the text.
     // Keep the popup stationary so its documentation button stays reachable.
     const x = event.type === 'mouseenter' ? event.clientX : rect.left
     const y = event.type === 'mouseenter' ? event.clientY : rect.bottom
@@ -51,9 +51,9 @@ export default function LayerHelp({ children, helper }) {
     }
   }, [])
   return <>
-    <div ref={anchor} onMouseEnter={show} onMouseLeave={leave} onFocus={show} onBlur={leave} aria-describedby={position ? id : undefined}>
+    <span ref={anchor} tabIndex={0} onMouseEnter={show} onMouseLeave={leave} onFocus={show} onBlur={leave} aria-describedby={position ? id : undefined}>
       {children}
-    </div>
+    </span>
     {position && createPortal(<div id={id} className="layer-help-popover" style={position} onMouseEnter={keep} onMouseLeave={leave} onFocus={keep} onBlur={leave}>
       <header className="layer-help-title">{helper.title}</header>
       <div className="layer-help-description">{helper.description}</div>
@@ -61,7 +61,7 @@ export default function LayerHelp({ children, helper }) {
     </div>, document.body)}
     {docs && createPortal(<DocumentationViewer open initialChapter={helper.documentation} onClose={() => {
       setDocs(false)
-      anchor.current?.querySelector('input')?.focus()
+      anchor.current?.focus()
     }} />, document.body)}
   </>
 }

@@ -33,10 +33,12 @@ A rotina existente de rarefação produz curvas distribuídas nas duas metades
 da característica (quando ambas estão presentes na janela). As sementes
 variam em `t`, em seções de `z` separadas pelas raízes de `A` e `P`, com `Y=0`, sem depender de pontos selecionados nem
 deslocar polilinhas prontas. A família lenta é ciano e a rápida é rosa.
-As setas do retrato de rarefação mantêm a orientação paramétrica de z crescente,
-sem invertê-la na mudança de cor. São suprimidas junto às singularidades e
+As setas do retrato de rarefação seguem o campo regularizado (Fτ,Fz), com Fz=P(z),
+independentemente da cor e da ordem da polilinha. São suprimidas junto às singularidades e
 agregadas em uma geometria. Na composta, a orientação é a convenção matemática
 existente de velocidade decrescente de K₋.
+As pontas têm tamanho compensado pelas escalas da cena e posições distribuídas
+pelo comprimento visual das curvas, evitando fileiras de setas alongadas.
 
 Cada região regular da equação `dt/dz` recebe sementes próprias, incluindo as
 duas extremidades compactificadas. Isso evita que as singularidades do caso III
@@ -49,6 +51,49 @@ da geometria. Os dados completos ficam guardados antes do recorte à janela em
 Singularidades, separatrizes e autodireções são opções diretas do painel.
 E, J e sônicas usam as camadas já existentes. O cálculo fica em um worker com
 cache; mover a câmera ou alternar elementos visuais não modifica as integrais.
+
+## Elementos da composta em S⁻
+
+O painel da composta tem controles independentes para singularidades,
+separatrizes e autodireções. Os marcadores usam esfera e anel; os detalhes da
+linearização aparecem no hover somente no modo inspeção, que pode ser ativado
+na vista 3D sem selecionar estados. S⁻, coincidência e inflexão continuam com
+seus próprios controles de camada.
+
+O campo diagnóstico é o núcleo de `(DF(π₋) − sI) Dπ₋`, restrito a S⁻.
+Ele é tangente à mesma família produzida pela saturação forward e interseção
+existentes; não substitui essa construção. Derivadas da projeção são calculadas
+por diferenciação automática de primeira ordem. As cartas `(τ,z)`, `(Y,z)`,
+`(T,Z)` e `(X,Z)`, com `Z=1/z`, `T=−z²τ`, `X=zY`, evitam tratar polos de
+parametrização como pontos críticos. O infinito tem uma única identidade,
+representada nos dois extremos compactificados.
+
+A eliminação algébrica fornece candidatos nas raízes de `(2z−b₂) P Q R`,
+onde `R=(b₁+1)²z²−(b₁+1)b₂z+b₁−1`. Cada candidato é verificado nas duas
+linhas do campo, numa carta regular. A classificação usa o Jacobiano local;
+“centro linear” indica autovalores imaginários, sem afirmar a existência de
+um centro não linear. Apenas selas hiperbólicas geram separatrizes. Autovalores
+complexos, repetidos ou nulos não geram autodireções artificiais.
+
+As separatrizes são integrações numéricas com controle de erro e continuação
+entre cartas; os orçamentos finitos e a detecção de retorno podem limitar ramos
+muito longos. Estável/instável refere-se ao campo regularizado na carta do ponto;
+as setas continuam usando a convenção de velocidade da composta. Os casos
+degenerados `b₁=0`, `b₁=−1` ou `c=0` são explicitamente sinalizados como sem
+diagnóstico, preservando o retrato existente.
+
+A densificação acrescenta até duas folhas geradoras por singularidade, com
+checagem de proximidade. Os pontos próximos em S⁻ são projetados em U₋ e
+levantados à característica com a mesma velocidade. As folhas passam pela rotina
+original de rarefação e, depois, pela mesma saturação/interseção da composta.
+O worker mantém esses dados em cache; alternar os três controles não reintegra.
+
+Componentes pequenas próximas de centros lineares/focos podem escapar à malha
+global de saturação. Quatro sementes locais acrescentam continuações do mesmo
+núcleo tangente a S⁻ nessas regiões. Cada amostra é verificada pelo levantamento
+canônico à característica, com U₋ e velocidade correspondentes. A integração
+acompanha a primeira volta e só fecha a curva quando o retorno numérico coincide
+com a semente; não presume que todo centro linear seja um centro não linear.
 
 ## 2D e a seleção de estados
 
