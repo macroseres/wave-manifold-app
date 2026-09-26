@@ -67,7 +67,25 @@ Seus autovalores \(\lambda_s\leq\lambda_f\) determinam as famílias lenta e ráp
 
 ## A variedade de ondas
 
-A variedade \(\mathcal W\) é exibida nas coordenadas \((\tau,Y,z)\). Cada ponto representa uma relação entre dois estados conectados por uma onda e contém a informação necessária para recuperar os estados esquerdo e direito e a velocidade da onda.
+Antes de introduzir as coordenadas do app, é importante separar a definição intrínseca da variedade das parametrizações usadas para calculá-la e desenhá-la.
+
+### Coordenadas de estado médio, salto, direção e velocidade
+
+A variedade de ondas pode ser vista inicialmente no espaço de variáveis
+
+\[
+(\bar U,X,Z,s),
+\qquad
+\bar U=(\bar u,\bar v),
+\]
+
+onde \(\bar U\) é o estado médio, \(X\) é a amplitude da primeira componente do salto, \(Z\) é sua inclinação e \(s\) é a velocidade de propagação. Nessa carta,
+
+\[
+\Delta U=U^+-U^-=X(1,Z)^{\mathsf T}.
+\]
+
+Essas cinco quantidades não são independentes. As condições de Rankine–Hugoniot fornecem duas relações: uma define a direção admissível do salto e a outra determina \(s\). Por isso, \(\mathcal W\) é tridimensional.
 
 Essa descrição nasce diretamente da condição de Rankine–Hugoniot. Para dois estados \(U^-\) e \(U^+\), defina
 
@@ -97,7 +115,108 @@ DF(\bar U)\,\Delta U=s\,\Delta U.
 
 Esse é o passo geométrico essencial: em vez de procurar diretamente quatro coordenadas de estado e uma velocidade, descreve-se o estado médio, a direção do salto e sua amplitude. A variedade de ondas reúne precisamente as combinações que satisfazem esse problema de autovalor.
 
-Na convenção do app,
+Definindo
+
+\[
+G(\bar U,Z)=(-Z,1)DF(\bar U)(1,Z)^{\mathsf T},
+\]
+
+\[
+S(\bar U,Z)=(1,0)DF(\bar U)(1,Z)^{\mathsf T},
+\]
+
+as duas relações são
+
+\[
+G(\bar U,Z)=0,
+\qquad
+s=S(\bar U,Z).
+\]
+
+Assim, nos cálculos pode-se trabalhar com \((\bar U,X,Z)\), sujeito a \(G=0\), e recuperar a velocidade depois. É nesse sentido que o app trata \(s\) “por fora”: ela não é um quarto grau de liberdade, mas uma função do ponto da variedade.
+
+Para o fluxo de Schaeffer–Shearer usado no app, é útil manter a formulação vetorial completa. Para
+
+\[
+p=(\bar U,X,Z,s)\in\mathbb R^5,
+\]
+
+defina
+
+\[
+\Phi(p)=
+\begin{pmatrix}
+-s+(b_1+1)\bar u+a+Z\bar v\\
+-sZ+Z\bar u+(1-b_2Z)\bar v+aZ+c
+\end{pmatrix}.
+\]
+
+A variedade é então
+
+\[
+\mathcal W=\Phi^{-1}(0).
+\]
+
+Quando \(0\) é valor regular de \(\Phi\), essas duas equações em cinco variáveis definem uma variedade suave de dimensão três. A função \(\Phi\) não depende de \(X\); isso é consequência direta da quadraticidade do fluxo e explica por que a amplitude do salto é uma coordenada livre.
+
+Eliminando \(s\), obtém-se a equação da projeção de \(\mathcal W\) nas variáveis \((\bar U,Z)\):
+
+\[
+b_1Z\bar u+(Z^2+b_2Z-1)\bar v-c=0.
+\]
+
+A velocidade é recuperada pela primeira componente de \(\Phi=0\):
+
+\[
+s=(b_1+1)\bar u+a+Z\bar v.
+\]
+
+Estas são as equações preferenciais para deduções analíticas. As expressões em \((\tau,Y,z)\) devem ser entendidas como versões transformadas para implementação e visualização.
+
+### Coordenadas \((T,X,Z)\)
+
+Como \(G\) é afim em \(\bar U\), a equação \(G=0\) descreve, para cada \(Z\), uma reta no plano dos estados médios. Seja
+
+\[
+\bar U^c(Z)=(\bar u^c(Z),\bar v^c(Z))
+\]
+
+o ponto da curva de coincidência associado a \(Z\). Introduzindo um parâmetro \(T\) ao longo dessa reta, escreve-se
+
+\[
+\bar u=\bar u^c(Z)-G_{\bar v}(Z)T,
+\qquad
+\bar v=\bar v^c(Z)+G_{\bar u}(Z)T.
+\]
+
+Com isso, \((T,X,Z)\) parametriza a variedade e
+
+\[
+U^\pm
+=\bar U(T,Z)\pm\frac{X}{2}(1,Z).
+\]
+
+A velocidade continua sendo dependente e pode ser avaliada como \(s=S(\bar U(T,Z),Z)\). Para fluxos quadráticos, ela é afim em \(T\).
+
+### Coordenadas \((\tau,Y,z)\) usadas pelo app
+
+O aplicativo usa outra carta, mais conveniente para as equações implementadas. Na região em que as duas cartas se sobrepõem,
+
+\[
+Z=\frac{1}{z},
+\qquad
+X=zY,
+\qquad
+T=-z^2\tau.
+\]
+
+Consequentemente,
+
+\[
+X(1,Z)=zY\left(1,\frac1z\right)=Y(z,1).
+\]
+
+Portanto, a mesma diferença de estados passa a ser escrita como
 
 \[
 \Delta U=Y(z,1)^{\mathsf T}.
@@ -111,7 +230,19 @@ Quando \(Y\ne0\), a condição de pertencer a \(\mathcal W\) pode ser escrita de
 
 e a velocidade é o autovalor correspondente. A coordenada \(\tau\) parametriza a reta de estados médios compatíveis com a direção \(z\). Assim, \((\tau,Y,z)\) fornece três coordenadas para a variedade.
 
+As fórmulas implícitas e paramétricas do código são, sempre que possível, avaliadas nessas coordenadas físicas \((\tau,Y,z)\). A transformação acima deve ser entendida entre cartas: \(z=0\) corresponde à direção \(Z=\infty\), que é tratada diretamente pela carta do app, sem efetuar numericamente uma divisão por zero.
+
 No código, a coordenada \(\tau\) ainda aparece internamente com o nome `t`. Essa convenção preserva a compatibilidade dos cálculos existentes.
+
+### Coordenada visual compactificada
+
+Somente na etapa de desenho, a direção física \(z\in\mathbb R\) é compactificada por
+
+\[
+\widehat z=\frac{2}{\pi}\arctan z.
+\]
+
+Logo, a cena 3D exibe \((\tau,Y,\widehat z)\), com \(\widehat z\in(-1,1)\), mas os estados, as velocidades e as equações matemáticas continuam sendo calculados em \((\tau,Y,z)\). A compactificação não define uma nova variedade; ela apenas traz as extremidades \(z=\pm\infty\) para uma janela visual finita.
 
 ## Estados e projeções
 

@@ -10,9 +10,10 @@ O Wave Manifold Explorer é um ambiente interativo para construir e visualizar s
 4. [Construção das superfícies](04-construcao-das-superficies.md)
 5. [Inspeção e construção da solução](05-inspecao-e-solucao.md)
 6. [Métodos computacionais e desenvolvimento](06-metodos-e-desenvolvimento.md)
+7. [Retratos de fase](07-retratos-de-fase.md)
 
 ## Como ler
 
-Os capítulos 1 e 2 apresentam a notação e o uso do aplicativo. Os capítulos 3 e 4 descrevem os objetos matemáticos. O capítulo 5 acompanha o fluxo da inspeção até a solução, e o capítulo 6 documenta a implementação.
+Os capítulos 1 e 2 apresentam a notação e o uso do aplicativo. Os capítulos 3 e 4 descrevem os objetos matemáticos. O capítulo 5 acompanha o fluxo da inspeção até a solução, o capítulo 6 documenta a implementação e o capítulo 7 explica os retratos de fase. O arquivo `08-retrato-composto-global.md` complementa o capítulo 7 com detalhes técnicos.
 
 Estes arquivos são a fonte única da documentação: o GitHub os apresenta diretamente e o aplicativo os incorpora durante o build. As fórmulas usam a mesma notação exibida na interface.

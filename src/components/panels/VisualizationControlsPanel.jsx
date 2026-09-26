@@ -146,9 +146,9 @@ export default function VisualizationControlsPanel({
               checked={showCoincidenceMinusProjection}
               onChange={setShowCoincidenceMinusProjection}
               color={waveColors.coincidence}
-              label={<><MathLabel tex={String.raw`\pi_-(\mathcal{E})`} /><span> : Coincidência</span></>}
+              label={<><MathLabel tex="\pi_-(\mathcal{E})" /><span> : Coincidência</span></>}
               helper={{
-                title: <><MathLabel tex={String.raw`\pi_-(\mathcal{E})`} /><span> — Coincidência</span></>,
+                title: <><MathLabel tex="\pi_-(\mathcal{E})" /><span> — Coincidência</span></>,
                 description: (
                   <><p>{"Coincidência: os dois valores característicos coincidem. A projeção π₋ associa cada ponto ao estado esquerdo U₋."}</p></>
                 ),

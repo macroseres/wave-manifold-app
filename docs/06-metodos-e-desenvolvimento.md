@@ -42,6 +42,24 @@ continuam representando τ no contrato numérico existente. A escala é chamada
 `tauScale`, com atualizador `setTauScale`, na interface e nos cálculos de distância.
 A compactificação de z ocorre na camada visual.
 
+### Cadeia de coordenadas
+
+A implementação segue a seguinte separação conceitual:
+
+1. \((\bar U,X,Z,s)\): descrição de Rankine–Hugoniot no espaço ampliado; \(s\) é determinado pelas demais variáveis.
+2. \((\bar U,X,Z)\), com \(G(\bar U,Z)=0\): descrição reduzida da variedade.
+3. \((T,X,Z)\): parametrização das retas de estados médios que resolvem \(G=0\).
+4. \((\tau,Y,z)\): coordenadas físicas usadas pelas entidades e pelas equações do app.
+5. \((\tau,Y,\widehat z)\): coordenadas usadas exclusivamente para posicionar a geometria na cena.
+
+Na sobreposição das cartas 3 e 4,
+
+\[
+Z=1/z,\qquad X=zY,\qquad T=-z^2\tau.
+\]
+
+Os objetos de domínio armazenam \((\tau,Y,z)\), não \(\widehat z\). Consequentemente, projeções de estado, velocidade, resíduos implícitos e testes devem receber o valor físico \(z\). A compactificação pertence à camada geométrica e deve ser aplicada exatamente uma vez.
+
 `normalizeWavePoint`, `normalizeWaveSegment` e `normalizeWaveSegments` validam
 e normalizam pontos. `createWaveCurve`, `createWaveLeaf` e
 `createWaveBifoliation` constroem os objetos de domínio. `slow/fast` identificam
@@ -87,10 +105,10 @@ Os testes cobrem equações implícitas, compactificação, projeções, interse
 
 ## Manutenção da documentação
 
-Os seis arquivos Markdown de `docs/` alimentam simultaneamente a leitura no GitHub e a janela de documentação do app. Alterações conceituais devem ser feitas nesses arquivos; o próximo build incorporará o mesmo conteúdo na aplicação.
+Os sete capítulos Markdown de `docs/` alimentam simultaneamente a leitura no GitHub e a janela de documentação do app. O arquivo `08-retrato-composto-global.md` é um suplemento técnico ligado pelo capítulo 7. Alterações conceituais devem ser feitas nesses arquivos; o próximo build incorporará o mesmo conteúdo na aplicação.
 
 ## Escopo matemático atual
 
 O núcleo implementado cobre a variedade de ondas do modelo de Schaeffer–Shearer, suas projeções, curvas de Hugoniot e rarefação, curvas de inflexão e coincidência, superfícies sônicas, saturações e cadeias compostas usadas pelo solucionador.
 
-A teoria geral permite refinar a variedade em câmaras determinadas pelos sinais do determinante, traço e discriminante de \(DF(U^\pm)-sI\). O aplicativo já utiliza parte dessa estrutura por meio das superfícies sônicas e das saturações da coincidência, mas ainda não oferece uma classificação espectral completa das câmaras, superfícies de Hopf ou choques complexos e subcompressivos. Essa distinção deve ser preservada em futuras extensões e na redação da interface.
+A teoria geral permite refinar a variedade em câmaras determinadas pelos sinais do determinante, traço e discriminante de \(DF(U^\pm)-sI\). O aplicativo visualiza superfícies sônicas, saturações da coincidência e superfícies de Hopf, mas ainda não oferece uma classificação automática completa das câmaras nem seleciona choques complexos e subcompressivos no pipeline de solução. Essa distinção deve ser preservada em futuras extensões e na redação da interface.

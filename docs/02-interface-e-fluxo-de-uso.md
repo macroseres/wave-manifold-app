@@ -2,7 +2,7 @@
 
 ## Visualizações principais
 
-- **Variedade:** variedade de ondas \(\mathcal W\) em três dimensões.
+- **Variedade:** representação de \(\mathcal W\) nas coordenadas visuais \((\tau,Y,\widehat z)\). O cálculo usa a coordenada física \(z\), antes da compactificação.
 - **Estados:** projeções \(\pi_-\) e \(\pi_+\) das construções no plano \((u,v)\).
 - **Perfil:** perfil da solução em \((x,t=t_0)\) e seus diagnósticos.
 - **Parâmetros:** mapa dos casos no plano \((b_1,b_2)\).
@@ -20,13 +20,13 @@
 
 Na vista 3D, arraste para orbitar e use a roda do mouse ou os botões `+` e `−` para zoom. A rotação automática pode ser ativada na barra superior. O botão **Exportar** salva a visualização 3D como imagem PNG.
 
-Em **Ajustes**, podem ser alteradas as escalas dos eixos, a resolução numérica, a opacidade e a janela de desenho em \(Y\), \(\tau\) e \(z\). Uma resolução maior tende a produzir superfícies mais detalhadas, com maior custo de processamento.
+Em **Ajustes**, podem ser alteradas as escalas dos eixos, a resolução numérica, a opacidade e a janela de cálculo em \(Y\), \(\tau\) e \(z\). Uma resolução maior tende a produzir superfícies mais detalhadas, com maior custo de processamento. Na cena, o terceiro eixo mostra \(\widehat z=2\arctan(z)/\pi\), embora os controles e diagnósticos continuem reportando o valor físico \(z\).
 
 ## Camadas da cena
 
 O painel esquerdo agrupa as camadas em referências geométricas, superfícies e fronteiras, família lenta e família rápida. **Ocultar tudo** e **Mostrar tudo** ajudam a isolar construções; **Limpar seleções** remove os estados escolhidos.
 
-Ao manter o ponteiro sobre uma camada, aparece um cartão curto com sua definição e seu papel geométrico. O botão **Abrir documentação** leva diretamente ao capítulo relacionado. Esses cartões servem como consulta rápida; as deduções, equações e limitações ficam registradas nos seis capítulos.
+Ao manter o ponteiro sobre uma camada, aparece um cartão curto com sua definição e seu papel geométrico. O botão **Abrir documentação** leva diretamente ao capítulo relacionado. Esses cartões servem como consulta rápida; as deduções, equações e limitações ficam registradas nos sete capítulos.
 
 Na variedade 3D, passar o ponteiro sobre uma sonda, interseção ou ponto notável mostra outro cartão com \((\tau,Y,z)\), os estados \(U^-\) e \(U^+\) e a velocidade \(s\). Valores indicados por `−` não estão definidos para aquele objeto ou ainda não foram calculados.
 
