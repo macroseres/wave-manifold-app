@@ -4,6 +4,10 @@ Interactive environment for the construction and visualization of wave manifolds
 
 ## Documentation
 
+Version history is maintained in [CHANGELOG.md](CHANGELOG.md). See
+[VERSIONING.md](VERSIONING.md) for version numbering, release steps, and recovering
+previously committed content.
+
 The application documentation is maintained in [`docs/`](docs/README.md) and is also available from the in-app **Ajuda** menu.
 
 ### Chapters
