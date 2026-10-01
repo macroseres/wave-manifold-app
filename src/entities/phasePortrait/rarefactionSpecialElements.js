@@ -39,8 +39,9 @@ export function buildRarefactionSpecialElements(leaves, params, view) {
       ? Math.abs(z) > 1e-10 ? { t: -t * z * z, Y: 0, z: 1 / z, coords: [-t * z * z, 0, 1 / z] } : null
       : { t, Y: 0, z, coords: [t, 0, z] }
     for (const [index, direction] of singularity.eigenDirections.entries()) {
-      // The direction tangent to Z=0 collapses in the app's compactified τ
-      // display. Keep it in the matrix/metadata, never invent a visible arc.
+      // Z=0 has no finite-z representative.  Keep this eigendirection in
+      // the singularity metadata; in the centered τ* chart the renderer draws
+      // its two branches explicitly on the identified compactification borders.
       if (atInfinity && Math.abs(direction.vector[1]) < 1e-10) continue
       const stability = direction.value < 0 ? 'stable' : 'unstable'
       const offset = amount => origin.map((x, i) => x + amount * direction.vector[i])

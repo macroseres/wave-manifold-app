@@ -12,6 +12,23 @@ import { nearRarefactionSingularity } from '../../entities/phasePortrait/rarefac
 import { buildPortraitArrowPositions, orientedRarefactionFieldEdge } from '../../entities/phasePortrait/portraitArrows.js'
 
 const EMPTY = []
+const SEPARATRIX_STABLE_COLOR = '#a78bfa'
+const SEPARATRIX_UNSTABLE_COLOR = '#84cc16'
+
+function clipArrowBufferToTauBounds(positions) {
+  const bounds = getTauDisplayBounds()
+  if (!bounds || !positions?.length) return positions
+  const kept = []
+  // Each chevron is stored as two line segments: tip,left,tip,right = 12 floats.
+  // Keep only heads whose complete geometry lies inside the displayed τ strip.
+  for (let i = 0; i + 11 < positions.length; i += 12) {
+    const taus = [positions[i], positions[i + 3], positions[i + 6], positions[i + 9]]
+    if (taus.every(tau => tau >= bounds.min - 1e-7 && tau <= bounds.max + 1e-7)) {
+      for (let j = 0; j < 12; j += 1) kept.push(positions[i + j])
+    }
+  }
+  return new Float32Array(kept)
+}
 function coloredArrowBuffers(curves, markerScale, orient, allowed) {
   const groups = new Map()
   for (const curve of curves) {
@@ -20,7 +37,7 @@ function coloredArrowBuffers(curves, markerScale, orient, allowed) {
     groups.get(color).push(curve)
   }
   return [...groups].map(([color, group]) => ({ color,
-    positions: buildPortraitArrowPositions(group, markerScale, orient, allowed) }))
+    positions: clipArrowBufferToTauBounds(buildPortraitArrowPositions(group, markerScale, orient, allowed)) }))
 }
 
 
@@ -166,9 +183,19 @@ export default function RarefactionPhasePortrait({ view, resolution, markerScale
   const infinity = data?.special.infinity
   const infinityTau = infinitySingularityVisualTau()
   const centeredInfinitySaddle = tauDisplayMode === 'centered' && infinity?.type === 'sela'
+  // In the centered τ* chart, τ*=-T+O(Z), so the eigendirection tangent
+  // to Z=0 no longer collapses.  The compactified rectangle is a cut
+  // fundamental domain: zHat=-1 and zHat=+1 are two copies of the same
+  // projective infinity.  Draw the tangent stable/unstable branches on both
+  // copies instead of inventing a finite-z orbit for Z=0.
+  const tangentInfinityDirection = centeredInfinitySaddle
+    ? infinity?.eigenDirections?.find(direction => Math.abs(direction.vector?.[1] ?? 1) < 1e-10)
+    : null
+  const tangentInfinityStability = (tangentInfinityDirection?.value ?? 1) < 0 ? 'stable' : 'unstable'
+  const tangentInfinityColor = tangentInfinityStability === 'stable' ? SEPARATRIX_STABLE_COLOR : SEPARATRIX_UNSTABLE_COLOR
   const infinityBoundarySeparatrices = centeredInfinitySaddle ? [-1, 1].flatMap(zHat => [
-    { id: `inf-boundary-neg-${zHat}`, points: [[view.tMin, 0, zHat], [0, 0, zHat]] },
-    { id: `inf-boundary-pos-${zHat}`, points: [[0, 0, zHat], [view.tMax, 0, zHat]] },
+    { id: `inf-boundary-neg-${zHat}`, points: [[view.tMin, 0, zHat], [infinityTau, 0, zHat]] },
+    { id: `inf-boundary-pos-${zHat}`, points: [[infinityTau, 0, zHat], [view.tMax, 0, zHat]] },
   ]) : []
   const curves = useMemo(() => {
     // physicalPointToVisual reads the configured display mode globally. Reading
@@ -182,9 +209,9 @@ export default function RarefactionPhasePortrait({ view, resolution, markerScale
   const composites = useMemo(() => (data?.components ?? []).flatMap(component => visibleParts(component.points, view)
     .map((points, i) => ({ id: `${component.componentId}-${i}`, points, color: waveColors.compositeSlow }))), [data, view])
   const separatrices = useMemo(() => (data?.special.separatrices ?? []).flatMap(curve => visibleParts(curve.points, view)
-    .map(points => ({ points, color: curve.stability === 'stable' ? '#60a5fa' : '#fbbf24' }))), [data, view])
+    .map(points => ({ points, color: curve.stability === 'stable' ? SEPARATRIX_STABLE_COLOR : SEPARATRIX_UNSTABLE_COLOR }))), [data, view])
   const compositeSeparatrices = useMemo(() => (data?.compositeSpecial?.separatrices ?? []).flatMap(curve => visibleParts(curve.points, view)
-    .map((points, i) => ({ id: `${curve.id}-${i}`, points, color: curve.stability === 'stable' ? '#60a5fa' : '#fbbf24' }))), [data, view])
+    .map((points, i) => ({ id: `${curve.id}-${i}`, points, color: curve.stability === 'stable' ? SEPARATRIX_STABLE_COLOR : SEPARATRIX_UNSTABLE_COLOR }))), [data, view])
   const compositeAxes = useMemo(() => (data?.compositeSpecial?.eigenDirections ?? []).flatMap(axis => visibleParts(axis.points, view)), [data, view])
   const arrows = useMemo(() => Math.abs(params?.b1 ?? 1) < 1e-10 ? [] : coloredArrowBuffers(curves, markerScale,
     (a, b) => orientedRarefactionFieldEdge(a, b, params),
@@ -195,7 +222,7 @@ export default function RarefactionPhasePortrait({ view, resolution, markerScale
     {(loading || error) && <Html position={[0, 0, 0]} style={{ pointerEvents: 'none', whiteSpace: 'nowrap', color: '#e2e8f0' }}>{error ?? 'Calculando retrato…'}</Html>}
     {phase.enabled && Math.abs(params?.b1 ?? 1) < 1e-10 && Math.abs(params?.c ?? 0) >= 1e-10 && <Html position={[view.tMin, 0, -0.92]} style={{ pointerEvents: 'none', whiteSpace: 'nowrap', color: '#e2e8f0', background: 'rgba(2,12,24,.78)', padding: '5px 8px', borderRadius: '6px', fontSize: '12px' }}>Carta adaptada: (Θ,Z)=(u,1/z) · Z=0 é regular</Html>}
     {phase.enabled && structuralB1C0 && <DegenerateB1C0Chart params={params} />}
-    {phase.enabled && phase.rarefactionOptions.singularities && view.tMin <= 0 && view.tMax >= 0 && infinity?.visualPositions.map((position, index) => <RarefactionSingularityMarker
+    {phase.enabled && phase.rarefactionOptions.singularities && view.tMin <= infinityTau && view.tMax >= infinityTau && infinity?.visualPositions.map((position, index) => <RarefactionSingularityMarker
       key={`${infinity.id}-${index}-${phase.inspectionModeEnabled}`} position={[infinityTau, position[1], position[2]]} markerScale={markerScale}
       inspection={phase.inspectionModeEnabled} type={infinity.type} details={infinity} infinity
       onInspect={phase.openInfinityChart} />)}
@@ -217,9 +244,13 @@ export default function RarefactionPhasePortrait({ view, resolution, markerScale
     {phase.compositeEnabled && data?.compositeSpecial?.unsupported && <Html position={[0, 0, 0]} style={{ color: '#fbbf24', pointerEvents: 'none' }}>Diagnóstico de singularidades indisponível neste parâmetro degenerado.</Html>}
     {phase.enabled && phase.rarefactionOptions.separatrices && <PortraitLines curves={separatrices} params={params} markerScale={markerScale} />}
     {phase.enabled && phase.rarefactionOptions.separatrices && centeredInfinitySaddle && infinityBoundarySeparatrices.map(curve =>
-      <Line key={curve.id} points={curve.points} color="#fbbf24" lineWidth={2.4} renderOrder={19} />)}
+      <Line key={curve.id} points={curve.points} color={tangentInfinityColor} lineWidth={2.4} renderOrder={19} />)}
     {phase.enabled && phase.rarefactionOptions.eigenDirections && centeredInfinitySaddle && [-1, 1].map(zHat =>
       <Line key={`inf-axis-${zHat}`} points={[[view.tMin,0,zHat],[view.tMax,0,zHat]]} color="#f8fafc" dashed dashSize={0.015} gapSize={0.012} lineWidth={2} />)}
+    {phase.enabled && centeredInfinitySaddle && (phase.rarefactionOptions.separatrices || phase.rarefactionOptions.eigenDirections) &&
+      <Html position={[infinityTau, 0, 0.985]} center style={{ pointerEvents:'none', whiteSpace:'nowrap', color:'#cbd5e1', background:'rgba(2,12,24,.78)', border:'1px solid #334155', borderRadius:5, padding:'3px 6px', fontSize:10 }}>
+        ẑ=−1 ≡ ẑ=+1 · mesmo infinito projetivo
+      </Html>}
     {phase.enabled && phase.rarefactionOptions.eigenDirections && data?.special.eigenDirections.map((axis, i) => axis.points.length > 1 &&
       <Line key={i} points={axis.points.map(p => physicalPointToVisual(p.coords))} color="#f8fafc" dashed dashSize={0.015} gapSize={0.012} lineWidth={2} />)}
     {phase.references.inflection && data?.special.inflections.filter(p => p.t >= view.tMin && p.t <= view.tMax).map((p, i) =>

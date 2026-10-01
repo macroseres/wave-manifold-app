@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { waveColors } from '../../../config/waveColors.js'
+import { getTauDisplayMode } from '../../../geometry/zCompactification.js'
 
 export function finite(value) { return Number.isFinite(value) }
 
@@ -36,9 +37,19 @@ export function pointDistance(a, b, sceneScale = [1, 1, 1]) {
 }
 
 export function clampCharacteristicPoint(point, view) {
-  const gap = Math.max(1e-5, 0.001 * Math.max(1, view.tMax - view.tMin))
-  const tMin = point.branch === 'fast' ? view.tMin : Math.max(gap, view.tMin)
-  const tMax = point.branch === 'fast' ? Math.min(-gap, view.tMax) : view.tMax
+  const normalizedDisplay = getTauDisplayMode() !== 'current'
+
+  // The slow/fast boundary is the coincidence curve tau_A = 0.  In the
+  // normalized displays view.tMin/view.tMax bound tau_N or tau_*, not tau_A,
+  // so they must never be used to clamp the physical coordinate.  Allowing
+  // tau_A = 0 also makes the probe reach the coincidence boundary exactly.
+  const tMin = point.branch === 'fast'
+    ? (normalizedDisplay ? -Infinity : view.tMin)
+    : 0
+  const tMax = point.branch === 'fast'
+    ? 0
+    : (normalizedDisplay ? Infinity : view.tMax)
+
   return {
     ...point,
     t: clamp(point.t, tMin, tMax),
