@@ -7,7 +7,7 @@ import {
   CHARACTERISTIC_SELECTED_RING_TUBE,
 } from '../../entities/characteristic/planeGeometry.js'
 
-export default function RarefactionSingularityMarker({ position, markerScale, inspection, type, z, infinity = false, details, family }) {
+export default function RarefactionSingularityMarker({ position, markerScale, inspection, type, z, infinity = false, details, family, onInspect }) {
   const [hovered, setHovered] = useState(false)
   const tooltipRef = useRef(null)
   const projectedPosition = useRef(new Vector3())
@@ -28,7 +28,8 @@ export default function RarefactionSingularityMarker({ position, markerScale, in
   return <group position={position}>
     <group scale={markerScale.map(value => value * 0.78)}
       onPointerOver={inspection ? event => { event.stopPropagation(); setHovered(true) } : undefined}
-      onPointerOut={inspection ? () => setHovered(false) : undefined}>
+      onPointerOut={inspection ? () => setHovered(false) : undefined}
+      onClick={inspection && onInspect ? event => { event.stopPropagation(); onInspect() } : undefined}>
       <mesh>
         <sphereGeometry args={[CHARACTERISTIC_POINT_RADIUS, 24, 24]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={highlighted ? 0.85 : 0.35} roughness={0.35} />

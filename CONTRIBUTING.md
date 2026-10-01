@@ -3,7 +3,6 @@
 Before submitting changes:
 
 1. Update documentation when algorithms change.
-   Record user-visible changes in `CHANGELOG.md`; follow `VERSIONING.md` when preparing a release.
 2. Run:
    - npm test
    - npm run lint

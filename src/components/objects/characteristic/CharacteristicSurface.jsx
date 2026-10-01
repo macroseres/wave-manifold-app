@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { Line } from '@react-three/drei'
 import * as THREE from 'three'
 import { waveColors } from '../../../config/waveColors'
+import { usePhasePortrait } from '../../../app/inspection/PhasePortraitContext.js'
 import {
   CHARACTERISTIC_CLICK_DRAG_TOLERANCE_PX as CLICK_DRAG_TOLERANCE_PX,
   CHARACTERISTIC_DRAG_PLANE as DRAG_PLANE,
@@ -10,6 +12,7 @@ import {
   CHARACTERISTIC_ZERO_TAU_GAP_FACTOR as ZERO_TAU_GAP_FACTOR,
   characteristicMarkerColor as markerColorForPoint,
   makeCharacteristicPlaneGeometry as makeCharacteristicPlane,
+  makeCenteredCharacteristicPlaneGeometry as makeCenteredCharacteristicPlane,
 } from '../../../entities/characteristic'
 import {
   VISUAL_Z_MAX,
@@ -17,10 +20,117 @@ import {
   physicalPointToVisual,
   physicalZToVisual,
   visualZToPhysical,
+  visualTauToPhysical,
+  getTauDisplayMode,
 } from '../../../geometry/zCompactification'
+
+
+const DEGENERATE_EPS = 1e-10
+
+function DegenerateCharacteristicSurface({ view, params, opacity, inspectionMode = false, onOpenBlowup, onCreateInspectionProbe, onSelectPoint, selectedPoint, selectedPoints, markerScale = [1,1,1] }) {
+  const b2 = Number(params?.b2 ?? 0)
+  const disc = Math.sqrt(b2 * b2 + 4)
+  // Roots in the app's physical z coordinate: A(z)=1+b2 z-z^2=0.
+  const zPlusPhysical = (b2 + disc) / 2
+  const zMinusPhysical = (b2 - disc) / 2
+  const zCuts = useMemo(() => [
+    physicalZToVisual(zMinusPhysical),
+    physicalZToVisual(zPlusPhysical),
+  ].filter(Number.isFinite).sort((a, b) => a - b), [zMinusPhysical, zPlusPhysical])
+
+  const geometries = useMemo(() => {
+
+    // C is still Y=0 in the (tau,Y,z) chart. At A(z)=0 the tau
+    // parametrization of the centre state collapses, so this chart must stop
+    // there; the missing fibres belong to separate local charts.
+    const gap = 0.018
+    const bounds = [VISUAL_Z_MIN]
+    for (const zc of zCuts) {
+      bounds.push(Math.max(VISUAL_Z_MIN, zc - gap), Math.min(VISUAL_Z_MAX, zc + gap))
+    }
+    bounds.push(VISUAL_Z_MAX)
+
+    const intervals = []
+    for (let i = 0; i + 1 < bounds.length; i += 2) {
+      if (bounds[i + 1] - bounds[i] > 1e-6) intervals.push([bounds[i], bounds[i + 1]])
+    }
+
+    const out = []
+    for (const [z0, z1] of intervals) {
+      const fast = makeCharacteristicPlane(view.tMin, Math.min(0, view.tMax), z0, z1)
+      const slow = makeCharacteristicPlane(Math.max(0, view.tMin), view.tMax, z0, z1)
+      if (fast) out.push({ geometry: fast, color: waveColors.characteristicFast })
+      if (slow) out.push({ geometry: slow, color: waveColors.characteristicSlow })
+    }
+    return out
+  }, [view.tMin, view.tMax, zCuts])
+
+  useEffect(() => () => {
+    geometries.forEach(({ geometry }) => geometry?.dispose?.())
+  }, [geometries])
+
+  const alpha = Number.isFinite(opacity) ? opacity : 0.52
+  const downRef = useRef(null)
+
+  const branchForIndex = (index) => geometries[index]?.color === waveColors.characteristicFast ? 'fast' : 'slow'
+  const handleDown = (branch) => (event) => {
+    const native = event.nativeEvent ?? event
+    if ((native.button ?? event.button) !== 0) { downRef.current = null; return }
+    downRef.current = { x: native.clientX, y: native.clientY, object: event.object, branch }
+  }
+  const handleUp = (branch) => (event) => {
+    const native = event.nativeEvent ?? event
+    const down = downRef.current
+    downRef.current = null
+    if (!down || (native.button ?? event.button) !== 0 || down.object !== event.object || down.branch !== branch) return
+    if (Math.hypot(native.clientX - down.x, native.clientY - down.y) > CLICK_DRAG_TOLERANCE_PX) return
+    const local = event.object.worldToLocal(event.point.clone())
+    const physicalZ = visualZToPhysical(local.z)
+    const nextPoint = { t: visualTauToPhysical(local.x, physicalZ), Y: 0, z: physicalZ, branch }
+    if (inspectionMode) onCreateInspectionProbe?.(nextPoint)
+    else onSelectPoint?.(nextPoint)
+  }
+
+  return <group>
+    {geometries.map(({ geometry, color }, index) => {
+      const branch = branchForIndex(index)
+      return <mesh key={index} geometry={geometry} renderOrder={-1}
+        onPointerDown={handleDown(branch)} onPointerUp={handleUp(branch)}>
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} transparent opacity={alpha}
+          roughness={0.55} metalness={0} depthWrite={false} />
+      </mesh>
+    })}
+    {zCuts.map((zVisual, i) => {
+      const zStar = i === 0 ? zMinusPhysical : zPlusPhysical
+      const label = i === 0 ? 'z₋' : 'z₊'
+      return <Line key={`singular-cut-${label}`} points={[[view.tMin,0,zVisual],[view.tMax,0,zVisual]]}
+        color={inspectionMode ? '#fbbf24' : '#0f172a'} lineWidth={inspectionMode ? 7 : 4}
+        onPointerDown={inspectionMode ? e => { e.stopPropagation(); downRef.current = null } : undefined}
+        onPointerUp={inspectionMode ? e => { e.stopPropagation(); downRef.current = null } : undefined}
+        onPointerOver={inspectionMode ? e => { e.stopPropagation(); document.body.style.cursor='pointer' } : undefined}
+        onPointerOut={inspectionMode ? () => { document.body.style.cursor='' } : undefined}
+        onClick={inspectionMode ? e => { e.stopPropagation(); onOpenBlowup?.({ label, zStar, b2 }) } : undefined} />
+    })}
+    {(selectedPoints ?? (selectedPoint ? [selectedPoint] : [])).map((point) => (
+      <group key={`degenerate-${point.branch ?? 'branch'}-marker`}
+        position={physicalPointToVisual([point.t, 0, point.z])} scale={markerScale} renderOrder={18}>
+        <mesh>
+          <sphereGeometry args={[POINT_RADIUS, 24, 24]} />
+          <meshStandardMaterial color={markerColorForPoint(point)} emissive={new THREE.Color(markerColorForPoint(point))}
+            emissiveIntensity={0.45} roughness={0.35} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]} renderOrder={19}>
+          <torusGeometry args={[SELECTED_RING_RADIUS, SELECTED_RING_TUBE, 12, 64]} />
+          <meshStandardMaterial color="#f5c542" emissive="#f5c542" emissiveIntensity={0.85} roughness={0.28} />
+        </mesh>
+      </group>
+    ))}
+  </group>
+}
 
 function CharacteristicSurface({
   view,
+  params,
   opacity = 0.52,
   onSelectPoint,
   onCreateInspectionProbe,
@@ -35,14 +145,22 @@ function CharacteristicSurface({
   inspectionMode = false,
   markerInteractive = true,
 }) {
+  const phase = usePhasePortrait()
+  const structuralB1C0 = Math.abs(params?.b1 ?? 1) < DEGENERATE_EPS && Math.abs(params?.c ?? 0) < DEGENERATE_EPS
   const zeroTauGap = Math.max(1e-5, ZERO_TAU_GAP_FACTOR * Math.max(1, view.tMax - view.tMin))
   // The rendered branches meet at t = 0; the gap is only a drag constraint.
+  const tauDisplayMode = getTauDisplayMode()
+  const rectangularDisplayTau = tauDisplayMode === 'normalized' || tauDisplayMode === 'centered'
   const fastGeometry = useMemo(() => (
-    makeCharacteristicPlane(view.tMin, Math.min(0, view.tMax), VISUAL_Z_MIN, VISUAL_Z_MAX)
-  ), [view.tMin, view.tMax])
+    rectangularDisplayTau
+      ? makeCenteredCharacteristicPlane(view.tMin, view.tMax, VISUAL_Z_MIN, VISUAL_Z_MAX, 'fast')
+      : makeCharacteristicPlane(view.tMin, Math.min(0, view.tMax), VISUAL_Z_MIN, VISUAL_Z_MAX)
+  ), [view.tMin, view.tMax, rectangularDisplayTau])
   const slowGeometry = useMemo(() => (
-    makeCharacteristicPlane(Math.max(0, view.tMin), view.tMax, VISUAL_Z_MIN, VISUAL_Z_MAX)
-  ), [view.tMin, view.tMax])
+    rectangularDisplayTau
+      ? makeCenteredCharacteristicPlane(view.tMin, view.tMax, VISUAL_Z_MIN, VISUAL_Z_MAX, 'slow')
+      : makeCharacteristicPlane(Math.max(0, view.tMin), view.tMax, VISUAL_Z_MIN, VISUAL_Z_MAX)
+  ), [view.tMin, view.tMax, rectangularDisplayTau])
 
   const rootRef = useRef(null)
   const pointerDownRef = useRef(null)
@@ -63,6 +181,7 @@ function CharacteristicSurface({
     if (!interactive || !onInspectPoint) return
     const local = event.object.worldToLocal(event.point.clone())
     local.z = visualZToPhysical(local.z)
+    local.x = visualTauToPhysical(local.x, local.z)
     onInspectPoint({
       t: local.x,
       Y: 0,
@@ -126,6 +245,7 @@ function CharacteristicSurface({
     // em estado de rotação após um clique simples sobre a característica.
     const local = event.object.worldToLocal(event.point.clone())
     local.z = visualZToPhysical(local.z)
+    local.x = visualTauToPhysical(local.x, local.z)
     const nextPoint = { t: local.x, Y: 0, z: local.z, branch }
     if (inspectionMode) onCreateInspectionProbe?.(nextPoint)
     else onSelectPoint(nextPoint)
@@ -152,15 +272,18 @@ function CharacteristicSurface({
     const hit = event.ray.intersectPlane(DRAG_PLANE, worldPoint)
     if (!hit) return null
     const local = rootRef.current.worldToLocal(worldPoint.clone())
-    const t = local.x + (options.offsetT ?? 0)
     const z = visualZToPhysical(local.z) + (options.offsetZ ?? 0)
+    const t = visualTauToPhysical(local.x, z) + (options.offsetT ?? 0)
     return clampToBranch(branch, t, z)
   }
 
   const applyMarkerPosition = (point) => {
     if (!point?.branch) return
     const marker = markerRefs.current.get(point.branch)
-    if (marker) marker.position.set(point.t, 0, physicalZToVisual(point.z))
+    if (marker) {
+      const visual = physicalPointToVisual([point.t, 0, point.z])
+      marker.position.set(visual[0], visual[1], visual[2])
+    }
   }
 
   const flushScheduledDrag = () => {
@@ -252,6 +375,13 @@ function CharacteristicSurface({
     event.target?.releasePointerCapture?.(event.pointerId)
   }
 
+
+  if (structuralB1C0) return <DegenerateCharacteristicSurface
+    view={view} params={params} opacity={opacity} inspectionMode={inspectionMode}
+    onOpenBlowup={phase?.openSingularBlowup} onCreateInspectionProbe={onCreateInspectionProbe}
+    onSelectPoint={onSelectPoint} selectedPoint={selectedPoint} selectedPoints={selectedPoints}
+    markerScale={markerScale}
+  />
 
   return (
     <group ref={rootRef}>

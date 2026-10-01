@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import WaveOverlayPanel from './app/panels/WaveOverlayPanel'
 import { buildComputationView } from './utils/viewLimits'
@@ -8,8 +8,10 @@ import { useCharacteristicSelection } from './app/selection/useCharacteristicSel
 import { useInspectionController } from './app/inspection/useInspectionController'
 import WaveSceneViewport from './app/scene/WaveSceneViewport'
 import PhasePortraitProvider from './app/inspection/PhasePortraitProvider.jsx'
+import { configureTauDisplay } from './geometry/zCompactification.js'
 
 export default function App() {
+  const [tauCoordinateMode, setTauCoordinateMode] = useState('current')
   const [waveState, waveActions] = useWaveAppState()
   const {
     params,
@@ -57,6 +59,8 @@ export default function App() {
     zoomIn,
     clearSelection,
   } = waveActions
+
+  configureTauDisplay(tauCoordinateMode, params, view)
 
   const showWireframe = false
   const showHysteresis = waveState.showHysteresisLeft || waveState.showHysteresisRight
@@ -284,6 +288,8 @@ export default function App() {
         onExportSnapshot={handleExportSnapshot}
         onCreateInspectionProbe={inspection.createInspectionProbe}
         onMoveInspectionProbe={inspection.moveInspectionProbe}
+        tauCoordinateMode={tauCoordinateMode}
+        setTauCoordinateMode={setTauCoordinateMode}
       />
 
       <WaveSceneViewport
@@ -293,7 +299,9 @@ export default function App() {
         zoomOut={zoomOut}
         view={view}
         calcView={calcView}
-        sceneKey={sceneKey}
+        sceneKey={`${sceneKey}-${tauCoordinateMode}`}
+        tauCoordinateMode={tauCoordinateMode}
+        setTauCoordinateMode={setTauCoordinateMode}
         params={params}
         resolution={resolution}
         opacity={opacity}

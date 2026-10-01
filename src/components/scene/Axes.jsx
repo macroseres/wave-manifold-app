@@ -1,5 +1,4 @@
 import { Html, Line as VisualLine } from '@react-three/drei'
-import { ZCompactifiedLine as Line } from '../../app/scene/ZCompactification'
 import { displayCoordinates } from '../../ui/display'
 import { VISUAL_Z_MAX, VISUAL_Z_MIN } from '../../geometry/zCompactification'
 
@@ -9,8 +8,11 @@ export default function Axes({ view }) {
 
   return (
     <group>
-      <Line points={[[tMin, 0, 0], [tMax, 0, 0]]} color={axisColor} lineWidth={1.35} />
-      <Line points={[[0, yMin, 0], [0, yMax, 0]]} color={axisColor} lineWidth={1.35} />
+      {/* Axes are already expressed in display coordinates.  Do not pass them
+          through physicalPointToVisual: in τ* that would translate τ=0 by
+          c b₂ / b₁ and move the visual origin away from (0,0,0). */}
+      <VisualLine points={[[tMin, 0, 0], [tMax, 0, 0]]} color={axisColor} lineWidth={1.35} />
+      <VisualLine points={[[0, yMin, 0], [0, yMax, 0]]} color={axisColor} lineWidth={1.35} />
       <VisualLine points={[[0, 0, VISUAL_Z_MIN], [0, 0, VISUAL_Z_MAX]]} color={axisColor} lineWidth={1.35} />
 
       <Html position={[tMax + 0.04, 0, 0]} center>

@@ -1,4 +1,3 @@
-import * as THREE from 'three'
 import { buildHopfGeometry } from './hopfSurfaceGeometry.js'
 import { buildSonicBranchGeometries } from '../entities/sonic/surfaceModel.js'
 import { buildHysteresisSaturationGeometry } from './hysteresisSaturationGeometry.js'
@@ -19,13 +18,8 @@ export function generateSurfaceBuffers({ type, params, view, resolution, directi
     throw new Error(`Unknown surface type: ${type}`)
   }
   return Object.fromEntries(Object.entries(geometries).map(([name, geometry]) => {
-    const position = geometry.getAttribute('position')
-    if (position) {
-      geometry.setAttribute('position', new THREE.BufferAttribute(compactifyZPositionArray(position.array), 3))
-      geometry.computeVertexNormals()
-    }
     const data = {
-      position: geometry.getAttribute('position')?.array ?? new Float32Array(),
+      position: geometry.getAttribute('position') ? compactifyZPositionArray(geometry.getAttribute('position').array) : new Float32Array(),
       normal: geometry.getAttribute('normal')?.array ?? new Float32Array(),
       index: geometry.getIndex()?.array ?? new Uint32Array(),
     }

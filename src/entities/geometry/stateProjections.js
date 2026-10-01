@@ -7,6 +7,12 @@
 export function equilibriumState(z, params) {
   const { b1, b2, c } = params
   const den = 1 + z * z
+  // Estrato b1=c=0: a secao de equilibrio usada na carta generica e
+  // indeterminada (0/0), mas o ramo regular A(z)\bar v=0 admite a
+  // escolha canonica uE=vE=0. Isto preserva (tau,Y,z) fora de A(z)=0.
+  if (Math.abs(b1) < 1e-12 && Math.abs(c) < 1e-12) {
+    return { u: 0, v: 0 }
+  }
   if (Math.abs(b1) < 1e-12 || Math.abs(den) < 1e-12) {
     return { u: Number.NaN, v: Number.NaN }
   }

@@ -149,7 +149,131 @@ export function splitAtCoincidence(segments) {
   return result
 }
 
+
+
+// Adapted global chart for b1=0, c!=0.
+// The canonical (tau,z) parametrization uses an equilibrium proportional to 1/b1
+// and is therefore not a chart on this stratum.  We use (Theta,Z)=(u,1/z):
+//   v = c Z^2/(1+b2 Z-Z^2),
+//   Theta' = c Z^2(2+b2 Z),  Z'=(1+b2 Z-Z^2)^2.
+// Roots of 1+b2 Z-Z^2 are excluded directions when c!=0, so integration stops there.
+function buildB1ZeroAdaptedPortrait(params, view, resolution = 40) {
+  const { b2, c } = params
+  if (Math.abs(c) < 1e-10) return []
+  const roots = solveQuadraticRealRoots(-1, b2, 1)
+  const rootTol = 2e-4
+  const field = ([_theta, Z]) => {
+    const d = 1 + b2 * Z - Z * Z
+    return [c * Z * Z * (2 + b2 * Z), d * d]
+  }
+  const inside = ([theta, Z]) => Number.isFinite(theta) && Number.isFinite(Z)
+    && theta >= view.tMin && theta <= view.tMax && Math.abs(physicalZToVisual(Z)) < 0.995
+    && roots.every(r => Math.abs(Z - r) > rootTol * Math.max(1, Math.abs(r)))
+  const rk4 = (point, h) => {
+    const k1 = field(point)
+    const p2 = point.map((x,i)=>x+h*k1[i]/2), k2=field(p2)
+    const p3 = point.map((x,i)=>x+h*k2[i]/2), k3=field(p3)
+    const p4 = point.map((x,i)=>x+h*k3[i]), k4=field(p4)
+    return point.map((x,i)=>x+h*(k1[i]+2*k2[i]+2*k3[i]+k4[i])/6)
+  }
+  const integrate = (seed, sign) => {
+    const out=[seed]
+    let p=seed
+    const base=0.012/Math.max(1, Math.sqrt(Math.max(1,resolution)/40))
+    for(let i=0;i<5000;i++){
+      const f=field(p), speed=Math.hypot(f[0]/Math.max(1,view.tMax-view.tMin), f[1]/(1+p[1]*p[1]))
+      const h=sign*base/Math.max(0.35,speed)
+      const q=rk4(p,h)
+      if(!inside(q)) break
+      if(roots.some(r => (p[1]-r)*(q[1]-r)<=0)) break
+      out.push(q); p=q
+    }
+    return out
+  }
+  const bounds=[-1,...roots.map(physicalZToVisual),1]
+  const zSeeds=[]
+  for(let i=0;i<bounds.length-1;i++){
+    const a=bounds[i], b=bounds[i+1]
+    for(const f of [0.2,0.5,0.8]) zSeeds.push(visualZToPhysical(a+f*(b-a)))
+  }
+  const thetaSeeds=Array.from({length:10},(_,i)=>view.tMin+(i+1)*(view.tMax-view.tMin)/11)
+  const curves=[]
+  for(const Z of zSeeds) for(const theta of thetaSeeds){
+    const seed=[theta,Z]
+    if(!inside(seed)) continue
+    const back=integrate(seed,-1).reverse(), forward=integrate(seed,1)
+    const raw=[...back.slice(0,-1),...forward]
+    if(raw.length<3) continue
+    const segment=raw.map(([Theta,ZZ])=>({t:Theta,Y:0,z:ZZ,coords:[Theta,0,ZZ],adaptedB1Zero:true}))
+    curves.push({id:`R-b10-${curves.length}`,seed:{t:theta,Y:0,z:Z,adaptedB1Zero:true},segments:[segment],
+      displayParts:[{branch:theta>=0?'slow':'fast',segment}],adaptedB1Zero:true})
+  }
+  return curves
+}
+
+
+// Structural stratum b1=0, c=0.
+// IMPORTANT: the app coordinate z is reciprocal to the characteristic slope Z:
+//   Z = 1/z.
+// The characteristic equation v(1-b2 Z-Z^2)=0 therefore becomes
+//   v(z^2-b2 z-1)=0 in the app chart.  Its two regular components are
+//   z=zeta_±=(b2±sqrt(b2^2+4))/2.  On each component dv/du=Z=1/zeta.
+// We display this stratum in the adapted state chart (u,v,z_app), encoded in
+// the scene coordinates (t,Y,z)=(u,v,z_app).  The coincidence rarefaction
+// Z=0 lives at z_app=infinity and is not a finite curve in this chart.
+function buildB1ZeroCZeroPortrait(params, view, resolution = 40) {
+  const { b2 } = params
+  const disc = Math.sqrt(b2 * b2 + 4)
+  const zetas = [(b2 + disc) / 2, (b2 - disc) / 2]
+  const uMin = view.tMin, uMax = view.tMax
+  const vMin = view.yMin, vMax = view.yMax
+  const count = Math.max(36, Math.min(180, Math.round(resolution * 1.5)))
+  const curves = []
+
+  for (const [familyIndex, zeta] of zetas.entries()) {
+    const slope = 1 / zeta
+    // Seed parallel leaves by their intercept K=v-Zu.  Cover the visible
+    // rectangle in (u,v), then clip each exact straight rarefaction to it.
+    const corners = [[uMin,vMin],[uMin,vMax],[uMax,vMin],[uMax,vMax]]
+    const ks = corners.map(([u,v]) => v - slope * u)
+    const kMin = Math.min(...ks), kMax = Math.max(...ks)
+    const leafCount = 11
+    for (let j = 0; j < leafCount; j++) {
+      const K = kMin + (j + 0.5) * (kMax - kMin) / leafCount
+      const points = []
+      for (let i = 0; i <= count; i++) {
+        const u = uMin + i * (uMax - uMin) / count
+        const v = slope * u + K
+        if (v < vMin - 1e-9 || v > vMax + 1e-9) continue
+        points.push({ t:u, Y:v, z:zeta, coords:[u,v,zeta], adaptedB1ZeroCZero:true })
+      }
+      if (points.length < 2) continue
+      // Across v=0 the ordering of the two eigenvalues reverses.  Split only
+      // for color semantics; the geometric integral curve remains continuous.
+      const parts=[]; let current=[]; let branch=null
+      const branchAt = v => familyIndex === 0 ? (v >= 0 ? 'fast' : 'slow') : (v >= 0 ? 'slow' : 'fast')
+      for (let i=0;i<points.length;i++) {
+        const p=points[i], nextBranch=branchAt(p.Y)
+        if (branch===null) { branch=nextBranch; current=[p]; continue }
+        if (nextBranch===branch || Math.abs(p.Y)<1e-12) { current.push(p); continue }
+        const prev=points[i-1]
+        const f=-prev.Y/(p.Y-prev.Y)
+        const u0=prev.t+f*(p.t-prev.t)
+        const cross={t:u0,Y:0,z:zeta,coords:[u0,0,zeta],adaptedB1ZeroCZero:true}
+        current.push(cross); if(current.length>1) parts.push({branch,segment:current})
+        branch=nextBranch; current=[cross,p]
+      }
+      if(current.length>1) parts.push({branch,segment:current})
+      curves.push({ id:`R-b10-c0-${familyIndex}-${j}`, seed:points[Math.floor(points.length/2)],
+        segments:[points], displayParts:parts, adaptedB1ZeroCZero:true })
+    }
+  }
+  return curves
+}
+
 export function buildGlobalRarefactionPortrait(params, view, resolution = 40) {
+  if (Math.abs(params?.b1 ?? 1) < 1e-10 && Math.abs(params?.c ?? 0) < 1e-10) return buildB1ZeroCZeroPortrait(params, view, resolution)
+  if (Math.abs(params?.b1 ?? 1) < 1e-10 && Math.abs(params?.c ?? 0) >= 1e-10) return buildB1ZeroAdaptedPortrait(params, view, resolution)
   const curves = []
   const occupied = new Map()
   const tSpan = view.tMax - view.tMin

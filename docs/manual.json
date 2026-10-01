@@ -1,0 +1,15 @@
+{
+  "title": "Manual do Wave Manifold Explorer",
+  "chapters": [
+    { "id": "guia", "title": "Guia de leitura e primeiros passos", "file": "00-guia-do-manual.md" },
+    { "id": "introducao", "title": "Introdução e fundamentos", "file": "01-introducao-e-fundamentos.md" },
+    { "id": "interface", "title": "Interface e fluxo de uso", "file": "02-interface-e-fluxo-de-uso.md" },
+    { "id": "curvas", "title": "Construção das curvas", "file": "03-construcao-das-curvas.md" },
+    { "id": "superficies", "title": "Construção das superfícies", "file": "04-construcao-das-superficies.md" },
+    { "id": "solucao", "title": "Inspeção e construção da solução", "file": "05-inspecao-e-solucao.md" },
+    { "id": "metodos", "title": "Métodos computacionais e desenvolvimento", "file": "06-metodos-e-desenvolvimento.md" },
+    { "id": "retratos", "title": "Retratos de fase", "file": "07-retratos-de-fase.md" },
+    { "id": "retrato-global", "title": "Apêndice: retrato composto global", "file": "08-retrato-composto-global.md" },
+    { "id": "experimentos", "title": "Experimentos e desempenho", "file": "09-experimentos-e-desempenho.md" }
+  ]
+}

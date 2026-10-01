@@ -3630,3 +3630,47 @@ button, input, select, textarea {
   font-size: var(--wm-font-aux);
   line-height: 1.4;
 }
+
+.infinity-chart-button { margin-top: 8px; width: 100%; }
+.infinity-chart-backdrop { position: fixed; inset: 0; z-index: 5000; background: rgba(2,6,23,.72); display: grid; place-items: center; padding: 18px; }
+.infinity-chart-dialog { width: min(720px, 96vw); max-height: 92vh; overflow: auto; background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 14px; box-shadow: 0 24px 70px rgba(0,0,0,.45); }
+.infinity-chart-dialog header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 10px; }
+.infinity-chart-dialog header div { display: grid; gap: 3px; }
+.infinity-chart-dialog header small { opacity: .75; }
+.infinity-chart-dialog header button { font-size: 24px; line-height: 1; min-width: 34px; }
+.infinity-chart-canvas { width: 100%; height: min(56vh, 440px); display: block; background: #020617; border: 1px solid #334155; border-radius: 8px; }
+.infinity-chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0 6px; font-size: 12px; }
+.infinity-chart-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.infinity-chart-legend i { width: 18px; height: 3px; display: inline-block; border-radius: 2px; }
+.infinity-chart-legend i.regular { background: #cbd5e1; opacity: .55; }
+.infinity-chart-legend i.stable { background: #60a5fa; }
+.infinity-chart-legend i.unstable { background: #f59e0b; }
+.infinity-chart-dialog p { margin: 8px 0; font-size: 13px; line-height: 1.45; }
+.infinity-chart-legend i.central { background: #a78bfa; }
+.infinity-chart-warning { min-height: 220px; display: grid; align-content: center; gap: 8px; padding: 28px; background: #020617; border: 1px solid #7c3aed; border-radius: 8px; }
+.infinity-chart-warning strong { color: #c4b5fd; font-size: 15px; }
+.infinity-chart-warning p { margin: 0; color: #cbd5e1; }
+
+.wm-tau-coordinate-switch { display:flex; align-items:center; gap:4px; flex:0 0 auto; padding:3px 5px; border:1px solid rgba(148,163,184,.28); border-radius:8px; background:rgba(1,11,21,.68); color:#cbd5e1; }
+.wm-tau-coordinate-switch .wm-tau-label { padding:0 3px; font-weight:700; color:#e2e8f0; }
+.wm-tau-coordinate-switch button { min-width:38px; padding:5px 7px; border-radius:6px; white-space:nowrap; }
+.wm-tau-coordinate-switch button[aria-pressed="true"] { outline:1px solid #38bdf8; color:#e0f2fe; background:rgba(14,116,144,.28); }
+
+/* Coordinate selector belongs to the 3D navigation toolbar, immediately after Restore view. */
+.scene-tau-coordinate-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  padding-left: 8px;
+  border-left: 1px solid #334155;
+  pointer-events: auto;
+}
+.scene-tau-label {
+  color: #cbd5e1;
+  font-weight: 700;
+  padding: 0 2px;
+}
+.scene-tau-coordinate-switch button {
+  padding: 7px 9px;
+}

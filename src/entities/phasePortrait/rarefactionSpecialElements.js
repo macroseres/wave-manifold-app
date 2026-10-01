@@ -4,6 +4,20 @@ import { integrateOrbit } from '../numerics/integrateOrbit.js'
 import { makeRarefactionParam, findRarefactionSonicAnchors } from '../composite/bifoliation/parametrization.js'
 
 export function buildRarefactionSpecialElements(leaves, params, view) {
+  // At b1=c=0 the characteristic manifold itself splits into components.
+  // There are no isolated finite/infinity singularities or saddle separatrices
+  // to compute with the generic formulas.  In the app chart z=1/Z the two
+  // component intersections are L_±={v=0,z=zeta_±}, zeta²-b2*zeta-1=0.
+  if (Math.abs(params?.b1 ?? 1) < 1e-10 && Math.abs(params?.c ?? 0) < 1e-10) {
+    const b2 = params?.b2 ?? 0
+    const disc = Math.sqrt(b2 * b2 + 4)
+    const zetas = [(b2 + disc) / 2, (b2 - disc) / 2]
+    const intersections = zetas.map((z, i) => ({ id:`L-${i}`, z, points:[
+      {t:view.tMin,Y:0,z,coords:[view.tMin,0,z]}, {t:view.tMax,Y:0,z,coords:[view.tMax,0,z]},
+    ] }))
+    return { singularities:[], infinity:null, separatrices:[], eigenDirections:[], inflections:[],
+      intersections, structuralDegenerate:true }
+  }
   const singularities = rarefactionSingularities(params)
   const infinity = rarefactionInfinitySingularity(params)
   const separatrices = [], eigenDirections = [], inflections = []

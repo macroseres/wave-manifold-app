@@ -36,6 +36,9 @@ Execute a partir da raiz do projeto. Exemplo para a primeira versão:
    `package.json` e do `package-lock.json` sem criar um commit automaticamente.
 3. No changelog, transforme a seção de desenvolvimento em `## 0.1.0 — AAAA-MM-DD`,
    usando a data real da entrega, e crie uma nova seção `## Em desenvolvimento` acima.
+   Atualize a edição em `docs/README.md` e o status no guia do manual. Execute
+   `npm run docs:manual` para gerar o manual da versão; revise a saída e o conteúdo
+   da Ajuda. Os capítulos e `docs/manual.json` devem integrar o mesmo commit do código.
 4. Confira `git diff` e `git status`, registre os arquivos da entrega com `git add`
    e faça `git commit -m "Release 0.1.0"`.
 5. Marque o commit com `git tag -a v0.1.0 -m "Wave Manifold App 0.1.0"`.

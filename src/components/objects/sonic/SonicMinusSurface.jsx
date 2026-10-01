@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useSurfaceGeometry } from '../../../hooks/useSurfaceGeometry'
 import * as THREE from 'three'
 import { ZCompactifiedMesh } from '../../../app/scene/ZCompactification'
-import { visualZToPhysical } from '../../../geometry/zCompactification'
+import { visualTauToPhysical, visualZToPhysical } from '../../../geometry/zCompactification'
 import { waveColors } from '../../../config/waveColors'
 import {
   classifySonicPoint,
@@ -32,6 +32,7 @@ export default function SonicMinusSurface({
     if (!interactive || !onInspectPoint) return
     const local = event.object.worldToLocal(event.point.clone())
     local.z = visualZToPhysical(local.z)
+    local.x = visualTauToPhysical(local.x, local.z)
     const branchInfo = classifySonicPoint('left', { t: local.x, Y: local.y, z: local.z }, params)
     onInspectPoint({
       t: local.x,
@@ -89,6 +90,7 @@ export default function SonicMinusSurface({
 
     const local = event.object.worldToLocal(event.point.clone())
     local.z = visualZToPhysical(local.z)
+    local.x = visualTauToPhysical(local.x, local.z)
     onSelectPoint({ t: local.x, Y: local.y, z: local.z })
   }
 

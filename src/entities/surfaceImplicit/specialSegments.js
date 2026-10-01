@@ -1,7 +1,7 @@
 import { P, Q, A } from './algebra.js'
 import { sonicLineTCoeff, sonicLineConst } from './sonic.js'
 import { pushSegment, inflectionZDomain, clipInflectionSegmentToTauWindow, uniqueFiniteLocal } from './helpers.js'
-import { VISUAL_Z_MAX, VISUAL_Z_MIN, visualZToPhysical } from '../../geometry/zCompactification.js'
+import { VISUAL_Z_MAX, VISUAL_Z_MIN, visualZToPhysical, getTauDisplayMode, physicalTauToVisual, getTauDisplayBounds } from '../../geometry/zCompactification.js'
 import { reflectDaggerSegments } from '../shared/reflection.js'
 
 // Dagger exchanges the two states: B- is B+ reflected in Y=0.
@@ -11,8 +11,34 @@ export function solveSecondaryLeftBifurcationSegments(params, view, samples = 26
 }
 
 export function solveCoincidenceSegments(view) {
-  if (view.tMin > 0 || view.tMax < 0 || view.yMin > 0 || view.yMax < 0) return []
+  if (view.yMin > 0 || view.yMax < 0) return []
   const visualMargin = 1e-4
+  const mode = getTauDisplayMode()
+
+  // Coincidence is defined physically by tau_A=0 and Y=0.  In both
+  // normalized coordinates (tau_N and tau*) its image is a z-dependent
+  // curve, so it must be sampled in the physical chart and transformed by
+  // ZCompactifiedLine.  Only the legacy/current chart leaves it at tau=0.
+  if (mode !== 'current') {
+    const bounds = getTauDisplayBounds()
+    const parts = []
+    let part = []
+    const samples = 480
+    const flush = () => { if (part.length > 1) parts.push(part); part = [] }
+    for (let i = 0; i <= samples; i += 1) {
+      const zHat = (VISUAL_Z_MIN + visualMargin)
+        + (i / samples) * ((VISUAL_Z_MAX - visualMargin) - (VISUAL_Z_MIN + visualMargin))
+      const z = visualZToPhysical(zHat)
+      const tauVisual = physicalTauToVisual(0, z)
+      const inside = !bounds || (tauVisual >= bounds.min && tauVisual <= bounds.max)
+      if (inside) part.push([0, 0, z])
+      else flush()
+    }
+    flush()
+    return parts
+  }
+
+  if (view.tMin > 0 || view.tMax < 0) return []
   const zMin = visualZToPhysical(VISUAL_Z_MIN + visualMargin)
   const zMax = visualZToPhysical(VISUAL_Z_MAX - visualMargin)
   return [[[0, 0, zMin], [0, 0, zMax]]]

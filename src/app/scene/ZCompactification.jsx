@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from 'react'
 import { Line } from '@react-three/drei'
 import * as THREE from 'three'
-import { compactifyZPositionArray, physicalPointToVisual } from '../../geometry/zCompactification.js'
+import { compactifyZPositionArray, physicalPointToVisual, getTauDisplayBounds } from '../../geometry/zCompactification.js'
+import { clipGeometryToTauBounds } from '../../geometry/clipGeometryToTauBounds.js'
 
 export function ZCompactifiedLine({ points = [], ...props }) {
   const visualPoints = useMemo(() => points.map(physicalPointToVisual), [points])
@@ -19,6 +20,12 @@ export function useZCompactifiedGeometry(geometry) {
       clone.computeVertexNormals()
       clone.computeBoundingBox()
       clone.computeBoundingSphere()
+    }
+    const bounds = getTauDisplayBounds()
+    if (bounds) {
+      const clipped = clipGeometryToTauBounds(clone, bounds.min, bounds.max)
+      clone.dispose()
+      return clipped
     }
     return clone
   }, [geometry])

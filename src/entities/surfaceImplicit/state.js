@@ -10,6 +10,7 @@ export function vEquilibrium(z, params) {
 }
 
 export function uEquilibriumPrime(z, { b1, b2, c }) {
+  if (Math.abs(b1) < 1e-12 && Math.abs(c) < 1e-12) return 0
   if (Math.abs(b1) < 1e-12) return Number.NaN
 
   const numerator = z * (2 + b2 * z)
@@ -164,6 +165,9 @@ export function waveSpeed(t, z, params) {
   const { a = 0, b1, b2, c } = params
   const q = Q(z, b1, b2)
 
+  if (Math.abs(b1) < 1e-12 && Math.abs(c) < 1e-12) {
+    return a + A(z, b2) * t
+  }
   if (Math.abs(b1) < 1e-12) return Number.NaN
 
   return (

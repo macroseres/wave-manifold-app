@@ -23,6 +23,8 @@ export default function OverlayPanel(props) {
     selectedEntries = [],
     activeView = '3d',
     setActiveView,
+    tauCoordinateMode,
+    setTauCoordinateMode,
     inspectionModeEnabled = false,
     inspectionProbesByBranch = { slow: null, fast: null },
     inspectionCurveVisibility = null,
@@ -76,6 +78,8 @@ export default function OverlayPanel(props) {
       <OverlayTopBar
         activeView={activeView}
         setActiveView={setActiveView}
+        tauCoordinateMode={tauCoordinateMode}
+        setTauCoordinateMode={setTauCoordinateMode}
         activeViewLabel={controller.activeViewLabel}
         activeModeLabel={controller.activeModeLabel}
         activeModeClass={controller.activeModeClass}

@@ -15,10 +15,14 @@ export default function WaveOverlayPanel({
   onExportSnapshot,
   onCreateInspectionProbe,
   onMoveInspectionProbe,
+  tauCoordinateMode,
+  setTauCoordinateMode,
 }) {
   return (
     <OverlayPanel
       params={state.params}
+      tauCoordinateMode={tauCoordinateMode}
+      setTauCoordinateMode={setTauCoordinateMode}
       setParams={actions.setParams}
       view={state.view}
       calculationView={calculationView}

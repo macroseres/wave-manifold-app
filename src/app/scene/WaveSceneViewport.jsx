@@ -132,6 +132,8 @@ function WaveSceneViewport({
   view,
   calcView,
   sceneKey,
+  tauCoordinateMode,
+  setTauCoordinateMode,
   params,
   resolution,
   opacity,
@@ -208,9 +210,16 @@ function WaveSceneViewport({
         <button type="button" onClick={() => setCameraView('top')}>Topo</button>
         <button type="button" aria-pressed={autoRotate3D} onClick={() => setAutoRotate3D(!autoRotate3D)}>Rotação</button>
         <button type="button" onClick={() => setCameraView('reset')}>Restaurar vista</button>
+        <div className="scene-tau-coordinate-switch" role="group" aria-label="Coordenada tau">
+          <span className="scene-tau-label">τ:</span>
+          <button type="button" aria-pressed={tauCoordinateMode === 'current'} onClick={() => setTauCoordinateMode?.('current')} title="Coordenada τ original do modelo">Atual</button>
+          <button type="button" aria-pressed={tauCoordinateMode === 'normalized'} onClick={() => setTauCoordinateMode?.('normalized')} title="τ_N: distância orientada normalizada ao longo da fibra">τ_N</button>
+          <button type="button" aria-pressed={tauCoordinateMode === 'centered'} onClick={() => setTauCoordinateMode?.('centered')} title="τ* = τ_N + cb₂/b₁; centraliza a sela no infinito">τ*</button>
+        </div>
       </div>
 
       <Canvas
+        key={sceneKey}
         style={{ width: '100%', height: '100%' }}
         onContextMenu={(event) => event.preventDefault()}
         camera={{ position: [5, 5, 5], fov: 50 }}
@@ -226,11 +235,12 @@ function WaveSceneViewport({
 
         <AutoRotateGroup autoRotate={activeView === '3d' && autoRotate3D} scale={sceneScale}>
           <RarefactionPhasePortrait view={calcView} resolution={resolution} markerScale={markerScale} />
-          {showAxes && <Axes view={view} />}
+          {showAxes && <Axes view={view} params={params} />}
 
           {showCharacteristic && (
             <ImplicitSurface type="characteristic"
               view={view}
+              params={params}
               opacity={opacity}
               onSelectPoint={onSelectCharacteristicPoint}
               onCreateInspectionProbe={onCreateInspectionProbe}

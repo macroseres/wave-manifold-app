@@ -1,0 +1,181 @@
+
+Análise de código
+
+
+Testes
+✔ crossing triangle retains its visible part and exact boundary (1.5886ms)
+✔ triangle crossing the window survives even with all vertices outside (0.4069ms)
+✔ inside triangles are preserved and outside triangles disappear (1.3214ms)
+✔ actual slow composite contour retains continuity across sparse grid cells (1271.6527ms)
+✔ an isolated large jump still separates disconnected pieces (1.285ms)
+✔ continuous compactified tail is not split by growing physical z steps (4.2142ms)
+✔ smoothing a long composite preserves its final endpoint (12.4924ms)
+✔ fast composite extension preserves the sonic anchor and drawable components (2708.8327ms)
+✔ extending the composite display preserves its source rarefaction and produces finite branches (2608.6066ms)
+✔ compactified composite passes beyond the old z clipping planes and preserves anchors (1601.6753ms)
+✔ slow composite side is accepted only when endpoint speed decreases from J (1.5843ms)
+✔ fast composite side is accepted only when endpoint speed increases from J (0.2927ms)
+✔ global leaves retain their identity through coincidence; visual splitting does not mutate data (494.7994ms)
+✔ each global rarefaction has regular edges tangent to the canonical dt/dz field (300.6946ms)
+✔ global level extraction preserves disconnected components without an inflection anchor (152.8269ms)
+✔ all computed K points lie on S-minus and the forward saturation of their source leaf (766.8195ms)
+✔ the extraneous sonic eigenvalue sheet is excluded instead of appearing as a transverse foliation (417.1449ms)
+✔ family filtering never bridges an excluded portion of a component (0.4834ms)
+✔ case IV composite loop stays connected across sonic-sheet crossings (551.6861ms)
+✔ case IV supplemental curves are complete certified loops, including the outer seeds (1850.7177ms)
+✔ case IV resolves small closed components around both previously empty critical points (1316.4526ms)
+✔ composite charts agree with canonical S-, projection and speed, including both infinite charts (23.421ms)
+✔ critical points satisfy both pullback rows and have convergent linearizations in every case (20.1534ms)
+✔ the diagnostic field is tangent to the existing saturation/intersection composite, not a second foliation (486.3705ms)
+✔ saddle branches lie on S-, follow the field and continue through coordinate changes (957.9198ms)
+✔ refinement adds source leaves and preserves canonical composite generator matching (463.6427ms)
+✔ characteristic entity builds finite plane geometry and branch colors (15.6386ms)
+✔ compactified inflection drawing reaches both visual z boundaries (24.3014ms)
+✔ rarefaction entity returns oriented arc segments with decorated points (5.7406ms)
+✔ hysteresis entity creates left and right curve segment arrays (6.2112ms)
+✔ coincidence and bifurcation entities expose segment builders (1.0648ms)
+✔ both DS projections preserve the sonic equations and clip to state bounds (4.095ms)
+✔ loading a camera-only experiment remains undoable and redoable (33.2377ms)
+✔ import preserves inspection probe amplitude and solution attachment (10.2325ms)
+✔ experiment round-trip preserves physical states and camera without retaining computed geometry (1.3774ms)
+✔ invalid experiments are rejected before changing app state (2.3066ms)
+✔ undo restores settings, ignores hover updates, and a new edit discards redo (1.4014ms)
+✔ shared worker survives one unsubscribe and terminates when its last subscriber leaves (1.1403ms)
+✔ fast local chain is generated only from the restricted local rarefaction arc (38.003ms)
+✔ fast rarefaction uses the decreasing-speed convention (2.3111ms)
+✔ fast nonlocal composite displays only the component through inflection (1.7889ms)
+✔ fast K_nloc uses exactly the terminal point of the nonlocal rarefaction as inflection (21.804ms)
+✔ implicit extraction evaluates every lattice point once, including NaN values (64.8087ms)
+✔ worker buffers preserve topology and compactify coordinates exactly once (613.5449ms)
+✔ Hopf formulas have the prescribed signs, zero matrix trace, and reflection symmetry (4.1742ms)
+✔ physical Hopf meshes contain only elliptic points on the requested surface inside the view (10137.7307ms)
+✔ rendered triangle interiors and edges remain elliptic after z compactification (12544.0705ms)
+✔ Hopf updates with model parameters and excludes degenerate or non-elliptic cases (3180.2372ms)
+✔ adaptive Hopf boundary recovers the thin strips lost by whole-cell rejection (1243.4794ms)
+✔ both branches pass through the exact node and satisfy the cubic (18.6939ms)
+✔ reducible case requests the implicit fallback (0.4376ms)
+✔ Hys-minus projections equal opposite Hys-plus projections across the extended domain (7.2365ms)
+✔ state projection has four incident edges at the double point (315.4647ms)
+✔ both hysteresis curves reach compactified tails and keep exact solver points (53.8941ms)
+✔ left hysteresis saturation does not reuse the right hysteresis double leaf (224.9268ms)
+✔ self intersection comes from distinct hysteresis seeds with the same left state (310.5603ms)
+✔ sat plus Hys minus double curve preserves the right state and reflects sat minus Hys plus (569.034ms)
+✔ B- satisfies its equations and clips to an asymmetric Y window (11.711ms)
+✔ both saturations of Hys- contain their seed and preserve the appropriate state (6.3919ms)
+✔ workers generate both Hys- saturations with finite clipped compactified coordinates (2341.3712ms)
+✔ slow local composite is generated only from the restricted local rarefaction arc (70.4386ms)
+✔ slow local composite selects the connected component anchored exactly at J_- (2.2617ms)
+✔ local composite extraction does not impose pointwise speed monotonicity (1.8728ms)
+✔ slow first chain stops K_loc at double composite before starting the nonlocal shock (3.116ms)
+✔ worker cache separates factories with identical names and canonicalizes payload keys (1.8828ms)
+✔ wave normalization preserves metadata, rejects invalid points, and does not mutate inputs (4.2472ms)
+✔ solveQuadraticRealRoots returns the two real roots of a quadratic (2.3645ms)
+✔ solveQuadraticRealRoots handles the linear degenerate case (1.8478ms)
+✔ brentRoot finds a bracketed nonlinear root (0.5437ms)
+✔ dedupeSortedNumbers sorts finite values and removes near duplicates (0.3453ms)
+✔ canonical wave coordinates satisfy RH and both viscous equilibria for varying parameters, including z=0 (7.3053ms)
+✔ flux Jacobian matches numerical differentiation (28.4987ms)
+✔ integration rejects a crossing edge before appending it, in both time directions (1.4323ms)
+✔ eigendirections handle saddle, complex, repeated and zero eigenvalues (1.7655ms)
+✔ adaptive orbits preserve a rotation invariant and terminate safely for explosive and nonfinite fields (14.6881ms)
+✔ surface portrait needs no selected point and reuses oriented leaves on both characteristic halves (699.6632ms)
+✔ case III portraits seed and draw both families beyond every singular chart boundary (3094.6216ms)
+✔ portrait arrows obey local canonical speed direction regardless of polyline order (2282.7573ms)
+✔ state portrait requires both selected states and uses UL speed even when UR is not equilibrium (415.3637ms)
+✔ viscous portrait does not join arbitrary RH equilibria or degenerate states artificially (361.9664ms)
+✔ a known heteroclinic orbit is detected only in the forward direction (1120.5564ms)
+✔ rarefaction arrows follow the regularized field on either side of P=0 regardless of array order (7.4486ms)
+✔ arrowheads retain their size and tangent after unequal scene scales (2.9019ms)
+✔ near-duplicate detection measures sustained overlap, not convergence at one endpoint (1.6805ms)
+✔ case III-C receives additional integrated leaves near its saddles (2098.2788ms)
+✔ diagnostic cancellation agrees with the existing rarefaction field at regular points (2.1884ms)
+✔ finite singularities distinguish nodes, saddles and degeneracy without marking removable A roots (1.9632ms)
+✔ arrows are suppressed near finite singularities and compactified ends, not regular arcs (0.4591ms)
+✔ infinity is one singularity represented at both chart edges with its projective classification (0.6955ms)
+✔ case III-C separatrices continue through both chart boundaries toward infinity (110.871ms)
+✔ finite and infinity Jacobians and eigendirections are those of the same rarefaction foliation (0.7981ms)
+✔ infinity extension uses T=-z²τ and agrees with the pushed-forward finite field (0.4755ms)
+✔ separatrices follow the same field with chart-time orientation; A roots are not dynamic singularities (67.1079ms)
+✔ Hys plus crosses zero without a false pole or an unstable seed (3.118ms)
+✔ sat plus Hys plus preserves the right state along each leaf and contains Hys plus (4.5661ms)
+✔ worker generates the plus saturation within the box across compactified z (1607.6545ms)
+✔ implicit saturation contains the original hysteresis leaves (6.9072ms)
+✔ the transverse double point retains alternating signs around its crossing (2.2493ms)
+✔ sheet mesh clips to the display box without capping compactified z (1765.1662ms)
+✔ generic defaults come from case IV and parameter resets respect each case (4.2257ms)
+✔ every Schaeffer case has independent scales, resolution, and drawing bounds (0.5317ms)
+✔ custom III-A settings take precedence over the special drawing defaults (0.3786ms)
+✔ reset restores the active case defaults without changing saved settings (0.6672ms)
+✔ saved startup values round-trip independently for different cases (1.2329ms)
+✔ corrupt or inaccessible storage does not prevent startup (0.4781ms)
+✔ compactified B+ includes fixed-z branches beyond the old window (3.7171ms)
+✔ B+ is absent when P has no real roots (1.4468ms)
+✔ extractCompositeSubarcBetweenPoints extracts the forward subarc between projected endpoints (5.1804ms)
+✔ extractCompositeSubarcBetweenPoints reverses the polyline when the stop precedes the start (0.7177ms)
+✔ extractCompositeSubarcBetweenPoints chooses the component closest to both endpoints (0.4691ms)
+✔ extractCompositeSubarcBetweenPoints returns an empty result for invalid or degenerate inputs (0.4352ms)
+✔ slow local rarefaction endpoint is refined on the implicit inflection curve (7.5696ms)
+✔ fast local rarefaction endpoint is refined on the implicit inflection curve (2.4653ms)
+✔ second slow chain inserts dashed H_+ after K_nloc before starting H_nloc (46.4033ms)
+✔ slow nonlocal rarefaction uses the exact local construction with only a different seed (1.9802ms)
+✔ slow nonlocal composite displays only the component through inflection and keeps the admissible arc separate (1.5726ms)
+✔ first-intersection composite follows each oriented H_- leaf and does not select a posterior side (2.4553ms)
+✔ sonic-anchor detection explicitly accepts the terminal point of a restricted rarefaction arc (1.2991ms)
+✔ slow nonlocal chain does not apply extra length filters after the local-style construction (1.6723ms)
+✔ first leaf-sonic intersection searches the intrinsic eta side first and the opposite side as fallback (1.4056ms)
+✔ second slow chain cannot jump directly from K_nloc to fixed H_-(U_L) (1.1131ms)
+✔ slow K_nloc uses exactly the terminal point of the nonlocal rarefaction as inflection (1.6619ms)
+✔ compactified DS includes finite roots outside the physical z window (2.235ms)
+✔ both sonic surfaces extend to both compactified z ends beyond the finite view (1918.2756ms)
+✔ sonic branch indicators classify opposite signs for mirrored left/right points (0.5034ms)
+✔ right sonic separator solves S-plus and D-plus simultaneously (3.1745ms)
+✔ pi-plus of D-minus matches pi-minus of D-plus (1.2258ms)
+✔ classifySonicPoint returns stable TeX labels and finite indicators (0.6436ms)
+✔ sonic separator sampling keeps points inside the requested view (4.2228ms)
+✔ sonicSurfaceResolution respects configured resolution bounds (0.2412ms)
+✔ surface implicit algebraic polynomials are finite on regular inputs (1.5604ms)
+✔ implicit coincidence equation contains its projected parametrization (0.4543ms)
+✔ forward and backward fixed-state solvers recover the same wave point away from singularities (0.9092ms)
+✔ global H_-(U_L) reaches both compactified z extremes (8.9484ms)
+✔ global R_-(U_L) reaches both compactified z extremes (131.1759ms)
+✔ implicit pi-plus projection contains the parametric H_-(U_L) states (0.7077ms)
+✔ compactified z axis has fixed visual bounds (1.354ms)
+✔ z compactification follows 2 atan(z) / pi and round-trips (0.3987ms)
+ℹ tests 138
+ℹ suites 0
+ℹ pass 138
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27926.0765
+
+
+Build
+vite v8.1.0 building client environment for production...
+[2Ktransforming...✓ 273 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                       0.79 kB │ gzip:   0.38 kB
+dist/assets/viscousPortrait.worker-BZJpM0Ol.js        6.50 kB
+dist/assets/rarefactionSegments.worker-bMVvdJrD.js   15.58 kB
+dist/assets/compositeSegments.worker-8ZPDloF_.js     40.67 kB
+dist/assets/globalPortrait.worker-D1gCwoR6.js        52.58 kB
+dist/assets/surfaceGeometry.worker-DTfgNihz.js      131.03 kB
+dist/assets/index-lqBe4We4.css                       62.27 kB │ gzip:  12.85 kB
+dist/assets/rolldown-runtime-QTnfLwEv.js              0.69 kB │ gzip:   0.42 kB
+dist/assets/numerics-DxZvsFlR.js                     11.56 kB │ gzip:   4.34 kB
+dist/assets/ParameterMapView-CcvMab34.js             15.49 kB │ gzip:   5.00 kB
+dist/assets/StateSpaceCanvas-BN8x92Xb.js             45.34 kB │ gzip:  15.03 kB
+dist/assets/DocumentationViewer-CxG_ijDM.js          82.05 kB │ gzip:  28.58 kB
+dist/assets/react-BHAeFs8l.js                       189.64 kB │ gzip:  59.66 kB
+dist/assets/index-CH_2Mp4P.js                       434.05 kB │ gzip: 102.98 kB
+dist/assets/three-BpVWgxXn.js                       914.96 kB │ gzip: 244.42 kB
+
+✓ built in 706ms
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
